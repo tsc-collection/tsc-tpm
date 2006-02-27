@@ -1,0 +1,408 @@
+#!/bin/sh
+#
+#            Tone Software Corporation BSD License ("License")
+# 
+#                      Software Distribution Facility
+#                      
+# Please read this License carefully before downloading this software. By
+# downloading or using this software, you are agreeing to be bound by the
+# terms of this License. If you do not or cannot agree to the terms of
+# this License, please do not download or use the software.
+# 
+# Provides ability to package software (binaries, configuration files,
+# etc.) into a set of self-installable well-compressed distribution files.
+# They can be installed on a target system as sub-packages and removed or
+# patched if necessary. The package repository is stored together with
+# installed files, so non-root installs are possible. A set of tasks can
+# be specified to perform pre/post install/remove actions. Package content
+# description can be used from software build environment to implement
+# installation rules for trying out the binaries directly on a development
+# system, thus decoupling compilation and installation rules.
+# 
+# Copyright (c) 2003, 2005, Tone Software Corporation
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer. 
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution. 
+#   * Neither the name of the Tone Software Corporation nor the names of
+#     its contributors may be used to endorse or promote products derived
+#     from this software without specific prior written permission. 
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+# OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+
+progpath="${0}"
+
+ORIGINAL_WORKING_DIRECTORY=`pwd`
+TRACE=no
+
+exec 3>&1 4>&2
+
+main()
+{
+  trap 'cleanup' EXIT HUP INT QUIT TERM
+  unset VERBOSE TEMPDIR
+
+  progname=`figure_script_name`
+  progdir=`figure_script_location` || {
+    print_location_problem
+    return 2
+  }
+  scan_options "${@}"
+  setup_temporary_directory
+
+  case "${progname}" in
+    *.tpm)
+      process_package "${@}"
+    ;;
+    *)
+      invoke_package_manager "${@}"
+    ;;
+  esac
+}
+
+scan_options()
+{
+  for option in "${@}"; do
+    action="${ACTION}"
+    unset ACTION
+
+    [ "${action:+set}" = set ] && {
+      eval "${action}"
+      continue
+    }
+    case "${option}" in
+      -v | --verbose)
+        VERBOSE=true
+        TRACE=yes
+      ;;
+      --tmp | -t*)
+        value=`_echo "${option}" | sed -n 's/^-t\(.*\)$/\1/p'`
+        [ "${value:+set}" = set ] && {
+          TEMPDIR="${value}"
+          continue
+        }
+        ACTION='TEMPDIR=${option}'
+      ;;
+    esac
+  done
+}
+
+setup_temporary_directory()
+{
+  : ${TEMPDIR:=/tmp}
+
+  (suppress_output cd "${TEMPDIR}") || {
+    trace_and_run mkdir -p "${TEMPDIR}" || exit 2
+    TEMPDIR=`suppress_output cd "${TEMPDIR}" && pwd`
+    register_for_cleanup "${TEMPDIR}"
+  }
+}
+
+process_package()
+{
+  package="${progdir}/${progname}"
+  tempdir="${TEMPDIR}/${progname}.temp.${$}"
+  error_log="${TEMPDIR}/${progname}.errors.${$}"
+
+  register_for_cleanup "${tempdir}" "${error_log}"
+  trace_and_run suppress_output mkdir -p "${tempdir}"
+
+  trace_and_run cd "${tempdir}" && {
+    exec 9<&0 0<"${package}"
+    while read line; do
+      [ "${line}" = '__END__' ] && {
+        error_codes=`{
+          (trace_and_run uncompress -c || _echo ${?} 1>&5) | (trace_and_run cpio -idcv 2>&1 || _echo ${?} 1>&5) | {
+            # The following is needed because cpio option -v on Linux sends
+            # its output to stderr. So in case of error we need the data in 
+            # the error log file available for reporting.
+            #
+            while read line; do
+              _echo ${line}; _echo ${line} 1>&2
+            done | progress Unpacking 1>&3
+          }
+        } 5>&1 2>"${error_log}"`
+
+        [ "${error_codes:+set}" = set ] && {
+          print_error "ERROR: ${progname}: Unpacking failed."
+          [ "${VERBOSE:+set}" = set ] && {
+            cat "${error_log}" | sed 's/^/stderr> /' 1>&2
+          }
+          return 4
+        }
+        trace_and_run tools/bin/ruby tools/bin/tpm --install "${@}" 0<&9
+        return "${?}"
+      }
+    done
+  }
+  print_error "
+    |${progname}: Internal error (__END__ not found)
+  "
+  return 3
+}
+
+progress()
+{
+  title="${1}"
+  indent="${2:-2}"
+  margin="${3:-75}"
+
+  counter=`expr "${title}" : '.*'`
+  indent_string=`printf "%${indent}.${indent}s" ""`
+
+  _echo "${title} \c"
+  while read line; do
+    [ "${counter}" -gt "${margin}" ] && {
+      marker="\n${indent_string}."
+      counter="${indent}"
+    }
+    _echo "${marker}\c"
+    marker='.'
+    counter=`expr "${counter}" + 1`
+  done
+  _echo
+}
+
+invoke_package_manager()
+{
+  manager=`figure_package_manager` || {
+    print_manager_problem
+    return 3
+  }
+  action=`figure_package_action`
+  RUBYTEMP="${TEMPDIR}/ruby.${$}"
+
+  register_for_cleanup "${RUBYTEMP}"
+  setup_ruby_executable "${RUBYTEMP}" || {
+    print_ruby_problem
+    return 4
+  }
+  trace_and_run "${RUBYTEMP}" -I "${progdir}" "${manager}" "--${action}" "${@}"
+}
+
+setup_ruby_executable()
+{
+  _executable="${@}"
+  _file=`find_file_in_path "ruby" "${progdir}:${progdir}/tools/bin:${PATH}"`
+
+  is_program "${_file}" && {
+    trace_and_run suppress_output "cp '${_file}' '${_executable}'" && {
+      trace_and_run suppress_output "chmod a+x '${_executable}'" && {
+	return 0
+      }
+    }
+  }
+}
+
+figure_package_action()
+{
+  _echo ${progname}|sed 's/^[^-]*--*//'
+}
+
+figure_package_manager()
+{
+  _manager_name=`_echo ${progname}|sed 's/--*.*$//'`
+
+  [ "${_manager_name:+set}" = set ] && {
+    for _manager in "${_manager_name}" "tools/bin/${_manager_name}"; do
+      _manager_path="${progdir}/${_manager}"
+      is_regular_file "${_manager_path}" && {
+	_echo ${_manager_path}
+	return 0
+      }
+    done
+  }
+  return 1
+}
+
+figure_script_name()
+{
+  basename "${progpath}"
+}
+
+figure_script_location()
+{
+  case "${progpath}" in
+    /*)
+      _path="${progpath}"
+    ;;
+    */*)
+      _path="`pwd`/${progpath}"
+    ;;
+    *)
+      return 1
+    ;;
+  esac
+
+  (cd `dirname "${_path}"` && pwd)
+}
+
+print_location_problem()
+{
+  print_error "
+    |${progname}: Cannot figure out own location.
+    |NOTE: Make sure \"${progname}\" is invoked either directly as a reqular
+    |      executable or via a shell with a path specification for
+    |      the script.
+  " 
+}
+
+print_manager_problem()
+{
+  print_error "
+    |${progname}: No package manager found in the script's location
+  "
+}
+
+print_ruby_problem()
+{
+  print_error "
+    |${progname}: Cannot setup ruby executable
+  "
+}
+
+print_environment()
+{
+  print_message "
+    |progpath='${progpath}'
+    |progname='${progname}'
+    |progdir='${progdir}'
+  "
+}
+
+###
+
+suppress_output()
+{
+  eval "${@}" >/dev/null 2>&1
+}
+
+trace_and_run()
+{
+  _commands=
+  while [ ${#} -gt 0 ]; do
+    case "${1}" in
+      suppress_output|trace_and_run)
+        _commands="${_commands}${1} "
+	shift
+      ;;
+      *)
+        break
+      ;;
+    esac
+  done
+
+  [ "${TRACE}" = yes ] && {
+    print_error "=> ${@}"
+  }
+  ${_commands} "${@}"
+}
+
+find_file_in_path()
+{
+  _file="${1}"
+  _path="${2}"
+
+  _ifs="${IFS}"
+  IFS=:
+  set entry ${_path}
+  shift
+  IFS="${_ifs}"
+
+  for _directory in "${@}"; do
+    _path="${_directory}/${_file}"
+    is_regular_file "${_path}" && {
+      _echo "${_path}"
+      return 0
+    }
+  done
+  return 1
+}
+
+is_regular_file()
+{
+  file="${@}"
+  suppress_output "ls -lL '${file}' | grep '^-'"
+}
+
+is_program()
+{
+  file="${@}"
+  is_regular_file "${file}" && {
+    suppress_output "file '${file}' | grep 'executable'"
+  }
+}
+
+print_message()
+{
+  _echo "${@}" | sed '/^[ \t]*$/d;s/^[ \t]*|//' 1>&3 
+}
+
+print_error()
+{
+  print_message "${@}" 3>&4
+}
+
+cleanup_list=
+register_for_cleanup()
+{
+  for item in "${@}"; do
+    cleanup_list="${item}<:>${cleanup_list}"
+  done
+}
+
+cleanup()
+{
+  exit_code="${?}"
+
+  _ifs="${IFS}"
+  IFS='<:>'
+  set entry ${cleanup_list}
+  shift
+  IFS=${_ifs}
+
+  [ "${#}" -ne 0 ] && trace_and_run cd "${ORIGINAL_WORKING_DIRECTORY}"
+
+  for _entry in "${@}"; do
+    eval _entry="${_entry}"
+    [ "${_entry:+set}" = set ] && {
+      trace_and_run rm -rf "${_entry}"
+    }
+  done
+  cleanup_list=
+  exit "${exit_code}"
+}
+
+if [ "`echo -e`" = "-e" ]; then
+  _echo()
+  {
+    echo "${@}"
+  }
+else
+  _echo()
+  {
+    echo -e "${@}"
+  }
+fi
+
+main "${@}"
+exit ${?}
+__END__
