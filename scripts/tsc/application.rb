@@ -62,6 +62,7 @@ module TSC
       ]
       @script_location, @script_name = File.split $0
     end
+
     def start
       handle_errors {
         process_command_line
@@ -70,6 +71,7 @@ module TSC
 
     protected
     #########
+
     def localize_ruby_loadpath
       top = File.dirname File.dirname(File.dirname(__FILE__))
       ruby_component = File.join 'lib', 'ruby'
@@ -84,6 +86,7 @@ module TSC
         end
       end
     end
+
     def process_command_line(require_order = false)
       require 'getoptlong'
 
@@ -113,6 +116,7 @@ module TSC
       do_and_exit { print_usage } if @options.key? 'help'
       @options
     end
+
     def handle_errors(*errors)
       begin
         yield
@@ -128,6 +132,7 @@ module TSC
       end
       exit! 2
     end
+
     def print_error(strings,exception)
       message = exception.message.strip
       message = exception.class.to_s if message.empty?
@@ -150,10 +155,12 @@ module TSC
         when TSC::UsageError then print_usage "\n"
       end
     end
+
     def do_and_exit(status = 0)
       yield if block_given?
       exit status
     end
+
     def print_usage(*args)
       $stderr.puts args, "USAGE: #{script_name} [<options>] #{@arguments_description}"
       unless @option_descriptions.empty?
@@ -165,8 +172,24 @@ module TSC
       end
     end
 
+    def verbose=(state)
+      @options ||= Hash.new
+      if state 
+        @options['verbose'] = true
+      else
+        @options.delete('verbose')
+      end
+    end
+
+    def find_in_path(command)
+      ENV.to_hash['PATH'].split(File::PATH_SEPARATOR).map { |_location|
+        Dir[ File.join(_location, command) ].first
+      }.compact
+    end
+
     private
     #######
+
     class FormattedOptions
       def initialize(options)
         @options = options.map do |_option, _description, _argument, *_others|
@@ -177,6 +200,7 @@ module TSC
           ]
         end
       end
+
       def show(&block)
         sw = short_option_field_width
         lw = long_option_field_width
@@ -191,6 +215,7 @@ module TSC
       def short_option_field_width
         @options.map { |_others, _argument, _description| _others.length }.max
       end
+
       def long_option_field_width
         @options.map { |_others, _argument, _description| _argument.length }.max
       end
