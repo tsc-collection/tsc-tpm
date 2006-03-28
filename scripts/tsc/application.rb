@@ -138,7 +138,7 @@ module TSC
       message = exception.class.to_s if message.empty?
       $stderr.puts(([ 'ERROR', script_name ] + strings + [ message ]).join(': '))
 
-      if @options.key? 'verbose'
+      if verbose?
         if exception.kind_of? TSC::Launcher::TerminateError
           exception.errors.each do |_error|
             $stderr.puts "  stderr> #{_error}"
@@ -170,6 +170,10 @@ module TSC
           $stderr.puts "  #{_option}   #{_description}"
         }
       end
+    end
+
+    def verbose?
+      @options.has_key? 'verbose'
     end
 
     def verbose=(state)

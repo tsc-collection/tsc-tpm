@@ -130,7 +130,7 @@ class Application < TSC::Application
 
   def adjust_loadpath
     distribution_directory = [ '.', '..' ].map { |_directory|
-      Dir[ File.join(script_location, _directory, :distribution) ].map { |_entry|
+      Dir[ File.join(script_location, _directory, 'distribution') ].map { |_entry|
         _entry if File.directory? _entry
       }
     }.flatten.compact.first
