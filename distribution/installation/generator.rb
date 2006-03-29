@@ -66,6 +66,7 @@ module Installation
 
       def_delegators Task, :installation_top, :installation_tools, :installation_product
       def_delegators Task, :installation_user, :installation_group, :installation_parameters
+      def_delegators Task, :installation_product_metainf, :installation_package_metainf
 
       def clear_recent_subclasses
 	@recent_subclasses.clear unless @recent_subclasses.nil?

@@ -53,7 +53,7 @@ module TSC
     @platforms = {
       [ :x86, :solaris]  => %w{ i386-solaris2.8 },
       :linux => %w{ i686-linux i386-linux-gnu },
-      [ :sparc, :solaris] => %w{ sparc-solaris2.6 sparc-solaris2.8 },
+      [ :sparc, :solaris] => %w{ sparc-solaris2.6 sparc-solaris2.8 sparc-solaris2.9},
       [ :s390, :linux] => %w{ s390-linux }
     }
     class << self
