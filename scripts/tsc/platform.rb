@@ -53,6 +53,8 @@ module TSC
     @platforms = {
       [ :x86, :solaris]  => %w{ i386-solaris2.8 },
       :linux => %w{ i686-linux i386-linux-gnu },
+      :hpux => %w{ hppa2.0w-hpux11.00 },
+      :aix5 => %w{ powerpc-aix5.1.0.0 },
       [ :sparc, :solaris] => %w{ sparc-solaris2.6 sparc-solaris2.8 sparc-solaris2.9},
       [ :s390, :linux] => %w{ s390-linux }
     }
