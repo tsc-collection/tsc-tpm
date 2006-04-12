@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+# Copyright (c) 2005, Gennady Bystritsky <bystr@mac.com>
+# 
+# Distributed under the MIT Licence.
+# This is free software. See 'LICENSE' for details.
+# You must read and accept the license prior to use.
+
+[ 'tsc/application.rb' ].each do |a|
+  # Workaround 'to_hash' is needed to silence the warning in case of world 
+  # writable directory is present in PATH. The warning is printed out in 
+  # Ruby 1.8.2 even if that particular directory is not added to the ruby
+  # loadpath. Alternatively, $VERBOSE=nil may be used to suppress all ruby
+  # warnings.
+  #
+  $: << ENV.to_hash['PATH'].split(':').find { |p| Dir[ p + '/' + a ].first }
+  require a
+end
+
+class Application < TSC::Application
+  def initialize
+    super('<parameter> ...',
+      [ '--option', 'Option', 'argument', '-o' ],
+      [ '--test', 'Run internal tests', nil ]
+    )
+  end
+
+  def start
+    handle_errors {
+      process_command_line
+
+      throw :TEST if options.has_key?('test')
+      raise TSC::UsageError, 'Nothing to do' if ARGV.empty?
+    }
+  end
+end
+
+unless defined? Test::Unit::TestCase
+  catch :TEST do
+    Application.new.start
+    exit 0
+  end
+end
+
+require 'test/unit'
+
+class ApplicationTest < Test::Unit::TestCase
+  def test_something
+    flunk 'Not implemented'
+  end
+
+  def setup
+    @app = Application.new
+  end
+
+  def teardown
+    @app = nil
+  end
+end
