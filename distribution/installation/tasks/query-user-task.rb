@@ -93,7 +93,7 @@ module Installation
 	  end
 	end
 	unless errors.empty?
-	  raise TSC::CompoundError.new(*errors)
+	  raise TSC::Error.new(*errors)
 	end
       end
       

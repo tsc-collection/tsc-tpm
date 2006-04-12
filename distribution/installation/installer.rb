@@ -56,19 +56,19 @@ require 'tsc/errors.rb'
 
 module Installation
   class Installer
-    class LocationError < TSC::CompoundError
+    class LocationError < TSC::Error
       def initialize(arg)
 	super arg, RuntimeError.new("Wrong location")
       end
     end
 
-    class ArgumentError < TSC::CompoundError
+    class ArgumentError < TSC::Error
       def initialize(arg)
 	super arg, RuntimeError.new("Wrong arguments")
       end
     end
 
-    class PackageError < TSC::CompoundError
+    class PackageError < TSC::Error
       def initialize(arg)
 	super arg, RuntimeError.new("No packages found")
       end

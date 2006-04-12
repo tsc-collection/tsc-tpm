@@ -80,7 +80,7 @@ module Installation
       rescue Exception => exception
 	errors = []
 	errors = revert_tasks task_undo_stack if perform_undo
-	raise TSC::CompoundError.new(*(errors + [exception]))
+	raise TSC::Error.new(*(errors + [exception]))
       end
     end
 
@@ -157,7 +157,7 @@ module Installation
 	  task = _class.new
 	  (table[task.provides.to_s] ||= []) << task
 	rescue Exception => exception
-	  raise TSC::CompoundError.new(_class.to_s.split('::').last, exception)
+	  raise TSC::Error.new(_class.to_s.split('::').last, exception)
 	end
       end
       table
@@ -178,7 +178,7 @@ module Installation
 	    undo_stack.push [ _task, *_params ]
 	    _task.execute *_params
 	  rescue Exception => exception
-	    raise TSC::CompoundError.new(_task.provides, exception)
+	    raise TSC::Error.new(_task.provides, exception)
 	  end
 	end
       end
@@ -191,14 +191,14 @@ module Installation
 	  begin
 	    _task.revert *_params
 	  rescue Exception => exception
-	    errors << TSC::CompoundError.new(_task.provides, exception)
+	    errors << TSC::Error.new(_task.provides, exception)
 	  end
 	end
 	begin
 	  directory = Task.installation_preserve_top
 	  Dir.rm_r directory unless directory.nil?
 	rescue Exception => exception
-	  errors << TSC::CompoundError.new('cleanup', exception)
+	  errors << TSC::Error.new('cleanup', exception)
 	end
       end
       errors
