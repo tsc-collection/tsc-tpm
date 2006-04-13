@@ -67,6 +67,8 @@ module TSC
         case os
           when 'linux' then name, arch = fine_tune_linux
           when 'solaris' then name, arch = fine_tune_solaris
+          when 'aix' then name, arch = fine_tune_aix
+          when 'hpux' then name, arch = fine_tune_hpux
         end
 
         new name, os, arch
@@ -119,6 +121,29 @@ module TSC
         [ "sun-#{release}-#{arch}", arch ]
       end
 
+      def fine_tune_aix
+        require 'sys/uname'
+        info = Sys::Uname.uname
+
+        arch = 'ppc'
+        release = [ info.version, info.release ].join
+
+        [ "aix-#{release}-#{arch}", arch ]
+      end
+
+      def fine_tune_hpux
+        require 'sys/uname'
+        info = Sys::Uname.uname
+
+        arch = case info.machine
+          when %r{^9000/\d+$} then 'pa'
+          else info.machine
+        end
+        label, kernel, version = info.release.split('.')
+
+        [ "hp#{kernel}-#{version}-#{arch}", arch ]
+      end
+
       def lookup(platform)
 	platform = platform.to_s.strip.downcase
 	@supported.each do |_ids, _platforms|
@@ -166,10 +191,10 @@ module TSC
       [ 'sol8-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.8 },
       [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu },
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
-      [ 'aix5-ppc', :aix5, :ppc ] => %w{ powerpc-aix5.1.0.0 },
+      [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 },
       [ 'tiger-ppc', :darwin, :ppc ] => %w{ powerpc-darwin8.1.0 },
       [ 'tru64', :osf5, :alpha ] => %w{ alphaev67-osf5.1b },
-      [ 'hpux', :hpux, :risc ] => %w{ hppa2.0w-hpux11.00 }
+      [ 'hpux', :hpux, :parisc ] => %w{ hppa2.0w-hpux11.00 }
     ]
   end
 end
