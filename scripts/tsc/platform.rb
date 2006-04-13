@@ -90,6 +90,7 @@ module TSC
 
         arch = case info.machine
           when 'i686', 'i386' then 'x86'
+          when 'x86_64' then 'amd64'
           else info.machine
         end
 
