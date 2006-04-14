@@ -1,0 +1,117 @@
+#!/usr/bin/env ruby
+# Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
+# 
+# Distributed under the MIT Licence.
+# This is free software. See 'LICENSE.MIT' for details.
+# You must read and accept the license prior to use.
+
+if defined? Installation::Generator
+  class Generator < Installation::Generator
+    def create(io)
+      bindir = File.join(self.class.installation_tools, 'bin')
+      [
+        '#!' + File.join(bindir, 'ruby'),
+        '$:.push ' + bindir.inspect
+      ] + IO::readlines(__FILE__).slice(1..-1)
+    end
+  end
+
+  throw :generator, Generator
+end
+
+$:.push File.dirname(__FILE__)
+require 'tsc/application.rb'
+
+class Application < TSC::Application
+  def initialize
+    super('[<script>] [<custom options>]',
+      [ '--test', 'Run internal tests', nil ],
+      [ '--eval', 'Evaluate Ruby code', 'program', '-e' ],
+      [ '--interactive', 'Start irb', nil, '-i' ],
+      [ '--require', 'Require a file', 'file', '-r' ]
+    )
+  end
+
+  def start
+    handle_errors {
+      process_command_line
+
+      file_to_require = options['require']
+      require file_to_require if file_to_require
+
+      throw :TEST if options.has_key?('test')
+
+      workspace = Workspace.new(options)
+
+      if options.key?('interactive')
+        require 'tsc/irb.rb'
+
+        IRB.start_for_binding(workspace.workspace)
+        exit 0
+      end
+
+      code = options['eval']
+
+      if code
+        workspace.process(code, '-e')
+        exit 0
+      end
+
+      unless ARGV.empty? 
+        program = ARGV.fisrt.strip
+        unless program.slice(0) == ?-
+          shift ARGV
+          File.open(program) do |_io|
+            workspace.process _io, program
+          end
+          exit 0
+        end
+      end
+
+      workspace.process $stdin, '(stdin)'
+      exit 0
+    }
+  end
+
+  private
+  #######
+
+  class Workspace
+    attr_reader :options
+
+    def initialize(options)
+      @options = options
+    end
+
+    def process(content, scope)
+      eval content.map.join, workspace, scope
+    end
+
+    def workspace
+      binding
+    end
+  end
+end
+
+unless defined? Test::Unit::TestCase
+  catch :TEST do
+    Application.new.start
+    exit 0
+  end
+end
+
+require 'test/unit'
+
+class ApplicationTest < Test::Unit::TestCase
+  def test_something
+    flunk 'Not implemented'
+  end
+
+  def setup
+    @app = Application.new
+  end
+
+  def teardown
+    @app = nil
+  end
+end
