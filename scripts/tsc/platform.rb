@@ -69,6 +69,7 @@ module TSC
           when 'solaris' then name, arch = fine_tune_solaris
           when 'aix' then name, arch = fine_tune_aix
           when 'hpux' then name, arch = fine_tune_hpux
+          when 'osf' then name, os, arch = fine_tune_osf
         end
 
         new name, os, arch
@@ -145,6 +146,18 @@ module TSC
         [ "hp#{kernel}-#{version}-#{arch}", arch ]
       end
 
+      def fine_tune_osf
+        require 'sys/uname'
+        info = Sys::Uname.uname
+
+        arch = info.machine
+        os = 'osf'
+
+        release, version = info.release.scan(%r{V(\d+)[.](\d+)$}).first
+
+        [ "#{os}-#{release}#{version}-#{arch}", os, arch ]
+      end
+
       def lookup(platform)
 	platform = platform.to_s.strip.downcase
 	@supported.each do |_ids, _platforms|
@@ -194,7 +207,8 @@ module TSC
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 },
       [ 'tiger-ppc', :darwin, :ppc ] => %w{ powerpc-darwin8.1.0 },
-      [ 'tru64', :osf5, :alpha ] => %w{ alphaev67-osf5.1b },
+      [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
+      [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
       [ 'hpux', :hpux, :parisc ] => %w{ hppa2.0w-hpux11.00 }
     ]
   end

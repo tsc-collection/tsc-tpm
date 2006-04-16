@@ -58,7 +58,7 @@ exec 3>&1 4>&2
 main()
 {
   trap 'cleanup' EXIT HUP INT QUIT TERM
-  unset VERBOSE TEMPDIR
+  unset VERBOSE TEMPDIR LIST EXTRACT EXTRACT_ITEMS
 
   progname=`figure_script_name`
   progdir=`figure_script_location` || {
@@ -90,7 +90,7 @@ scan_options()
     }
     case "${option}" in
       -v | --verbose)
-        VERBOSE=true
+        VERBOSE=yes
         TRACE=yes
       ;;
       --tmp | -t*)
@@ -100,6 +100,13 @@ scan_options()
           continue
         }
         ACTION='TEMPDIR=${option}'
+      ;;
+      --list)
+        LIST=yes
+      ;;
+      --extract)
+        EXTRACT=yes
+        ACTION='EXTRACT_ITEMS="${EXTRACT_ITEMS} ${option}";ACTION=${action}'
       ;;
     esac
   done
@@ -125,38 +132,72 @@ process_package()
   register_for_cleanup "${tempdir}" "${error_log}"
   trace_and_run suppress_output mkdir -p "${tempdir}"
 
-  trace_and_run cd "${tempdir}" && {
-    exec 9<&0 0<"${package}"
-    while read line; do
-      [ "${line}" = '__END__' ] && {
-        error_codes=`{
-          (trace_and_run uncompress -c || _echo ${?} 1>&5) | (trace_and_run cpio -idcv 2>&1 || _echo ${?} 1>&5) | {
-            # The following is needed because cpio option -v on Linux sends
-            # its output to stderr. So in case of error we need the data in 
-            # the error log file available for reporting.
-            #
-            while read line; do
-              _echo ${line}; _echo ${line} 1>&2
-            done | progress Unpacking 1>&3
-          }
-        } 5>&1 2>"${error_log}"`
-
-        [ "${error_codes:+set}" = set ] && {
-          print_error "ERROR: ${progname}: Unpacking failed."
-          [ "${VERBOSE:+set}" = set ] && {
-            cat "${error_log}" | sed 's/^/stderr> /' 1>&2
-          }
-          return 4
-        }
-        trace_and_run tools/bin/ruby tools/bin/tpm --install "${@}" 0<&9
-        return "${?}"
-      }
-    done
+  [ "${LIST:+set}" = set ] && {
+    process_archive list "${package}"
+    return ${?}
   }
+  [ "${EXTRACT:+set}" = set ] && {
+    process_archive extract "${package}"
+    return ${?}
+  }
+  trace_and_run cd "${tempdir}" && {
+    process_archive extract "${package}"  && {
+      trace_and_run tools/bin/ruby tools/bin/tpm --install "${@}" 0<&9
+      return "${?}"
+    }
+  }
+}
+
+process_archive()
+{
+  action=${1}
+  archive=${2}
+
+  shift
+  shift
+
+  exec 9<&0 0<"${archive}"
+  while read line; do
+    [ "${line}" = '__END__' ] && {
+      "${action}" "${@}"
+      return ${?}
+    }
+  done
   print_error "
     |${progname}: Internal error (__END__ not found)
   "
   return 3
+}
+
+list()
+{
+  trace_and_run uncompress -c | trace_and_run cpio -tdcv "${@}"
+}
+
+extract()
+{
+  error_codes=`{
+    (trace_and_run uncompress -c || _echo ${?} 1>&5) | {
+      (trace_and_run cpio -idcv ${EXTRACT_ITEMS} 2>&1 || _echo ${?} 1>&5) | {
+        # The following is needed because cpio option -v on Linux sends
+        # its output to stderr. So in case of error we need the data in 
+        # the error log file available for reporting.
+        #
+        while read line; do
+          _echo ${line}; _echo ${line} 1>&2
+        done | progress Unpacking 1>&3
+      }
+    }
+  } 5>&1 2>"${error_log}"`
+
+  [ "${error_codes:+set}" = set ] && {
+    print_error "ERROR: ${progname}: Unpacking failed."
+    [ "${VERBOSE:+set}" = set ] && {
+      cat "${error_log}" | sed 's/^/stderr> /' 1>&2
+    }
+    return 4
+  }
+  return 0
 }
 
 progress()
