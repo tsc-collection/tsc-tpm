@@ -47,7 +47,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 
-
+require 'tsc/errors.rb'
+require 'tsc/dtools.rb'
 require 'installation/action.rb'
 require 'installation/remove-action.rb'
 require 'ftools'
@@ -63,18 +64,35 @@ module Installation
       :symlink
     end
     def make_target
-      if File.exists?(target)  
-        File.delete(target)
-      end
-      File.symlink File.expand_path(source,Task.installation_top), target
+      TSC::Error.ignore(SystemCallError) {
+        info = File.lstat(target)
+        case
+          when info.directory?
+            Dir.rm_r(target)
+          else
+            File.unlink(target)
+        end
+      }
+      File.symlink source, target
     end
     def preserve_target
     end
     def undo_for_existing
-      SymlinkAction.new target, File.readlink(target)
+      info = File.lstat(target)
+      user = Etc::getpwuid(info.uid).name rescue Task.installation_user
+      group = Etc::getgrgid(info.gid).name rescue Task.installation_group
+      case 
+        when info.directory?
+          DirectoryAction.new target, nil, user, group, info.mode
+        when info.symlink?
+          SymlinkAction.new target, File.readlink(target)
+        else
+          preserve = File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
+          InstallAction.new target, preserve, user, group, info.mode
+      end
     end
     def target_type
-      :link
+      [ :link, :directory, :file ]
     end
     def undo_for_non_existing
       RemoveAction.new target
