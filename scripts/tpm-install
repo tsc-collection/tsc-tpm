@@ -336,6 +336,11 @@ suppress_output()
   eval "${@}" >/dev/null 2>&1
 }
 
+suppress_error_output()
+{
+  eval "${@}" 2>/dev/null
+}
+
 trace_and_run()
 {
   _commands=
@@ -378,17 +383,47 @@ find_file_in_path()
   return 1
 }
 
+resolve_symlink()
+{
+  file="${1}"
+  set -- entry `suppress_error_output "ls -ld '${file}'"`
+  case "${2}" in
+    l*)
+      while [ "${#}" -ne 1 ]; do
+        shift
+      done
+      link="${1}"
+      case "${link}" in
+        /*)
+          echo "${link}"
+        ;;
+        *)
+          echo `dirname "${file}"`/${link}
+        ;;
+      esac
+    ;;
+    *)
+      echo "${file}"
+    ;;
+  esac
+}
+
 is_regular_file()
 {
   file="${@}"
-  suppress_output "ls -lL '${file}' | grep '^-'"
+  suppress_output "ls -ldL '${file}' | grep '^-'"
+}
+
+invoke_file_command()
+{
+  file `resolve_symlink "${1}"`
 }
 
 is_program()
 {
   file="${@}"
   is_regular_file "${file}" && {
-    suppress_output "file '${file}' | grep 'executable'"
+    suppress_output "invoke_file_command '${file}' | grep 'executable'"
   }
 }
 

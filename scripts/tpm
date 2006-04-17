@@ -67,7 +67,10 @@ class Application < TSC::Application
       [ "--revert", "Revert last installation", nil ],
       [ "--tmp", "Temporary directory location", "directory", "-t" ],
       [ "--force", "Unconditionally update existing files", nil, "-f" ],
-      [ "--nocleanup", "Do not perform cleanup on failure", nil ]
+      [ "--no-cleanup", "Do not perform cleanup on failure", nil ],
+      [ "--nocleanup", "Same as --no-cleanup, for compatibility", nil ],
+      [ "--list", "List the content of the archive", nil ],
+      [ "--extract", "Extract the archive into the current directory", nil ]
     )
   end
 
@@ -75,6 +78,8 @@ class Application < TSC::Application
     handle_errors {
       prepare_environment
       process_command_line
+
+      options['nocleanup'] = true if options.key? 'no-cleanup'
 
       require 'installation/installer.rb'
 
