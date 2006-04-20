@@ -82,8 +82,8 @@ module TSC
       end
     end
 
-    def initialize(&process_setup_block)
-      @process_setup_block = process_setup_block
+    def initialize(&child_setup_block)
+      @child_setup_block = child_setup_block
       reset_data
     end
 
@@ -98,6 +98,14 @@ module TSC
       end
     end
 
+    def call_in_parent(&block)
+      @parent_setup_block = block
+    end
+
+    def call_in_child(&block)
+      @child_setup_block = block
+    end
+
     private
     #######
     def process(*pipeline, &block)
@@ -106,6 +114,9 @@ module TSC
       @pipeline.each_with_index do |_command, _index|
 	@pids.push spawn(_command, @pipes[_index], @pipes[_index.next])
       end
+
+      @parent_setup_block.call if @parent_setup_block
+
       collect_read_descriptors
       collect_process_info collect_data(&block)
     end
@@ -169,11 +180,11 @@ module TSC
         $stderr.reopen p1[1][1]
 
         close_io @pipes
-        @process_setup_block.call if @process_setup_block
+        @child_setup_block.call if @child_setup_block
 
         case command
           when Array
-            exec *command
+            exec *command.compact
           else
             exec command.to_s
         end

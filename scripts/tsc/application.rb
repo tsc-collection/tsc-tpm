@@ -134,12 +134,12 @@ module TSC
 
       begin
         block.call(options)
-      rescue *usage_errors => error
-        print_error(error)
-        print_usage('===')
-        exit 2
       rescue Exception => exception
         case exception
+          when *usage_errors
+            print_error(exception)
+            print_usage('===')
+            exit 2
           when TSC::Error
             exception.each_error do |_error, *_strings|
               print_error _error, *_strings

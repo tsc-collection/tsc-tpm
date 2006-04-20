@@ -204,6 +204,7 @@ module TSC
       ].join(', ')
     end
   end
+  
   class OperationCanceled < OperationError
     def initialize(*args)
       super args.shift, 'canceled', *args
