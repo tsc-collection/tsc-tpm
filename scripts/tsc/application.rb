@@ -85,7 +85,7 @@ module TSC
       @registry = OptionRegistry.new
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
-      @registry.add 'help', 'Prints out this message', nil, 'h'
+      @registry.add 'help', 'Prints out this message', nil, 'h', '?'
       @registry.add_bulk(*args)
 
       @script_location, @script_name = File.split($0)
@@ -135,8 +135,9 @@ module TSC
       begin
         block.call(options)
       rescue Exception => exception
+        require 'getoptlong'
         case exception
-          when *usage_errors
+          when TSC::UsageError, GetoptLong::InvalidOption, GetoptLong::MissingArgument
             print_error(exception)
             print_usage('===')
             exit 2
@@ -235,13 +236,8 @@ module TSC
       }
     end
 
-    def usage_errors
-      require 'getoptlong'
-      [ 
-        TSC::UsageError, 
-        GetoptLong::InvalidOption, 
-        GetoptLong::MissingArgument
-      ]
+    def extra_usage_info
+      []
     end
 
     def print_usage(*args)
@@ -252,7 +248,8 @@ module TSC
             'Options:',
             @registry.format_entries.map { |_aliases, _option, _description|
               "  #{_aliases}#{_option}   #{_description}"
-            }
+            },
+            extra_usage_info
           ]
         end
       ]
