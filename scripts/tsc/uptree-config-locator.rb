@@ -4,9 +4,11 @@
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
 
+require 'yaml'
+
 module TSC
   class UptreeConfigLocator
-    attr_reader :resource_name, :location
+    attr_reader :resource_name
 
     def initialize(resource_name)
       @resource_name = resource_name
@@ -17,11 +19,17 @@ module TSC
     end
 
     class Config
-      attr_reader :location, :hash
+      attr_reader :location_from_cwd, :hash
 
       def initialize(hash, location = nil)
         @hash = hash
-        @location = location
+
+        components = Array(location)
+        unless components.empty?
+          @location_from_cwd = components unless components.detect { |_item|
+            _item != '.' and _item != '..'
+          }
+        end
       end
 
       def fetch(parameter, value = nil)
@@ -30,7 +38,7 @@ module TSC
 
       def update(config)
         @hash.update config.hash
-        @location = config.location if config.location
+        @location_from_cwd = config.location_from_cwd if config.location_from_cwd
 
         self
       end
