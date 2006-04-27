@@ -65,6 +65,7 @@ module TSC
       def current
         name, os, arch = lookup(PLATFORM)
         case os
+          when 'windows' then name, os, arch = fine_tune_windows
           when 'linux' then name, arch = fine_tune_linux
           when 'solaris' then name, arch = fine_tune_solaris
           when 'aix' then name, arch = fine_tune_aix
@@ -158,6 +159,16 @@ module TSC
         [ "#{os}-#{release}#{version}-#{arch}", os, arch ]
       end
 
+      def fine_tune_windows
+        require 'sys/uname'
+        info = Sys::Uname.uname
+
+        arch = 'x86'
+        os = 'cygwin'
+
+        [ "#{os}-xp-#{arch}", os, arch ]
+      end
+
       def lookup(platform)
 	platform = platform.to_s.strip.downcase
 	@supported.each do |_ids, _platforms|
@@ -199,6 +210,7 @@ module TSC
     end
 
     @supported = Hash[
+      [ 'win-x86', :windows, :x86 ]  => %w{ i386-cygwin },
       [ 'sol-x86', :solaris, :x86 ]  => %w{ i386-solaris2.8 },
       [ 'sol-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.6 },
       [ 'sol9-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.9 },
