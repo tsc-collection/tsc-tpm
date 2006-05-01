@@ -202,8 +202,25 @@ module TSC
       name
     end
 
+    def driver
+      @driver ||= begin
+        require 'tsc/os/generic.rb'
+        require "tsc/os/#{os}.rb"
+
+        find_class("TSC::OS::#{os.capitalize}").new
+      rescue NameError, LoadError => error
+        TSC::OS::Generic.new(os)
+      end
+    end
+
     private
     #######
+
+    def find_class(specification)
+      specification.split('::').inject(Module) { |_module, _symbol|
+        _module.const_get(_symbol)
+      }
+    end
 
     def initialize(name, os, arch)
       @name, @os, @arch = name, os, arch
