@@ -25,12 +25,16 @@ module TSC
       }.compact
     end
 
-    def check(errors)
-      raise TSC::Error.new(*errors) unless errors.empty?
+    def inspect
+      @commands.join(' ')
     end
 
     private
     #######
+
+    def check(errors)
+      raise TSC::Error.new(*errors) unless errors.empty?
+    end
 
     def close(*ios)
       ios.each do |_io|
