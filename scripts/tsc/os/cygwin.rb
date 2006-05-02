@@ -24,11 +24,11 @@ module TSC
       end
 
       def stream_compress_command
-        'cat'
+        'bzip2 -fc'
       end
 
       def stream_uncompress_command
-        'cat'
+        'bzip2 -dc'
       end
     end
   end
