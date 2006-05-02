@@ -58,7 +58,7 @@ module Distribution
         _entry = Array(_entry)
 	if _entry.size > 1
 	  name = File.join _entry[1..-1]
-	  location = File.join directory, _entry.first
+	  location = File.smart_join directory, _entry.first
 	else
 	  name = File.join _entry
 	  location = directory
