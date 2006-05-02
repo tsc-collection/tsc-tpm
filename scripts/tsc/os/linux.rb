@@ -4,29 +4,22 @@
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
 
+require 'tsc/launch.rb'
+require 'tsc/os/generic.rb'
+
 module TSC
   module OS
-    class Generic
-      attr_reader :name
-
-      def initialize(name)
-        @name = name
-      end
-
-      def path(path)
-        path
-      end
-
-      def exe(path)
-        path.sub %r{[.]exe$}, ''
+    class Linux < Generic
+      def initialize
+        super 'linux'
       end
 
       def stream_compress_command
-        'compress -fc'
+        'gzip -fc'
       end
 
       def stream_uncompress_command
-        'uncompress -c'
+        'gzip -cd'
       end
     end
   end
@@ -37,21 +30,13 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   
   module TSC
     module OS
-      class GenericTest < Test::Unit::TestCase
+      class LinuxTest < Test::Unit::TestCase
         def test_name
-          assert_equal 'sample', @os.name
-        end
-
-        def test_path
-          assert_equal '/a/b/c/abcd', @os.path('/a/b/c/abcd')
-        end
-
-        def test_exe
-          assert_equal 'abcd', @os.exe('abcd')
+          assert_equal 'linux', @os.name
         end
 
         def setup
-          @os = Generic.new('sample')
+          @os = Linux.new
         end
         
         def teardown

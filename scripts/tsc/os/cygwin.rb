@@ -5,6 +5,7 @@
 # You must read and accept the license prior to use.
 
 require 'tsc/launch.rb'
+require 'tsc/os/generic.rb'
 
 module TSC
   module OS
@@ -16,6 +17,19 @@ module TSC
       def path(path)
         launch("cygpath -w -m #{path}").first.first
       end
+
+      def exe(path)
+        suffix = '.exe'
+        [ path.sub(%r{#{Regexp.quote(suffix)}$}, ''), suffix ].join
+      end
+
+      def stream_compress_command
+        'cat'
+      end
+
+      def stream_uncompress_command
+        'cat'
+      end
     end
   end
 end
@@ -26,10 +40,17 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   module TSC
     module OS
       class CygwinTest < Test::Unit::TestCase
+        def test_exe
+          assert_equal 'abcd.exe', @os.exe('abcd')
+          assert_equal 'abcd.exe', @os.exe('abcd.exe')
+        end
+
         def setup
+          @os = Cygwin.new
         end
         
         def teardown
+          @os = nil
         end
       end
     end

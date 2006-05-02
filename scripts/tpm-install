@@ -50,6 +50,11 @@
 
 progpath="${0}"
 
+# DO NOT REMOVE OR RENAME the following variable, it is used by 
+# distributor to hard-code a command to uncompress the archive 
+# specific to a platform.
+#
+STREAM_UNCOMPRESS_COMMAND="uncompress -c"
 ORIGINAL_WORKING_DIRECTORY=`pwd`
 TRACE=no
 
@@ -171,13 +176,13 @@ process_archive()
 
 list()
 {
-  trace_and_run uncompress -c | trace_and_run cpio -tdcv "${@}"
+  trace_and_run ${STREAM_UNCOMPRESS_COMMAND} | trace_and_run cpio -tdcv "${@}"
 }
 
 extract()
 {
   error_codes=`{
-    (trace_and_run uncompress -c || _echo ${?} 1>&5) | {
+    (trace_and_run ${STREAM_UNCOMPRESS_COMMAND} || _echo ${?} 1>&5) | {
       (trace_and_run cpio -idcv ${EXTRACT_ITEMS} 2>&1 || _echo ${?} 1>&5) | {
         # The following is needed because cpio option -v on Linux sends
         # its output to stderr. So in case of error we need the data in 

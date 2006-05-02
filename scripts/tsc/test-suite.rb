@@ -63,4 +63,9 @@ require 'progress.rb'
 require 'string.rb'
 require 'trace.rb'
 require 'pipeline.rb'
+
+require 'os/generic.rb'
+require 'os/cygwin.rb'
+require 'os/linux.rb'
+
 # require 'tty-process.rb'

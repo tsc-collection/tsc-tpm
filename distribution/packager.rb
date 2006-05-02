@@ -77,7 +77,11 @@ module Distribution
     private
     #######
     def figure_ruby_path
-      find_in_path('ruby', ENV.to_hash['PATH'].split(':')).first
+      find_in_path(os.exe('ruby'), ENV.to_hash['PATH'].split(':')).first
+    end
+
+    def os
+      @os ||= TSC::Platform.current.driver
     end
 
     def find_in_path(what, where)
@@ -227,12 +231,22 @@ module Distribution
         TSC::Progress.new "Building #{@package.build_package_name.inspect}" do |_progress|
           installer = File.join(@config.binary_directory, 'tpm-install')
 
+          compress = os.stream_compress_command
+          uncompress = os.stream_uncompress_command
+
           File.rm_f package_path
-          File.copy installer, package_path
+
+          File.open(package_path, 'w') do |_io|
+            _io.puts IO.readlines(installer).map { |_line|
+              r = _line.scan(%r{^(\s*STREAM_UNCOMPRESS_COMMAND=)(.*)$}).first
+              r ? r[0] + uncompress.inspect : _line
+            }
+          end
+
           File.chmod(0755, package_path)
 
           Dir.cd package_temp_directory do
-            launch "find . -print", "cpio -ocv", "compress -fc >> #{package_path}" do
+            launch 'find . -print', 'cpio -ocv', "#{compress} >> #{package_path}" do
               _progress.print
             end
           end 
