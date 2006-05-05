@@ -19,10 +19,11 @@ module TSC
     end
 
     class Config
-      attr_reader :location_from_cwd, :hash
+      attr_reader :location, :location_from_cwd, :hash
 
       def initialize(hash, location = nil)
         @hash = hash
+        @location = location
 
         components = Array(location)
         unless components.empty?

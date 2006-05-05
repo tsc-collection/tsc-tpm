@@ -133,9 +133,9 @@ module TSC
       return unless block
 
       begin
+        require 'getoptlong'
         block.call(options)
       rescue Exception => exception
-        require 'getoptlong'
         case exception
           when TSC::UsageError, GetoptLong::InvalidOption, GetoptLong::MissingArgument
             print_error(exception)
