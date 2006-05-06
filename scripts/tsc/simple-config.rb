@@ -65,7 +65,7 @@
 require 'tsc/string'
 
 module TSC
-  class Config
+  class SimpleConfig
     include Enumerable
 
     def initialize(*files)
@@ -167,7 +167,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
   require 'test/unit'
   require 'tempfile'
 
-  class ConfigTest < Test::Unit::TestCase
+  class SimpleConfigTest < Test::Unit::TestCase
     def test_get
       assert_equal 3, @config.size
 
@@ -243,7 +243,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
       file.puts @source
       file.close
 
-      config = TSC::Config.new(file.path)
+      config = TSC::SimpleConfig.new(file.path)
       config.load
       assert_equal 3, config.size
       config.set "aaa", "AAA"
@@ -256,7 +256,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
     end
 
     def setup
-      @config = TSC::Config.new
+      @config = TSC::SimpleConfig.new
       @source = [ 
         "",
 	"  # kljlkjlkjlkjlkjlj",
