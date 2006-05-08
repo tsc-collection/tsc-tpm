@@ -5,26 +5,38 @@
 # You must read and accept the license prior to use.
 
 require 'tsc/config.rb'
+require 'tsc/dtools.rb'
 
 module TSC
   class ConfigLocator
+    LEVELS = 10
+
     attr_reader :resource_name
 
     def initialize(resource_name)
       @resource_name = resource_name
     end
 
-    def find_all_above(levels = 10)
+    def find_all_above(levels = LEVELS)
       locate_resource(levels, '.')
     end
 
-    def combine_all_above(levels = 10)
-      find_all_above(levels).inject { |_memo, _item|
+    def merge_all_above_with_personal(levels = LEVELS)
+      find_all_above(levels).inject(personal) { |_memo, _item|
         _memo.update(_item)
       }
     end
 
-    def find_bellow(directory = '.')
+    def find_all_bellow(directory = '.', depth = 0)
+      configs = []
+      each_config_bellow(File.expand_path(directory), depth.to_i) do |_config|
+        configs.push _config
+      end
+      configs
+    end
+
+    def personal
+      read_resource_from File.expand_path('~')
     end
 
     private
@@ -32,7 +44,7 @@ module TSC
 
     def locate_resource(levels, *directory)
       if directory.size > levels
-        [ read_resource_from File.expand_path('~') ]
+        []
       else
         locate_resource(levels, '..', *directory) << read_resource_from(directory)
       end
@@ -43,6 +55,22 @@ module TSC
         Config.parse(directory, resource_name) 
       rescue Errno::ENOENT
         Config.new(Hash.new)
+      end
+    end
+
+    def each_config_bellow(top, depth)
+      Dir.cd(top) do
+        Find.find('.') do |_path|
+          components = _path.split(File::SEPARATOR)
+
+          unless depth.zero?
+            Find.prune if components.size > depth
+          end
+
+          if components.last == resource_name
+            yield TSC::Config.parse(top, *components)
+          end
+        end
       end
     end
   end
