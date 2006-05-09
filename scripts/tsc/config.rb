@@ -58,8 +58,13 @@ module TSC
     def update(config)
       @hash.update config.hash
       @location_from_cwd = config.location_from_cwd if config.location_from_cwd
+      @location = config.location if config.location
 
       self
+    end
+
+    def serialize
+      @hash.to_yaml
     end
   end
 end

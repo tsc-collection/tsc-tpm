@@ -36,7 +36,7 @@ module TSC
     end
 
     def personal
-      read_resource_from File.expand_path('~')
+      read_resource_from(File.expand_path('~')) or Config.new(Hash.new)
     end
 
     private
@@ -46,7 +46,7 @@ module TSC
       if directory.size > levels
         []
       else
-        locate_resource(levels, '..', *directory) << read_resource_from(directory)
+        locate_resource(levels, '..', *directory).concat Array(read_resource_from(directory))
       end
     end
 
@@ -54,7 +54,7 @@ module TSC
       begin
         Config.parse(directory, resource_name) 
       rescue Errno::ENOENT
-        Config.new(Hash.new)
+        nil
       end
     end
 

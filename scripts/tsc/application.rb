@@ -102,7 +102,7 @@ module TSC
     def start(&block) # :yields: options
       handle_errors do
         process_command_line
-        block.call(options) if block
+        block.call(self) if block
       end
     end
 
