@@ -30,11 +30,12 @@ module TSC
         communicator.choose { |_menu|
           _menu.select_by = :index
           _menu.header = "Please select #{header}"
+          _menu.default = default_item_number.to_s
 
           add_category _menu, :current, :preferred
 
           choices.each do |_choice|
-            _menu.choice _choice if register_item(_choice)
+            add_choice _menu, _choice if register_item(_choice)
           end
 
           add_category _menu, :other do
@@ -52,6 +53,10 @@ module TSC
       private
       #######
 
+      def default_item_number
+        [ config[:default].to_i, 1 ].max
+      end
+
       def header
         config[:header]
       end
@@ -68,15 +73,20 @@ module TSC
         @choices ||= Array(config[:choices]).flatten.compact
       end
 
+      def add_choice(menu, choice, &block)
+        choice = "[#{choice}]" if @registry.size == default_item_number
+        menu.choice choice, &block
+      end
+
       def add_category(menu, *categories, &block)
         categories.each do |_category|
           item = config[_category]
           next unless register_item(item)
 
           if block
-            menu.choice("<#{_category} ...>", &block)
+            add_choice menu, "<#{_category} ...>", &block
           else
-            menu.choice("#{_category} => #{item}") {
+            add_choice(menu, "#{_category} => #{item}") {
               item
             }
           end
