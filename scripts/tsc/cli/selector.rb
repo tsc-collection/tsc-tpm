@@ -74,8 +74,11 @@ module TSC
       end
 
       def add_choice(menu, choice, &block)
-        choice = "[#{choice}]" if @registry.size == default_item_number
-        menu.choice choice, &block
+        menu.choice figure_item(choice), &(block || proc { choice })
+      end
+
+      def figure_item(choice)
+        @registry.size == default_item_number ? "[#{choice}]" : choice
       end
 
       def add_category(menu, *categories, &block)
