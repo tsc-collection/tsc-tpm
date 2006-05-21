@@ -26,7 +26,7 @@ module TSC
     end
 
     def inspect
-      @commands.join(' ')
+      @commands.join(' | ')
     end
 
     private
