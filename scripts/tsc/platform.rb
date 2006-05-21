@@ -236,6 +236,7 @@ module TSC
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 },
       [ 'tiger-ppc', :darwin, :ppc ] => %w{ powerpc-darwin8.1.0 },
+      [ 'tiger-x86', :darwin, :x86 ] => %w{ i686-darwin8.6.1 },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
       [ 'hpux', :hpux, :parisc ] => %w{ hppa2.0w-hpux11.00 }
