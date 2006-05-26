@@ -16,12 +16,16 @@ module TSC
         figure_resource(resource.flatten.compact) do |_path, _directory|
           File.open(_path) { |_io|
             begin
-                Config.new(YAML.parse(_io).transform, _directory)
+                Config.new((YAML.parse(_io) or self).transform, _directory)
             rescue Exception => exception
               raise TSC::Error.new("Error parsing #{_path.inspect}", exception)
             end
           }
         end
+      end
+
+      def transform
+        Hash.new
       end
 
       private
@@ -40,7 +44,7 @@ module TSC
     end
 
     def initialize(hash, location = nil)
-      @hash = hash
+      @hash = ensure_hash(hash)
 
       components = Array(location)
       unless components.empty?
@@ -48,6 +52,13 @@ module TSC
         @location_from_cwd = components unless components.detect { |_item|
           _item != '.' and _item != '..'
         }
+      end
+    end
+
+    def ensure_hash(hash)
+      case hash
+        when Hash then hash
+        else Hash.new
       end
     end
 
