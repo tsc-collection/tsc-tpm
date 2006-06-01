@@ -145,7 +145,7 @@ module TSC
               args = @fds.map { nil }
               args[index] = line.chomp
               yield *args
-              messages[index] << args[index] if index > 0
+              messages[index] << args[index]
             else
               messages[index] << line.chomp
             end
@@ -248,7 +248,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
         error1 = []
         error2 = []
 
-        launch "echo aaa;echo bbb 1>&2", "echo ccc 1>&2;sed 's/aaa/&ddd/'" do |*_entries|
+        result = launch "echo aaa;echo bbb 1>&2", "echo ccc 1>&2;sed 's/aaa/&ddd/'" do |*_entries|
           assert_equal 3, _entries.size
 
           output << _entries[0] unless _entries[0].nil?
@@ -256,9 +256,11 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
           error2 << _entries[2] unless _entries[2].nil?
         end
 
-        assert_equal 1, output.size
-        assert_equal 1, error1.size
-        assert_equal 1, error2.size
+        assert_equal [ 'aaaddd' ], output
+        assert_equal [ 'bbb' ], error1
+        assert_equal [ 'ccc' ], error2
+
+        assert_equal [ output, error1, error2 ], result
       end
 
       def test_process_setup

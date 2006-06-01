@@ -132,8 +132,10 @@ module TSC
     def handle_errors(*errors, &block) # :yields: options
       return unless block
 
+      localize_ruby_loadpath
+      require 'getoptlong'
+
       begin
-        require 'getoptlong'
         block.call(options)
       rescue Exception => exception
         case exception
