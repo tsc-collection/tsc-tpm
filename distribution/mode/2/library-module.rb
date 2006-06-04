@@ -48,44 +48,40 @@
 # 
 
 
-require 'tsc/dtools'
-require 'etc'
-
-require 'installation/config-manager.rb'
-require 'installation/task.rb'
-require 'installation/communicator.rb'
+require 'binary-exec-module'
 
 module Distribution
-  class Installer
-    def initialize(info, force, product)
-      @force = force
-      @info = info
-      @product = product
-      @communicator = Installation::Communicator.new
+  class LibraryModule < BinaryExecModule
+    def entries
+      super.map { |_entry|
+        _entry = Array(_entry)
+	_entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.so.#{self.class.library_major}" ]
+      }
     end
+    def process_file_entry(file)
+      super
+      file.path_for_checksum = file.path.sub(/[.]so[.][^.]*$/,'.a.reloc.o')
+    end
+  end
+end
 
-    def install_from(directory)
-      @config = Installation::ConfigManager.new
-      @config.process_content @info
+if $0 == __FILE__ or defined? Test::Unit::TestCase
+  require 'test/unit'
 
-      user = Installation::Task.installation_user || @product.user
-      user_entry = Etc.getpwnam(user) rescue raise("Wrong installation user - #{user.inspect}")
-      group_entry = Etc.getgrgid(user_entry.gid) or raise("Cannot figure installation group")
+  module Distribution
+    class LibraryModuleTest < Test::Unit::TestCase
+      def test_files
+	LibraryModule.library_major = 15
+	LibraryModule.library_prefix = "tsc"
 
-      Installation::Task.installation_user_entry = user_entry
-      Installation::Task.installation_group_entry = group_entry
+	_module = LibraryModule.new "lib" => %w{ ffc util }
 
-      Installation::Task.installation_user = user_entry.name
-      Installation::Task.installation_group = group_entry.name
-      Installation::Task.installation_top ||= @product.top || user_entry.dir
+	assert_equal [ 
+	  FileInfo.new("lib/ffc/libtscffc.so.*.15",0755), 
+	  FileInfo.new("lib/util/libtscutil.so.*.15",0755) 
+	], _module.files
 
-      Dir.cd directory do
-	@config.actions.each do |_action|
-	  _action.keep_existing = false if @force
-	  _action.create(@communicator)
-	  _action.set_user_and_group
-	  _action.set_permissions
-	end
+	assert_equal "lib/ffc/libtscffc.so.reloc.o", _module.files.first.path_for_checksum
       end
     end
   end

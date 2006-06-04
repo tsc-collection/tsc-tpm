@@ -138,7 +138,7 @@ class Application < TSC::Application
     if distribution_directory
       mode = @options['mode']
       unless mode.nil? or mode == '0'
-        mode_directory = File.join distribution_directory, :mode, mode
+        mode_directory = File.join distribution_directory, 'mode', mode
         raise "Mode #{mode.inspect} not supported" unless File.directory? mode_directory
         $: << mode_directory
       end
