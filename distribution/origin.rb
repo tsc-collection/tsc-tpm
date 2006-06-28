@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,12 +47,13 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'descriptor.rb'
 require 'config-parser.rb'
 require 'module.rb'
 require 'library-module.rb'
+require 'static-library-module.rb'
 require 'binary-exec-module.rb'
 require 'shared-object-module.rb'
 require 'ruby-module.rb'
@@ -83,6 +85,9 @@ module Distribution
         },
         :library => proc { |_block, *_parameters|
           add_module LibraryModule, *_parameters, &_block
+        },
+        :static_library => proc { |_block, *_parameters|
+          add_module StaticLibraryModule, *_parameters, &_block
         },
         :dll => proc { |_block, *_parameters|
           add_module SharedObjectModule, *_parameters, &_block
