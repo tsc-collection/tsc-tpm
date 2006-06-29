@@ -18,7 +18,7 @@ module TSC
 
       def start
         pool = [ preferred, current, *choices ].compact.uniq
-        if pool.size > 1
+        if none or select or pool.size > 1
           menu
         else
           question pool.first
@@ -33,13 +33,20 @@ module TSC
           _menu.default = default_item_number.to_s
 
           add_category _menu, :current, :preferred
+          add_category _menu, :select do
+            throw :SELECT
+          end
 
           choices.each do |_choice|
-            add_choice _menu, _choice if register_item(_choice)
+            add_choice _menu, _choice if register_item(:choice, _choice)
           end
 
           add_category _menu, :other do
             question(preferred || current)
+          end
+
+          add_category _menu, :none do
+            nil
           end
         }
       end
@@ -69,6 +76,14 @@ module TSC
         config[:current]
       end
 
+      def select
+        config[:select]
+      end
+
+      def none
+        config[:none]
+      end
+
       def choices
         @choices ||= Array(config[:choices]).flatten.compact
       end
@@ -84,10 +99,19 @@ module TSC
       def add_category(menu, *categories, &block)
         categories.each do |_category|
           item = config[_category]
-          next unless register_item(item)
+          next unless register_item(_category, item)
 
           if block
-            add_choice menu, "<#{_category} ...>", &block
+            label = case item
+              when true
+                "#{_category} ..."
+              when false
+                _category
+              when String
+                "#{_category} #{item} ..."
+            end
+
+            add_choice menu, "<#{label}>", &block
           else
             add_choice(menu, "#{_category} => #{item}") {
               item
@@ -96,11 +120,11 @@ module TSC
         end
       end
 
-      def register_item(item)
-        return false unless item
-        return false if @registry.include?(item)
+      def register_item(category, item)
+        return false if item.nil?
+        return false if @registry.include?([ category, item ])
 
-        @registry.push item
+        @registry.push [ category, item ]
       end
     end
   end
