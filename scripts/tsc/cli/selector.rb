@@ -29,7 +29,7 @@ module TSC
         @registry = []
         communicator.choose { |_menu|
           _menu.select_by = :index
-          _menu.header = "Please select #{header}"
+          _menu.header = "#{header} (select a number)"
           _menu.default = default_item_number.to_s
 
           add_category _menu, :current, :preferred
