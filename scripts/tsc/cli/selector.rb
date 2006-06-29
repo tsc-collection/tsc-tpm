@@ -122,9 +122,16 @@ module TSC
 
       def register_item(category, item)
         return false if item.nil?
-        return false if @registry.include?([ category, item ])
 
-        @registry.push [ category, item ]
+        entry = case item
+          when true, false
+            [ category, item ]
+          else
+            item
+        end
+        return false if @registry.include? entry
+
+        @registry.push entry
       end
     end
   end
