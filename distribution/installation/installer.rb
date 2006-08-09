@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'ftools'
 require 'tsc/dtools.rb'
@@ -93,6 +94,24 @@ module Installation
             process_file _arg
           end
         end
+      end
+    end
+
+    def info(*args)
+      raise LocationError, :remove unless File.basename(top_directory) == ".meta-inf"
+      raise ArgumentError, :remove unless args.empty?
+
+      collect_config_data.each do |_config|
+        product = _config.product
+        package = _config.package
+
+        puts "#{product.name}#{package.name}"
+        puts "  Description: #{product.description}/#{package.description}"
+        puts "  Platform:    #{product.platform}"
+        puts [ 
+          "  Version:     #{product.version}",  
+          product.build && "(build #{product.build})"
+        ].compact.join(' ')
       end
     end
 

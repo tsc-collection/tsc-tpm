@@ -173,9 +173,10 @@ module Distribution
         }
       end
       info + [
-        "symlink '.meta-inf/tools/bin/tpm-remove', '.meta-inf/tools/bin/tpm-install'",
-        "symlink '.meta-inf/tools/bin/tpm-revert', '.meta-inf/tools/bin/tpm-install'",
-        "symlink '.meta-inf/tools/bin/tpm-commit', '.meta-inf/tools/bin/tpm-install'"
+        "symlink '.meta-inf/tools/bin/tpm-info', 'tpm-install'",
+        "symlink '.meta-inf/tools/bin/tpm-remove', 'tpm-install'",
+        "symlink '.meta-inf/tools/bin/tpm-revert', 'tpm-install'",
+        "symlink '.meta-inf/tools/bin/tpm-commit', 'tpm-install'"
       ]
     end
 

@@ -61,6 +61,7 @@ class Application < TSC::Application
 
   def initialize
     super("[ [<package> | <location>] ... ]",
+      [ "--info", "Print information about installed packages", nil ],
       [ "--install", "Perform product installation", nil ],
       [ "--remove", "Perform product deinstallation", nil ],
       [ "--commit", "Commit last installation", nil ],
@@ -113,23 +114,12 @@ class Application < TSC::Application
   def process_command_line
     @options = super
 
-    actions = %w{ install remove commit revert }.select { |_action| 
+    actions = %w{ install remove commit revert info }.select { |_action| 
       @options.key? _action 
     }
     raise ActionArgumentError unless actions.size == 1
     @action = actions.first.intern
     @packages = ARGV
-  end
-
-  def process_install
-    require 'installation/installer.rb'
-
-    installer = Installation::Installer.new
-
-    installer.options = @options
-    installer.top_directory = File.dirname @top
-
-    installer.install *@packages
   end
 end
 
