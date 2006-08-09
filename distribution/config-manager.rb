@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'tsc/attribute-set.rb'
 
@@ -69,7 +70,7 @@ module Distribution
 
       @parser = ConfigParser.new @cache, Hash[
         :product => proc { |_block| 
-          raise ConfigError.new('Multiple products defined') if @product
+          raise 'Multiple products defined' if @product
           @product = Product.new(@cache, &_block)
         },
         :fileset => proc { |_block| 
@@ -82,7 +83,7 @@ module Distribution
       contents = File.readlines(file).join
       eval contents, @parser.get_binding, file
       
-      raise ConfigError.new('No product defined') unless @product
+      raise 'No product defined' unless @product
       adjust_package_filesets
     end
 
@@ -116,7 +117,7 @@ module Distribution
         _package.filesets = _package.filesets.map do |_name|
           @filesets.detect { |_fileset|
             _fileset.name == _name
-          } or raise ConfigError.new("No fileset #{_name.inspect} for package #{_package.full_name.inspect}")
+          } or raise "No fileset #{_name.inspect} for package #{_package.full_name.inspect}"
         end
       end
     end

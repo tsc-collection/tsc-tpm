@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'tsc/progress'
 require 'forwardable'
@@ -91,7 +92,7 @@ module Distribution
     def file_located_in(file, *dirs)
       return true if dirs.empty?
       dirs.each do |_dir|
-	return true if file =~ %r{^#{Regexp.quote File.expand_path(_dir)}/}
+	return true if File.expand_path(file).index(_dir + '/') == 0
       end
       false
     end

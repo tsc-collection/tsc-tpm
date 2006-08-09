@@ -81,8 +81,8 @@ class Application < TSC::Application
 
       @options.each do |_key, _value|
         case _key
-          when 'source' then distributor.product_source_path = _value
-          when 'binary' then distributor.product_binary_path = _value
+          when 'source' then distributor.product_source_path = File.expand_path(_value)
+          when 'binary' then distributor.product_binary_path = File.expand_path(_value)
           when 'build' then distributor.product_build = convert_to_integer(_value)
           when 'prefix' then distributor.product_library_prefix = _value
           when 'major' then distributor.product_library_major = convert_to_integer(_value)
@@ -90,7 +90,11 @@ class Application < TSC::Application
         end
       end
       if @options.key? 'install'
-        distributor.install_content *@args
+        @args.clear unless ([ @options['source'], @options['binary'] ] & @args).empty?
+
+        distributor.install_content *@args.map { |_arg|
+          File.expand_path(_arg)
+        }
       else
         distributor.create_packages @options['output'], *@args
       end
