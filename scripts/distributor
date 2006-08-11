@@ -56,7 +56,8 @@ if defined? Installation::Generator
       bindir = File.join(self.class.installation_tools, 'bin')
       [
         '#!' + File.join(bindir, 'ruby'),
-        "ENV['PATH'] = [ #{bindir.inspect}, *ENV.to_hash['PATH'].split(':') ].join(':')"
+        "ENV['PATH'] = [ #{bindir.inspect}, *ENV.to_hash['PATH'].split(':') ].join(':')",
+        "BINARY_DIRECTORY = #{bindir.inspect}"
       ] + IO::readlines(__FILE__).slice(1..-1)
     end
   end
@@ -92,7 +93,7 @@ class Application < TSC::Application
       file_to_require = @options['require']
       require file_to_require if file_to_require
 
-      distributor = Distribution::Distributor.new(@prodinfo, script_location)
+      distributor = Distribution::Distributor.new(@prodinfo, binary_directory)
 
       @options.each do |_key, _value|
         case _key
@@ -148,7 +149,7 @@ class Application < TSC::Application
   end
 
   def adjust_loadpath
-    distribution_directory = [ '.', '..' ].map { |_directory|
+    distribution_directory = [ '.', '..', '../lib' ].map { |_directory|
       Dir[ File.join(script_location, _directory, 'distribution') ].map { |_entry|
         _entry if File.directory? _entry
       }
@@ -162,6 +163,14 @@ class Application < TSC::Application
         $: << mode_directory
       end
       $: << distribution_directory
+    end
+  end
+
+  def binary_directory
+    if defined? BINARY_DIRECTORY 
+      BINARY_DIRECTORY
+    else
+      script_location
     end
   end
 end
