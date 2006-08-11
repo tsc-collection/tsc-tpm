@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -47,9 +48,23 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
+=end
 
-$:.push File.dirname(__FILE__)
+if defined? Installation::Generator
+  class Generator < Installation::Generator
+    def create(io)
+      bindir = File.join(self.class.installation_tools, 'bin')
+      [
+        '#!' + File.join(bindir, 'ruby'),
+        "ENV['PATH'] = [ #{bindir.inspect}, *ENV.to_hash['PATH'].split(':') ].join(':')"
+      ] + IO::readlines(__FILE__).slice(1..-1)
+    end
+  end
 
+  throw :generator, Generator
+end
+
+$:.concat ENV.to_hash['PATH'].split(':')
 require 'tsc/application.rb'
 
 class Application < TSC::Application

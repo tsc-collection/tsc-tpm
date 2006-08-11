@@ -1,0 +1,54 @@
+# vim: set ft=ruby:
+
+cache.platform = TSC::Platform.current.name
+cache.os = TSC::Platform.current.driver
+
+product {
+  name 'TSC'
+  description "Tone Software Corporation tool set"
+
+  top '/usr/local/tsc'
+  version '0.2.0'
+
+  case cache.platform
+    when 'cygwin-xp-x86'
+      user 'Guest'
+      group 'Guests'
+    else
+      user 'root'
+      group 'bin'
+  end
+
+  package {
+    name 'tpm'
+    description "Tone's Package Manager"
+
+    tasks %w{
+      system-query-top
+      system-create-files
+      system-set-permissions
+      system-set-user-group
+    }
+    filesets %w{
+      tpm
+    }
+  }
+}
+
+fileset {
+  name 'tpm'
+
+  directory %w{
+    bin
+    distribution
+    distribution/installation
+  }
+  generate.into('bin').source {
+    program 'scripts' => %w{
+      distributor tsc-ruby app-template
+    }
+  }
+  install.into('.').source {
+    tree 'distribution'
+  }
+}
