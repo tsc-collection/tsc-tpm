@@ -70,7 +70,7 @@ module Distribution
 	    elsif file_on_disk.file?
 	      LeafTreeDescriptor.new file, top
             elsif file_on_disk.symlink?
-              LinkTreeDescriptor.new file, top
+              LinkTreeDescriptor.new file, File.readlink(file.path)
 	    end
 	  }
 	end

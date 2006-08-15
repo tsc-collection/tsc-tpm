@@ -35,9 +35,10 @@ module Distribution
 
         when file_stat.symlink?
           dirname, basename = File.split(File.readlink(path))
-          raise "Cross directory symbolic links not supported for #{path.inspect}" unless dirname == '.'
-          [ LinkTreeDescriptor.new(file, location), detect_file_type(basename, location) ]
-
+          [ 
+            LinkTreeDescriptor.new(file, basename), 
+            detect_file_type(basename, File.expand_path(dirname, location)) 
+          ]
         else
           raise "Unsupported file type for #{path.inspect}"
       end

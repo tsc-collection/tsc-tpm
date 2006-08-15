@@ -96,8 +96,8 @@ module Distribution
   end
 
   class LinkTreeDescriptor < TreeDescriptor
-    def initialize(file, origin)
-      link = FileInfo.new(File.readlink(File.join(origin, file.path)))
+    def initialize(file, reference)
+      link = FileInfo.new(reference)
       super link
 
       @link = file
