@@ -85,9 +85,9 @@ module Distribution
       end
     end
 
-    def initialize(*args)
+    def initialize(*args, &block)
       @info = Hash.new
-      @entries = process(*args)
+      @entries = process args, Array(block && block.call)
     end
 
     def files
@@ -117,7 +117,7 @@ module Distribution
     #######
     def process(*args)
       depot = []
-      args.each do |_arg|
+      args.flatten.each do |_arg|
         case _arg
           when Distribution::Module
             depot.concat _arg.entries

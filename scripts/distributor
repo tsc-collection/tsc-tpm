@@ -87,6 +87,8 @@ class Application < TSC::Application
   def start
     handle_errors {
       process_command_line
+      self.verbose = ENV['TRACE'].to_s.split.include?(script_name)
+
       prepare_environment
       guess_source_and_binary
 

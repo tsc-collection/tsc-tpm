@@ -60,6 +60,7 @@ require 'ruby-module.rb'
 require 'generator-module.rb'
 require 'config-module.rb'
 require 'tree-module.rb'
+require 'node-module.rb'
 
 module Distribution
   class Origin
@@ -79,6 +80,9 @@ module Distribution
         },
         :file => proc { |_block, *_parameters|
           add_module Distribution::Module, Hash[:mode=>0644], *_parameters, &_block
+        },
+        :node => proc { |_block, *_parameters|
+          add_module NodeModule, *_parameters, &_block
         },
         :application => proc { |_block, *_parameters|
           add_module BinaryExecModule, *_parameters, &_block

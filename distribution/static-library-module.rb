@@ -1,9 +1,9 @@
 =begin
-# Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
-# 
-# Distributed under the MIT Licence.
-# This is free software. See 'LICENSE.MIT' for details.
-# You must read and accept the license prior to use.
+  Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
+  
+  Distributed under the MIT Licence.
+  This is free software. See 'LICENSE.MIT' for details.
+  You must read and accept the license prior to use.
 =end
 
 require 'binary-exec-module'
