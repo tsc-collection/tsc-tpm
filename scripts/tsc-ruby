@@ -90,6 +90,11 @@ class Application < TSC::Application
     def workspace
       binding
     end
+
+    def to_s
+      'tsc'
+    end
+
   end
 end
 
