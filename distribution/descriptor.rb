@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'tsc/ftools'
 require 'ftools'
@@ -63,42 +64,50 @@ module Distribution
 
       @source = File.smart_join @origin, @file.path
       unless @file.path_for_checksum.nil?
-	@checksum_source = File.smart_join @origin, @file.path_for_checksum
+        @checksum_source = File.smart_join @origin, @file.path_for_checksum
       end
 
       @print_destination = true
       @print_target = true
     end
+
     def add_destination_component(directory)
       @destinations << directory
     end
+
     def set_exclude_patterns(*patterns)
       @exclude_patterns |= patterns.flatten
     end
+
     def target_directory=(directory)
       @target_directory = directory
     end
+
     def target=(target)
       @target_path = target
     end
+
     def action=(action)
       @action ||= action
     end
+
     def print_destination=(state)
       @print_destination = state && true
     end
+
     def print_target=(state)
       @print_target = state && true
     end
 
     def keep?
       @exclude_patterns.each { |_pattern|
-	if File.fnmatch "#{_pattern}", File.basename(figure_target), File::FNM_DOTMATCH
-	  return true
-	end
+        if File.fnmatch "#{_pattern}", File.basename(figure_target), File::FNM_DOTMATCH
+          return true
+        end
       }
       return false
     end
+
     def info
       return nil if figure_target.nil?
 
@@ -114,6 +123,7 @@ module Distribution
 
       "#{@action} #{target}, #{destination}, #{owner}, #{group}, #{mode}, #{build}, #{checksum}, #{keep?}"
     end
+
     def install_to_destination(directory)
       return if figure_destination.nil?
       return unless self.verify
@@ -122,6 +132,7 @@ module Distribution
       File.makedirs File.dirname(destination), false
       copy_source_to destination
     end
+
     def copy_source_to(destination)
       File.copy @source, destination, false
     end
@@ -129,15 +140,19 @@ module Distribution
     def source?(source)
       match source, @source
     end
+
     def checksum_source?(source)
       match source, @checksum_source
     end
+
     def action?(action)
       match action, @action
     end
+
     def target?(target)
       match target, figure_target
     end
+
     def destination?(destination)
       match destination, figure_destination
     end
@@ -147,25 +162,31 @@ module Distribution
     def verify
       true
     end
+
     def figure_destination
       return nil if @destinations.empty?
       File.smart_join @destinations.reverse, File.basename(@file.path)
     end
+
     def figure_target
       return @target_path unless @target_path.nil?
       unless @target_directory.nil?
-	return File.smart_join(@target_directory, File.basename(@file.path))
+        return File.smart_join(@target_directory, File.basename(@file.path))
       end
     end
+
     def file
       @file
     end
+
     def origin
       @origin
     end
+
     def target_directory
       @target_directory
     end
+
     def target_path
       @target_path
     end
@@ -177,12 +198,13 @@ module Distribution
       pattern = what.kind_of?(Regexp) ? what : %r{^#{Regexp.quote what.to_s}$}
       not (string =~ pattern).nil?
     end
+
     def calculate_checksum(path)
       digest = MD5.new
       File.open path do |_io|
-	while chunk = _io.read(1024) do
-	  digest.update chunk
-	end
+        while chunk = _io.read(1024) do
+          digest.update chunk
+        end
       end
       digest.to_s
     end
