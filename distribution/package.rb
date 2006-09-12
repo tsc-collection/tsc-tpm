@@ -58,7 +58,7 @@ require 'config-parser.rb'
 
 module Distribution
   class Package
-    attr_reader :name, :description, :product, :tasks
+    attr_reader :name, :description, :product, :tasks, :base
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
@@ -74,6 +74,9 @@ module Distribution
         },
         :tasks => proc { |_block, *_argument|
           @tasks += normalize_tasks(_argument)
+        },
+        :base => proc { |_block, _argument|
+          @base = _argument
         }
       ]
       @product = product

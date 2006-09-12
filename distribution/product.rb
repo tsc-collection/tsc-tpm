@@ -54,7 +54,7 @@ require 'package.rb'
 
 module Distribution
   class Product
-    attr_reader :name, :description, :version, :user, :group, :top, :packages
+    attr_reader :name, :description, :version, :user, :group, :top, :packages, :base
     attr_accessor :library_prefix, :library_major, :build
 
     def initialize(cache, &block)
@@ -79,6 +79,9 @@ module Distribution
         },
         :package => proc { |_block|
           @packages.push Package.new(self, cache, &_block)
+        },
+        :base => proc { |_block, _argument|
+          @base = _argument
         }
       ]
       @packages = []

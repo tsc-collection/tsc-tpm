@@ -67,7 +67,7 @@ module Distribution
         package_info = copy_files_and_collect_info package_temp_directory
         tools_info = make_tools package_temp_directory
 
-        make_prodinfo package_info + tools_info, package_temp_directory
+        make_prodinfo tools_info + package_info, package_temp_directory
         make_package package_temp_directory, package_path
       ensure
         Dir.rm_r package_temp_directory

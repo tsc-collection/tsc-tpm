@@ -109,7 +109,9 @@ module Distribution
 
     def descriptors(directory)
       self.files.map do |_file|
-        Descriptor.new _file, directory
+        descriptor = Descriptor.new(_file, directory)
+        descriptor.keep! if @info[:keep]
+        descriptor
       end
     end
 
@@ -123,7 +125,7 @@ module Distribution
             depot.concat _arg.entries
           when Hash 
             _arg.each do |_key, _value|
-              if [ :mode, :owner, :group ].include? _key
+              if [ :mode, :owner, :group, :keep ].include? _key
                 @info[_key] = _value
               else
                 depot.concat process(*_value).map { |_entry|

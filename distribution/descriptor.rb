@@ -79,6 +79,14 @@ module Distribution
       @exclude_patterns |= patterns.flatten
     end
 
+    def keep!
+      @unconditionally_keep = true
+    end
+
+    def set_base(base)
+      @base = base
+    end
+
     def target_directory=(directory)
       @target_directory = directory
     end
@@ -100,6 +108,8 @@ module Distribution
     end
 
     def keep?
+      return true if @unconditionally_keep
+
       @exclude_patterns.each { |_pattern|
         if File.fnmatch "#{_pattern}", File.basename(figure_target), File::FNM_DOTMATCH
           return true
@@ -120,8 +130,9 @@ module Distribution
 
       mode = @file.mode.nil? ? @file.mode.inspect : "0%o" % @file.mode
       checksum = (@checksum_source.nil? ? nil : calculate_checksum(@checksum_source)).inspect
+      base = @base.inspect
 
-      "#{@action} #{target}, #{destination}, #{owner}, #{group}, #{mode}, #{build}, #{checksum}, #{keep?}"
+      "#{@action} #{target}, #{destination}, #{owner}, #{group}, #{mode}, #{build}, #{checksum}, #{keep?}, #{base}"
     end
 
     def install_to_destination(directory)

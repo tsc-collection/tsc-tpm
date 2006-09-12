@@ -118,7 +118,12 @@ module TSC
         require 'sys/uname'
         info = Sys::Uname.uname
 
-        arch = info.architecture
+        arch = case info.architecture
+	  when 'i386'
+	    'x86'
+	  else
+	    info.architecture
+	end
         release = info.release.split('.').last
 
         [ "sun-#{release}-#{arch}", arch ]
@@ -228,7 +233,7 @@ module TSC
 
     @supported = Hash[
       [ 'win-x86', :windows, :x86 ]  => %w{ i386-cygwin },
-      [ 'sol-x86', :solaris, :x86 ]  => %w{ i386-solaris2.8 },
+      [ 'sol-x86', :solaris, :x86 ]  => %w{ i386-solaris2.8 i386-solaris2.10 },
       [ 'sol-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.6 },
       [ 'sol9-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.9 },
       [ 'sol8-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.8 },

@@ -68,7 +68,7 @@ module Distribution
       @config = Installation::ConfigManager.new
       @config.process_content @info
 
-      user = Installation::Task.installation_user || @product.user
+      user = Installation::Task.installation_user || @product.user || Etc.getlogin
       user_entry = Etc.getpwnam(user) rescue raise("Wrong installation user - #{user.inspect}")
       group_entry = Etc.getgrgid(user_entry.gid) or raise("Cannot figure installation group")
 

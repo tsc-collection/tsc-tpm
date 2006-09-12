@@ -61,7 +61,7 @@ require 'remove-action.rb'
 
 module Distribution
   class Fileset
-    attr_reader :name, :description, :actions
+    attr_reader :name, :description, :actions, :base
 
     def initialize(cache, &block)
       @parser = ConfigParser.new cache, Hash[
@@ -100,6 +100,9 @@ module Distribution
         },
         :directory => proc { |_block, *_dirs|
           add_action DirectoryAction, *_dirs
+        },
+        :base => proc { |_block, _directory|
+          @base = _directory
         }
       ]
       @actions = []
@@ -117,6 +120,7 @@ module Distribution
 	_action.descriptors package
       }.flatten.each { |_descriptor|
 	_descriptor.set_exclude_patterns *@patterns
+        _descriptor.set_base(@base || package.base || package.product.base)
       }
     end
 

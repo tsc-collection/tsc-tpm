@@ -89,7 +89,7 @@ module TSC
 
     def launch(*args, &block)
       begin
-        @pipes = [ [[args.first.kind_of?(IO) ? args.shift : File.open("/dev/null")]] ]
+        @pipes = [ [ [ args.first.kind_of?(IO) ? args.shift : File.open('/dev/null') ] ] ]
         process *args, &block unless args.empty?
       ensure
         close_io @pipes

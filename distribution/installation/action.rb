@@ -58,14 +58,18 @@ module Installation
     attr_writer :keep_existing, :undoable, :reportable, :link_count
 
     def target
-      File.expand_path @target, Task.installation_top
+      File.expand_path @target, base
+    end
+
+    def base
+      File.expand_path(@base || '.', Task.installation_top)
     end
 
     def initialize(target, *optional_arguments)
       @target, @source, *rest = target, *optional_arguments
       @user, @group, @permission, *rest = *rest
       @build, @checksum, *rest = *rest
-      @keep_existing, @link_count, *rest = *rest
+      @keep_existing, @base, @link_count, *rest = *rest
 
       @link_count ||= 0
 
