@@ -263,14 +263,14 @@ module TSC
       }
       print_diagnostics [
         message.join(': '),
+        if exception.kind_of? TSC::Launcher::TerminateError
+          exception.errors.map { |_error|
+            "  stderr> #{_error}"
+          }
+        end,
         if verbose?
           [
             '<' + exception.class.name + '>',
-            if exception.kind_of? TSC::Launcher::TerminateError
-              exception.errors.map { |_error|
-                "  stderr> #{_error}"
-              }
-            end,
             if exception.backtrace
               exception.backtrace.map { |_line|
                 '  ' + _line.sub(%r{^#{script_location}/}, '')
