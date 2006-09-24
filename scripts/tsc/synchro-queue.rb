@@ -42,31 +42,106 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
-$:.concat ENV['PATH'].split(':')
+require 'tsc/monitor.rb'
+require 'tsc/errors.rb'
 
-require 'test/unit'
+module TSC
+  class SynchroQueue
+    attr_reader :high_water_mark
 
-require 'application.rb'
-require 'array.rb'
-require 'attribute-set.rb'
-require 'simple-config.rb'
-require 'dtools.rb'
-require 'errors.rb'
-require 'ftools.rb'
-require 'irb.rb'
-require 'launch.rb'
-require 'loadable.rb'
-require 'monitor.rb'
-require 'object-space.rb'
-require 'platform.rb'
-require 'progress.rb'
-require 'string.rb'
-require 'trace.rb'
-require 'pipeline.rb'
-require 'synchro-queue.rb'
+    def blocking_put=(status)
+      @blocking_put = status ? true : false;
+    end
 
-require 'os/generic.rb'
-require 'os/cygwin.rb'
-require 'os/linux.rb'
+    def blocking_put?
+      @blocking_put
+    end
 
-# require 'tty-process.rb'
+    def initialize(blocking_put = false)
+      @queue = []
+      @blocking_put = blocking_put
+      @monitor = TSC::Monitor.new
+      @data_available = TSC::Monitor::ConditionVariable.new @monitor
+      @high_water_mark = 0
+    end
+
+    def read(size)
+      get
+    end
+
+    def get(timeout = nil)
+      @monitor.synchronize do
+        loop do
+          return @queue.shift unless @queue.empty?
+          if @data_available.wait(timeout) == false
+            throw TSC::OperationFailed, 'get'
+          end
+        end
+      end
+    end
+
+    def put(*args)
+      if blocking_put?
+        @monitor.mon_enter
+      else
+        return false if @monitor.try_mon_enter == false
+      end
+
+      begin 
+        @queue.concat args
+        size = @queue.size
+        @high_water_mark = size if size > @high_water_mark
+        @data_available.broadcast
+      ensure
+        @monitor.mon_exit
+      end
+      true
+    end
+  end
+end
+
+if $0 != '-e' and $0 == __FILE__ or defined? Test::Unit::TestCase
+  require 'test/unit'
+
+  class SynchroQueueTest < Test::Unit::TestCase
+    class MockReader
+      attr_reader :data
+
+      def initialize(queue)
+        @queue = queue
+        @data = []
+      end
+
+      def run
+        loop do
+          data = @queue.get
+          @data.push data
+        end
+      end
+    end
+
+    def test_data
+      reader = MockReader.new @queue
+      thread = Thread.new { reader.run }
+
+      assert_equal 0, reader.data.size, 'Reader buffer must be empty'
+      while @queue.put('abc', nil, 'def') == false do
+        sleep 1
+      end
+      sleep 1
+      assert_equal 3, reader.data.size, 'Reader buffer must have the data'
+      assert_equal 'abc', reader.data[0]
+      assert_equal nil, reader.data[1]
+      assert_equal 'def', reader.data[2]
+    end
+
+    def setup
+      Thread.abort_on_exception = true
+      @queue = TSC::SynchroQueue.new
+    end
+
+    def teardown
+      @queue = nil
+    end
+  end
+end
