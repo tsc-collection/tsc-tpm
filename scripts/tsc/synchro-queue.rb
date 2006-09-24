@@ -103,45 +103,47 @@ end
 if $0 != '-e' and $0 == __FILE__ or defined? Test::Unit::TestCase
   require 'test/unit'
 
-  class SynchroQueueTest < Test::Unit::TestCase
-    class MockReader
-      attr_reader :data
+  module TSC
+    class SynchroQueueTest < Test::Unit::TestCase
+      class MockReader
+        attr_reader :data
 
-      def initialize(queue)
-        @queue = queue
-        @data = []
-      end
+        def initialize(queue)
+          @queue = queue
+          @data = []
+        end
 
-      def run
-        loop do
-          data = @queue.get
-          @data.push data
+        def run
+          loop do
+            data = @queue.get
+            @data.push data
+          end
         end
       end
-    end
 
-    def test_data
-      reader = MockReader.new @queue
-      thread = Thread.new { reader.run }
+      def test_data
+        reader = MockReader.new @queue
+        thread = Thread.new { reader.run }
 
-      assert_equal 0, reader.data.size, 'Reader buffer must be empty'
-      while @queue.put('abc', nil, 'def') == false do
+        assert_equal 0, reader.data.size, 'Reader buffer must be empty'
+        while @queue.put('abc', nil, 'def') == false do
+          sleep 1
+        end
         sleep 1
+        assert_equal 3, reader.data.size, 'Reader buffer must have the data'
+        assert_equal 'abc', reader.data[0]
+        assert_equal nil, reader.data[1]
+        assert_equal 'def', reader.data[2]
       end
-      sleep 1
-      assert_equal 3, reader.data.size, 'Reader buffer must have the data'
-      assert_equal 'abc', reader.data[0]
-      assert_equal nil, reader.data[1]
-      assert_equal 'def', reader.data[2]
-    end
 
-    def setup
-      Thread.abort_on_exception = true
-      @queue = TSC::SynchroQueue.new
-    end
+      def setup
+        Thread.abort_on_exception = true
+        @queue = TSC::SynchroQueue.new
+      end
 
-    def teardown
-      @queue = nil
+      def teardown
+        @queue = nil
+      end
     end
   end
 end
