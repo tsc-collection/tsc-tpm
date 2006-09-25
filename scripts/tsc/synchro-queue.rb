@@ -74,7 +74,7 @@ module TSC
         loop do
           return @queue.shift unless @queue.empty?
           if @data_available.wait(timeout) == false
-            throw TSC::OperationFailed, 'get'
+            raise TSC::OperationFailed, 'get'
           end
         end
       end
