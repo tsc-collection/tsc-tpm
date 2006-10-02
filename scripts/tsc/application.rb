@@ -122,6 +122,17 @@ module TSC
       end
     end
 
+    class << self
+      def in_generator_context(&block)
+        return unless defined? Installation::Generator
+        generator = Class.new(Installation::Generator)
+        generator.define_generating_method { |_io|
+          instance_eval(&block)
+        }
+        throw :generator, generator
+      end
+    end
+
     protected
     #########
 
