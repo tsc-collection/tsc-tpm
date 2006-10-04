@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'forwardable'
 require 'installation/task.rb'
@@ -59,6 +60,7 @@ module Installation
 	super "Class #{name.inspect} is not a direct generator"
       end
     end
+
     @recent_subclasses = []
     class << self
       attr_reader :recent_subclasses
@@ -71,24 +73,38 @@ module Installation
       def clear_recent_subclasses
 	@recent_subclasses.clear unless @recent_subclasses.nil?
       end
+
       def inherited(subclass)
 	raise SubclassError, subclass if @recent_subclasses.nil?
 	@recent_subclasses << subclass
       end
     end
+
     attr_reader :target
 
     def initialize(target)
       @target = target
     end
+
     def process_create
-      File.open(@target,"a+") {}
-      result = File.open(@target,"r") do |_io|
+      File.open(@target,'a+') {}
+      result = File.open(@target, 'r') do |_io|
 	create _io
       end
-      File.open(@target, "w") do |_io|
+
+      File.open(@target, 'w') do |_io|
 	_io.puts result
       end
+    end
+
+    def figure_ruby_path
+      ruby_path_list.detect { |_path|
+        File.file?(_path) && File.executable?(_path)
+      }
+    end
+
+    def installation_tools_bin
+      File.join self.class.installation_tools, 'bin'
     end
 
     protected
@@ -96,10 +112,17 @@ module Installation
     def readlines_after_end_marker(file)
       skip_lines_before_end_marker IO.readlines(file)
     end
+
     def skip_lines_before_end_marker(array)
       end_marker = false
       array.reject { |_line|
 	"#{end_marker = (_line =~ %r{^\s*__END__\s*$})}" unless end_marker
+      }
+    end
+
+    def ruby_path_list
+      [ installation_tools_bin, *ENV.to_hash['PATH'].to_s.split(':') ].map { |_location|
+        File.join(_location, 'ruby')
       }
     end
   end

@@ -1,5 +1,6 @@
+
 module TSC
-  class Path
+  class PATH
     class << self
       def current
         self.new(*ENV.to_hash['PATH'].to_s.split(':'))
@@ -7,26 +8,28 @@ module TSC
     end
 
     def initialize(*entries)
+      @front = []
       @entries = entries
+      @back = []
     end
 
     def install
-      eval to_ruby_eval
+      ENV['PATH'] = to_s
       self
     end
 
     def front(entry)
-      @entries.unshift(entry)
+      @front.push(entry)
       self
     end
 
     def back(entry)
-      @entries.push(entry)
+      @back.push(entry)
       self
     end
 
     def to_s
-      @entries.join(':')
+      (@front.reverse + @entries + @back).join(':')
     end
 
     def inspect
@@ -34,7 +37,7 @@ module TSC
     end
 
     def to_ruby_eval
-      "ENV['PATH'] = #{self.inspect}"
+      %q{ENV['PATH'] = (} + @front.reverse.inspect + %q{ + ENV.to_hash['PATH'].to_s.split(':') + } + @back.inspect + %q{).join(':')}
     end
 
     def to_sh_eval
@@ -57,11 +60,13 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
       end
 
       def test_modify
-        assert_equal '/zzz:/bin/aaa:/bin/bbb:/uuu', @path.front('/zzz').back('/uuu').to_s
+        assert_equal '/qqq:/zzz:/bin/aaa:/bin/bbb:/uuu', @path.front('/zzz').front('/qqq').back('/uuu').to_s
       end
 
       def test_to_ruby_eval
-        assert_equal %q{ENV['PATH'] = "/bin/aaa:/bin/bbb"}, @path.to_ruby_eval
+        @path.install
+        @path.front('/abc').front('/ZZZ')
+        assert_equal %q{/ZZZ:/abc:/bin/aaa:/bin/bbb}, eval(@path.to_ruby_eval)
       end
 
       def test_to_sh_eval
@@ -79,7 +84,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
       end
 
       def setup
-        @path = Path.new('/bin/aaa', '/bin/bbb')
+        @path = PATH.new('/bin/aaa', '/bin/bbb')
       end
       
       def teardown

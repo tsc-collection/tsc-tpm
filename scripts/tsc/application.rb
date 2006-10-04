@@ -122,12 +122,28 @@ module TSC
       end
     end
 
+    class Content < ::Array
+      def initialize(io)
+        @io = io
+        super()
+      end
+
+      def original
+        io.readlines
+      end
+    end
+
     class << self
       def in_generator_context(&block)
         return unless defined? Installation::Generator
+
         generator = Class.new(Installation::Generator)
-        generator.define_generating_method { |_io|
-          instance_eval(&block)
+        generator.send(:define_method, '__fill_content__', &block)
+        generator.send(:define_method, 'create') { |_io|
+          content = Content.new(_io)
+          __fill_content__(content)
+
+          content.flatten.compact
         }
         throw :generator, generator
       end

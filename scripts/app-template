@@ -5,32 +5,19 @@
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
 
-if defined? Installation::Generator
-  class Generator < Installation::Generator
-    def create(io)
-      bindir = File.join(self.class.installation_tools, 'bin')
-      [
-        '#!' + File.join(bindir, 'ruby'),
-        "ENV['PATH'] = [ #{bindir.inspect}, *ENV.to_hash['PATH'].split(':') ].join(':')"
-      ] + IO::readlines(__FILE__).slice(1..-1)
-    end
-  end
+$:.concat ENV.to_hash['PATH'].to_s.split(':')
 
-  throw :generator, Generator
-end
-
-[ 'tsc/application.rb' ].each do |a|
-  # Workaround 'to_hash' is needed to silence the warning in case of world 
-  # writable directory is present in PATH. The warning is printed out in 
-  # Ruby 1.8.2 even if that particular directory is not added to the ruby
-  # loadpath. Alternatively, $VERBOSE=nil may be used to suppress all ruby
-  # warnings.
-  #
-  $: << ENV.to_hash['PATH'].split(':').find { |p| Dir[ p + '/' + a ].first }
-  require a
-end
+require 'tsc/application.rb'
+require 'tsc/path.rb'
 
 class Application < TSC::Application
+
+  in_generator_context do |_content|
+    _content << '#!' + figure_ruby_path
+    _content << TSC::PATH.current.front(installation_tools_bin).to_ruby_eval
+    _content << IO.readlines(__FILE__).slice(1..-1)
+  end
+
   def initialize
     super('<parameter> ...',
       [ '--option', 'Option', 'argument', '-o' ],
