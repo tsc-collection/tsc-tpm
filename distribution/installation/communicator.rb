@@ -49,9 +49,10 @@
 
 
 require 'tsc/progress.rb'
+require 'tsc/cli/communicator.rb'
 
 module Installation
-  class Communicator
+  class Communicator < TSC::CLI::Communicator
     def report(*args)
       $stderr.puts "### #{args.join(' ')}"
     end

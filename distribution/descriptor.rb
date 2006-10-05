@@ -55,7 +55,7 @@ require 'md5'
 
 module Distribution
   class Descriptor
-    attr_reader :source
+    attr_reader :source, :file, :origin
 
     def initialize(file,origin = nil)
       @file, @origin = file, origin
@@ -184,14 +184,6 @@ module Distribution
       unless @target_directory.nil?
         return File.smart_join(@target_directory, File.basename(@file.path))
       end
-    end
-
-    def file
-      @file
-    end
-
-    def origin
-      @origin
     end
 
     def target_directory

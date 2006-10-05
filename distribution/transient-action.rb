@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,16 +47,18 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'originator.rb'
 
 module Distribution
   class TransientAction < Originator
     def update_descriptor(descriptor, package)
+      location = File.dirname(descriptor.file.path)
+
       descriptor.action = 'install'
-      descriptor.add_destination_component 'meta-inf/installation/transient'
-      descriptor.target_directory = ".meta-inf/packages/#{package.name}/installation/transient"
+      descriptor.add_destination_component "meta-inf/installation/transient/#{location}"
+      descriptor.target_directory = ".meta-inf/packages/#{package.name}/installation/transient/#{location}"
     end
   end
 end
