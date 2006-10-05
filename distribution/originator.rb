@@ -51,6 +51,7 @@
 
 require 'source-origin.rb'
 require 'binary-origin.rb'
+require 'path-origin.rb'
 
 require 'config-parser.rb'
 
@@ -65,6 +66,9 @@ module Distribution
         },
         :binary => proc { |_block|
           add_origin BinaryOrigin, &_block
+        },
+        :path => proc { |_block|
+          add_origin PathOrigin, &_block
         }
       ]
       @origins = []

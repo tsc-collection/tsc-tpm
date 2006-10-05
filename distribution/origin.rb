@@ -113,7 +113,7 @@ module Distribution
     end
 
     def descriptors
-      @modules.map { |_module|
+      modules.map { |_module|
 	_module.descriptors self.class.path
       }.flatten
     end
@@ -122,7 +122,7 @@ module Distribution
     #######
     def add_module(klass, *args, &block)
       aModule =  klass.new(*args, &block)
-      @modules.push aModule
+      modules.push aModule
 
       aModule
     end

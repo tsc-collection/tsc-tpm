@@ -10,7 +10,7 @@ module TSC
   class Path
     class << self
       def current
-        self.new(*ENV.to_hash[name].to_s.split(':'))
+        self.new.load
       end
     end
 
@@ -22,6 +22,14 @@ module TSC
       @front = []
       @entries = entries
       @back = []
+    end
+
+    def load
+      @entries = ENV.to_hash[name].to_s.split(':')
+      @front.clear
+      @back.clear
+
+      self
     end
 
     def install
@@ -39,8 +47,12 @@ module TSC
       self
     end
 
+    def entries
+      @front.reverse + @entries + @back
+    end
+
     def to_s
-      (@front.reverse + @entries + @back).join(':')
+      entries.join(':')
     end
 
     def inspect
