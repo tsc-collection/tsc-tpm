@@ -1,10 +1,16 @@
 
+require 'tsc/errors.rb'
+
 module TSC
-  class PATH
+  class Path
     class << self
       def current
-        self.new(*ENV.to_hash['PATH'].to_s.split(':'))
+        self.new(*ENV.to_hash[name].to_s.split(':'))
       end
+    end
+
+    def name
+      raise TSC::NotImplementedError, :name
     end
 
     def initialize(*entries)
@@ -14,7 +20,7 @@ module TSC
     end
 
     def install
-      ENV['PATH'] = to_s
+      ENV[name] = to_s
       self
     end
 
@@ -37,15 +43,33 @@ module TSC
     end
 
     def to_ruby_eval
-      %q{ENV['PATH'] = (} + @front.reverse.inspect + %q{ + ENV.to_hash['PATH'].to_s.split(':') + } + @back.inspect + %q{).join(':')}
+      [
+        %Q{ENV[#{name.inspect}] = (},
+        @front.reverse.inspect,
+        %Q{ + ENV.to_hash[#{name.inspect}].to_s.split(':') + },
+        @back.inspect,
+        %q{).join(':')}
+      ].join
     end
 
     def to_sh_eval
-      "PATH=#{self.inspect} export PATH"
+      "#{name}=#{self.inspect} export #{name}"
     end
 
     def to_csh_eval
-      "setenv PATH #{self.inspect}"
+      "setenv #{name} #{self.inspect}"
+    end
+  end
+
+  class PATH < Path
+    def name
+      'PATH'
+    end
+  end
+
+  class LD_LIBRARY_PATH < Path
+    def name
+      'LD_LIBRARY_PATH'
     end
   end
 end
@@ -54,7 +78,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
   
   module TSC
-    class PathTest < Test::Unit::TestCase
+    class PATHTest < Test::Unit::TestCase
       def test_to_s
         assert_equal '/bin/aaa:/bin/bbb', @path.to_s
       end
