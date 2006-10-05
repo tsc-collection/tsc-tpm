@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'installation/product.rb'
 require 'installation/package.rb'
@@ -61,31 +62,37 @@ module Installation
   class ConfigManager
     class Error < RuntimeError
     end
+
     class ProductError < Error
       def initialize(name,package)
-	super "Multiple product definition"
-      end
-    end
-    class PackageError < Error
-      def initialize
-	super "Multiple package definition"
+	super 'Multiple product definition'
       end
     end
 
-    attr_reader :product, :package, :actions
+    class PackageError < Error
+      def initialize
+	super 'Multiple package definition'
+      end
+    end
+
+    attr_reader :product, :package, :actions, :params
 
     def initialize
       @actions = []
+      @params = Hash.new
 
       @config = Config.new Hash[
 	:product => proc { |_product| process_product _product },
+	:params => proc { |_params| process_params _params },
 	:package => proc { |_package| process_package _package },
 	:action  => proc { |_action|  process_action  _action  }
       ]
     end
+
     def process(file)
       process_content File.readlines(file), file
     end
+
     def process_content(lines,*args)
       content = lines.map { |_line| _line.chomp.chomp }
       eval content.join("\n"), @config.get_binding, *args
@@ -97,10 +104,16 @@ module Installation
       raise ProductError unless @product.nil?
       @product = product
     end
+
+    def process_params(params)
+      @params.update(params)
+    end
+
     def process_package(package)
       raise PackageError unless @package.nil?
       @package = package
     end
+
     def process_action(action)
       @actions << action
     end
@@ -118,24 +131,35 @@ module Installation
       def product(*credentials)
 	@actions[:product].call Product.new(*credentials)
       end
+
+      def params(hash)
+	@actions[:params].call(hash)
+      end
+
       def package(*credentials)
 	@actions[:package].call Package.new(*credentials)
       end
+
       def install(*data)
 	@actions[:action].call InstallAction.new(*data)
       end
+
       def generate(*data)
 	@actions[:action].call GenerateAction.new(*data)
       end
+
       def expand(*data)
 	@actions[:action].call ExpandAction.new(*data)
       end
+
       def symlink(*data)
 	@actions[:action].call SymlinkAction.new(*data)
       end
+
       def remove(*data)
 	@actions[:action].call RemoveAction.new(*data)
       end
+
       def directory(*data)
 	@actions[:action].call DirectoryAction.new(*data)
       end

@@ -124,11 +124,6 @@ module Installation
       collect_config_data.each do |_config|
         product = _config.product
         package = _config.package
-
-        actions = _config.actions
-        user = product.user
-        group = product.group
-        top = File.dirname top_directory 
         
         name = "#{product.name}#{package.name}"
 
@@ -139,7 +134,7 @@ module Installation
         puts "Removing #{name}#{version}#{platform}"
 
         Dir.cd top_directory do
-          task_manager = TaskManager.new(product, actions, package, top, user, group)
+          task_manager = TaskManager.new(product, package, _config.params, _config.actions)
           task_manager.revert
         end
       end
@@ -211,7 +206,7 @@ module Installation
 
       puts "Installing #{info}"
       
-      task_manager = TaskManager.new(product,  package, actions)
+      task_manager = TaskManager.new(product,  package, config.params, actions)
       task_manager.execute !@options.key?("nocleanup")
     end
 

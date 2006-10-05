@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,19 +47,21 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'tsc/errors.rb'
 require 'etc'
 
 module Installation
   class TaskManager
-    def initialize(product, package, actions)
+    def initialize(product, package, params, actions)
       @services = package.tasks
 
       Task.installation_product = product
       Task.installation_package = package
       Task.installation_actions = actions
+
+      Task.installation_parameters.update(params)
 
       setup_task_user(product.user)
       setup_task_group(product.group)

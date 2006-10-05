@@ -74,7 +74,7 @@ module Distribution
           @product = Product.new(@cache, &_block)
         },
         :fileset => proc { |_block| 
-          @filesets << Fileset.new(@cache, &_block)
+          @filesets << Fileset.new(product, @cache, &_block)
         }
       ]
     end

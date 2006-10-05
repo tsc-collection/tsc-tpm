@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'tsc/platform'
 require 'config-parser.rb'
@@ -55,6 +56,7 @@ require 'package.rb'
 module Distribution
   class Product
     attr_reader :name, :description, :version, :user, :group, :top, :packages, :base
+    attr_reader :params
     attr_accessor :library_prefix, :library_major, :build
 
     def initialize(cache, &block)
@@ -82,9 +84,13 @@ module Distribution
         },
         :base => proc { |_block, _argument|
           @base = _argument
+        },
+        :params => proc {
+          params
         }
       ]
       @packages = []
+      @params = Hash.new
       @parser.process &block
     end
 
@@ -104,7 +110,10 @@ module Distribution
       prefix = self.library_prefix.inspect
       major = self.library_major.inspect
 
-      "product #{name}, #{description}, #{top}, #{version}, #{build}, #{platform}, #{prefix}, #{major}, #{user}, #{group}"
+      [
+        "product #{name}, #{description}, #{top}, #{version}, #{build}, #{platform}, #{prefix}, #{major}, #{user}, #{group}",
+        "params(#{params.inspect})"
+      ]
     end
   end
 end

@@ -216,7 +216,7 @@ module Distribution
     end
 
     def copy_files_and_collect_info(directory)
-      info = [ @package.product.info, @package.info ]
+      info = Array(@package.product.info) + Array(@package.info)
       TSC::Progress.new 'Copying package contents' do |_progress|
         @package.descriptors.each do |_descriptor|
           info << _descriptor.info

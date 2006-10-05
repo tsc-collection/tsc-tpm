@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'tsc/dtools'
 require 'etc'
@@ -78,6 +79,8 @@ module Distribution
       Installation::Task.installation_user = user_entry.name
       Installation::Task.installation_group = group_entry.name
       Installation::Task.installation_top ||= @product.top || user_entry.dir
+
+      Installation::Task.installation_parameters.update @product.params
 
       Dir.cd directory do
 	@config.actions.each do |_action|

@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'tsc/launch'
 require 'tsc/dtools'
@@ -77,6 +78,9 @@ module Distribution
         },
         :base => proc { |_block, _argument|
           @base = _argument
+        },
+        :params => proc {
+          product.params
         }
       ]
       @product = product
