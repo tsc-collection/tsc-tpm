@@ -5,24 +5,17 @@
 # This is free software. See 'LICENSE.MIT' for details.
 # You must read and accept the license prior to use.
 
-if defined? Installation::Generator
-  class Generator < Installation::Generator
-    def create(io)
-      bindir = File.join(self.class.installation_tools, 'bin')
-      [
-        '#!' + File.join(bindir, 'ruby'),
-        '$:.push ' + bindir.inspect
-      ] + IO::readlines(__FILE__).slice(1..-1)
-    end
-  end
-
-  throw :generator, Generator
-end
-
 $:.push File.dirname(__FILE__)
 require 'tsc/application.rb'
 
 class Application < TSC::Application
+
+  in_generator_context do |_content|
+    _content << '#!' + figure_ruby_path
+    _content << '$:.unshift ' + installation_tools_bin.inspect
+    _content << IO.readlines(__FILE__).slice(1..-1)
+  end
+
   def initialize
     super('[<script>] [<custom options>]',
       [ '--test', 'Run internal tests', nil ],
