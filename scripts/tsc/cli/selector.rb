@@ -13,7 +13,8 @@ module TSC
         @config = config
         @communicator = communicator
 
-        @config[:other] = true if choices.empty?
+        @config[:other] ||= true if choices.empty?
+        @config[:other] = nil if @config[:other] == false
       end
 
       def start
@@ -42,7 +43,7 @@ module TSC
           end
 
           add_category _menu, :other do
-            question(preferred || current)
+            question(current || preferred)
           end
 
           add_category _menu, :none do

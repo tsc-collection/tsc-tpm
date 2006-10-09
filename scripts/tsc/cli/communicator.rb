@@ -20,11 +20,12 @@ module TSC
         Selector.new(menu, communicator).start
       end
 
-      def ask_hash_key(hash, key, preferred = nil, &block)
+      def ask_hash_key(hash, key, preferred = nil, other = false, &block)
         key = key.to_s
         hash[key] = select Hash[
           :header => key,
           :current => hash[key],
+          :other => other,
           :preferred => preferred,
           :choices => (block.call hash, key if block)
         ]
