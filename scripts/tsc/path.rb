@@ -20,7 +20,7 @@ module TSC
 
     def initialize(*entries)
       @front = []
-      @entries = entries
+      @entries = entries.flatten.compact
       @back = []
     end
 
@@ -37,13 +37,13 @@ module TSC
       self
     end
 
-    def front(entry)
-      @front.push(entry)
+    def front(*entries)
+      @front.concat entries.flatten.compact
       self
     end
 
-    def back(entry)
-      @back.push(entry)
+    def back(*entries)
+      @back.concat entries.flatten.compact
       self
     end
 
