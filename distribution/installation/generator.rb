@@ -87,12 +87,13 @@ module Installation
     end
 
     def process_create
-      File.open(@target,'a+') {}
-      result = File.open(@target, 'r') do |_io|
+      source = File.exist?(target) ? target : '/dev/null'
+      result = File.open(source, 'r') do |_io|
 	create _io
       end
 
-      File.open(@target, 'w') do |_io|
+      File.rm_f target
+      File.open(target, 'w') do |_io|
 	_io.puts result
       end
     end
