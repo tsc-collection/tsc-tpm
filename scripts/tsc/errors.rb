@@ -87,27 +87,45 @@ module TSC
       # compound TSC::Error instance.
       #
       def undo(*errors, &block)
-        stack = []
-        class << stack
-          def add(&block)
-            self.push block if block
-          end
-        end
-
+        stack = collector
         on_error(block, [ stack ], RuntimeError, *errors) do |_error|
-          errors = []
-          stack.flatten.compact.reverse_each do |_proc|
-            on_error(_proc, [ _error ], Exception) do |_exception|
-              errors << _exception
-            end
+          begin
+            persist(*stack.flatten.compact.reverse)
+          rescue Exception => undo_error
+            raise self.new(_error, undo_error)
           end
-          raise if errors.empty?
-          raise self.new(_error, *errors)
+
+          raise
         end
+      end
+
+      def persist(*blocks, &block)
+        operations = collector.concat blocks
+        block.call(operations) if block
+
+        errors = []
+        operations.each do |_proc|
+          on_error(_proc, [], Exception) do |_error|
+            errors << _error
+          end
+        end
+        raise errors.first if errors.size == 1
+        raise self.new(*errors) unless errors.empty?
       end
 
       private
       #######
+
+      def collector
+        collector = []
+        class << collector
+          def add(*blocks, &block)
+            self.concat(blocks + Array(block))
+          end
+        end
+
+        collector
+      end
 
       def on_error(block, arguments, default_list, *error_list, &handler)
         begin
@@ -279,6 +297,40 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           'aaa: bbb: zzz#aaa: bbb: uuu', 
           TSC::Error.new('aaa', 'bbb', RuntimeError.new('zzz'), RuntimeError.new('uuu')).message
         )
+      end
+
+      def test_persist_no_error
+        result = []
+        TSC::Error.persist { |_queue|
+          _queue.add { result << 'aaa' }
+          _queue.add { result << 'bbb' }
+        }
+        assert_equal [ 'aaa', 'bbb' ], result
+      end
+
+      def test_persist_with_one_error
+        result = []
+        assert_raises(RuntimeError) do
+          TSC::Error.persist { |_queue|
+            _queue.add { result << 'aaa' }
+            _queue.add { raise 'Error 1' }
+            _queue.add { result << 'ddd' }
+          }
+        end
+        assert_equal [ 'aaa', 'ddd' ], result
+      end
+
+      def test_persist_with_many_errors
+        result = []
+        assert_raises(TSC::Error) do
+          TSC::Error.persist { |_queue|
+            _queue.add { result << 'aaa' }
+            _queue.add { raise 'Error 1' }
+            _queue.add { raise 'Error 2' }
+            _queue.add { result << 'ddd' }
+          }
+        end
+        assert_equal [ 'aaa', 'ddd' ], result
       end
 
       def test_undo_no_error

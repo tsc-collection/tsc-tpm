@@ -99,7 +99,7 @@ module Installation
     end
 
     def figure_ruby_path
-      ruby_path_list.detect { |_path|
+      @ruby ||= ruby_path_list.detect { |_path|
         File.file?(_path) && File.executable?(_path)
       }
     end
