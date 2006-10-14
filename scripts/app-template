@@ -12,12 +12,6 @@ require 'tsc/path.rb'
 
 class Application < TSC::Application
 
-  in_generator_context do |_content|
-    _content << '#!' + figure_ruby_path
-    _content << TSC::PATH.current.front(installation_tools_bin).to_ruby_eval
-    _content << IO.readlines(__FILE__).slice(1..-1)
-  end
-
   def initialize
     super('<parameter> ...',
       [ '--option', 'Option', 'argument', '-o' ],
@@ -28,11 +22,16 @@ class Application < TSC::Application
   def start
     handle_errors {
       process_command_line
-      localize_ruby_loadpath
 
       throw :TEST if options.has_key?('test')
       raise TSC::UsageError, 'Nothing to do' if ARGV.empty?
     }
+  end
+
+  in_generator_context do |_content|
+    _content << '#!' + figure_ruby_path
+    _content << TSC::PATH.current.front(File.dirname(figure_ruby_path)).to_ruby_eval
+    _content << IO.readlines(__FILE__).slice(1..-1)
   end
 end
 
