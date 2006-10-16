@@ -55,9 +55,8 @@ require 'package.rb'
 
 module Distribution
   class Product
-    attr_reader :name, :description, :version, :user, :group, :top, :packages, :base
-    attr_reader :params
-    attr_accessor :library_prefix, :library_major, :build
+    attr_reader :description, :user, :group, :top, :packages, :base, :params
+    attr_accessor :library_prefix, :library_major, :build, :name, :version, :tag
 
     def initialize(cache, &block)
       @parser = ConfigParser.new cache, Hash[

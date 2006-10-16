@@ -63,10 +63,15 @@ module Distribution
     attr_accessor :binary_directory, :force
 
     def_delegators :@config, :filesets, :product
+
     def_delegators :@config, "product_build="
+    def_delegators :@config, "product_name="
+    def_delegators :@config, "product_version="
+    def_delegators :@config, "product_tag="
     def_delegators :@config, "product_library_prefix="
     def_delegators :@config, "product_library_major="
-    def_delegators :@config, "product_source_path=", "product_binary_path="
+    def_delegators :@config, "product_source_path="
+    def_delegators :@config, "product_binary_path="
 
     def initialize(prodinfo, binary_directory)
       @force = false

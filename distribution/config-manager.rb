@@ -92,6 +92,18 @@ module Distribution
       @product.build = build
     end
 
+    def product_name=(name)
+      @product.name = name if name
+    end
+
+    def product_version=(version)
+      @product.version = version if version
+    end
+
+    def product_tag=(tag)
+      @product.tag = tag if tag
+    end
+
     def product_library_prefix=(prefix)
       Module.library_prefix = prefix
       @product.library_prefix = prefix

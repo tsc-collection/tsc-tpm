@@ -63,7 +63,10 @@ module TSC
     end
 
     def fetch(parameter, value = nil)
-      @hash[parameter] or value or raise "No #{parameter.inspect} specified"
+      @hash[parameter] or begin
+        raise "No #{parameter.inspect} specified" if value.nil?
+        value
+      end
     end
 
     def update(config)

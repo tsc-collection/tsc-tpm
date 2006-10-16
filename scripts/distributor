@@ -69,7 +69,10 @@ class Application < TSC::Application
       [ '--install',  'Install',              nil,              '-i' ],
       [ '--source',   'Source top directory', 'directory'            ],
       [ '--binary',   'Binary top directory', 'directory'            ],
-      [ '--build',    'Broduct build',        'build no',       '-b' ],
+      [ '--product',  'Product name',         'string',         '-P' ],
+      [ '--version',  'Product version',      'string',         '-V' ],
+      [ '--tag',      'Product tag',          'string',         '-T' ],
+      [ '--build',    'Broduct build',        'build no',       '-b', '-B' ],
       [ '--prefix',   'Library prefix',       'string',         '-p' ],
       [ '--major',    'Library major number', 'value',          '-l' ],
       [ '--mode',     'Operational mode',     'mode',           '-m' ],
@@ -87,29 +90,32 @@ class Application < TSC::Application
       prepare_environment
       guess_source_and_binary
 
-      file_to_require = @options['require']
+      file_to_require = options['require']
       require file_to_require if file_to_require
 
       distributor = Distribution::Distributor.new(@prodinfo, binary_directory)
 
-      @options.each do |_key, _value|
+      options.each do |_key, _value|
         case _key
           when 'source' then distributor.product_source_path = File.expand_path(_value)
           when 'binary' then distributor.product_binary_path = File.expand_path(_value)
           when 'build' then distributor.product_build = convert_to_integer(_value)
+          when 'product' then distributor.product_name = _value
+          when 'version' then distributor.product_version = _value
+          when 'tag' then distributor.product_tag = _value
           when 'prefix' then distributor.product_library_prefix = _value
           when 'major' then distributor.product_library_major = convert_to_integer(_value)
           when 'force' then distributor.force = true
         end
       end
-      if @options.key? 'install'
-        @args.clear unless ([ @options['source'], @options['binary'] ] & @args).empty?
+      if options.key? 'install'
+        @args.clear unless ([ options['source'], options['binary'] ] & @args).empty?
 
         distributor.install_content *@args.map { |_arg|
           File.expand_path(_arg)
         }
       else
-        distributor.create_packages @options['output'], *@args
+        distributor.create_packages options['output'], *@args
       end
       exit! 0
     }
@@ -118,7 +124,7 @@ class Application < TSC::Application
   private
   #######
   def process_command_line
-    @options = super
+    super
 
     raise "No product description file specified" if ARGV.size == 0 
 
@@ -136,8 +142,8 @@ class Application < TSC::Application
     array = File.expand_path(@prodinfo).scan(%r{(.*)(/src/)})
     return if array.empty?
 
-    @options['source'] ||= File.join(array.first.first, 'src')
-    @options['binary'] ||= File.join(array.first.first, 'bin')
+    options['source'] ||= File.join(array.first.first, 'src')
+    options['binary'] ||= File.join(array.first.first, 'bin')
   end
 
   def prepare_environment
@@ -153,7 +159,7 @@ class Application < TSC::Application
     }.flatten.compact.first
 
     if distribution_directory
-      mode = @options['mode']
+      mode = options['mode']
       unless mode.nil? or mode == '0'
         mode_directory = File.join distribution_directory, 'mode', mode
         raise "Mode #{mode.inspect} not supported" unless File.directory? mode_directory

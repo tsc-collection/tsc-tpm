@@ -104,8 +104,10 @@ module Distribution
       platform_string = "-#{product.platform}" unless product.platform.nil?
       build_string = "-b#{product.build}" unless product.build.nil?
       version_string = "-#{product.version}" unless product.version.nil?
+      tag_string = "-#{product.tag}" unless product.tag.nil?
       name = "#{product.name.upcase}#{self.name.downcase}"
-      "#{name}#{version_string}#{build_string}#{platform_string}.tpm"
+
+      "#{name}#{version_string}#{build_string}#{tag_string}#{platform_string}.tpm"
     end
 
     def info
