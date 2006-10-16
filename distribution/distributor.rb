@@ -83,16 +83,16 @@ module Distribution
     def create_packages(*args)
       directory, *packages = args
       @config.product.packages.each do |_package|
-	if packages.empty? == true or packages.include? _package.name
-	  Packager.new(_package, self).create directory
-	end
+        if packages.empty? == true or packages.include? _package.name
+          Packager.new(_package, self).create directory
+        end
       end
     end
 
     def file_located_in(file, *dirs)
       return true if dirs.empty?
       dirs.each do |_dir|
-	return true if File.expand_path(file).index(_dir + '/') == 0
+        return true if File.expand_path(file).index(_dir + '/') == 0
       end
       false
     end
@@ -100,9 +100,9 @@ module Distribution
     def collect_filesets
       filesets = []
       @config.product.packages.each do |_package|
-	_package.filesets.each do |_fileset|
-	  filesets << _fileset unless filesets.include? _fileset
-	end
+        _package.filesets.each do |_fileset|
+          filesets << _fileset unless filesets.include? _fileset
+        end
       end
       filesets
     end
@@ -111,24 +111,24 @@ module Distribution
       info = []
       directory = "/tmp/distributor.#{$$}"
       begin
-	File.makedirs directory
-	TSC::Progress.new "Collecting information" do |_progress|
-	  collect_filesets.each do |_fileset|
-	    _fileset.descriptors(@config.product.packages.first).each do |_descriptor|
-	      next unless file_located_in _descriptor.source, *dirs
+        File.makedirs directory
+        TSC::Progress.new "Collecting information" do |_progress|
+          collect_filesets.each do |_fileset|
+            _fileset.descriptors(@config.product.packages.first).each do |_descriptor|
+              next unless file_located_in _descriptor.source, *dirs
 
-	      info << _descriptor.info
-	      _descriptor.install_to_destination directory
-	      _progress.print
-	    end
-	  end
-	end
-	info.compact!
-	unless info.empty?
-	  Installer.new(info, @force, @config.product).install_from directory
-	end
+              info << _descriptor.info
+              _descriptor.install_to_destination directory
+              _progress.print
+            end
+          end
+        end
+        info.compact!
+        unless info.empty?
+          Installer.new(info, @force, @config.product).install_from directory
+        end
       ensure
-	Dir.rm_r directory
+        Dir.rm_r directory
       end
     end
   end
@@ -146,52 +146,52 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
             self
           end
         end
-	distributor = Distributor.new File.join(File.dirname(__FILE__), 'prodinfo')
+        distributor = Distributor.new File.join(File.dirname(__FILE__), 'prodinfo')
 
-	distributor.product_library_prefix = "tsc"
-	distributor.product_library_major = 17
-	
-	distributor.product_build = 17
-	distributor.product_source_path = "src"
-	distributor.product_binary_path = "bin"
+        distributor.product_library_prefix = "tsc"
+        distributor.product_library_major = 17
+        
+        distributor.product_build = 17
+        distributor.product_source_path = "src"
+        distributor.product_binary_path = "bin"
 
-	assert_equal 11, distributor.filesets[0].descriptors(package).size
-	assert_equal 5, distributor.filesets[1].descriptors(package).size
-	assert_equal 8, distributor.filesets[2].descriptors(package).size
+        assert_equal 11, distributor.filesets[0].descriptors(package).size
+        assert_equal 5, distributor.filesets[1].descriptors(package).size
+        assert_equal 8, distributor.filesets[2].descriptors(package).size
 
-	ffc = distributor.filesets[0].descriptors(package)[1]
+        ffc = distributor.filesets[0].descriptors(package)[1]
 
-	assert ffc.source?(%r{#{Regexp.quote "bin/lib/ffc/libtscffc.so.*.17"}$})
-	assert ffc.action?("install")
-	assert true, ffc.checksum_source?(%r{bin/lib/ffc/libtscffc\.so\.reloc\.o$})
-	assert true, ffc.target?('lib/libtscffc.so.*.17')
-	assert true, ffc.destination?(%r{^contents/location-\d+/libtscffc\.so\.\*\.17$})
+        assert ffc.source?(%r{#{Regexp.quote "bin/lib/ffc/libtscffc.so.*.17"}$})
+        assert ffc.action?("install")
+        assert true, ffc.checksum_source?(%r{bin/lib/ffc/libtscffc\.so\.reloc\.o$})
+        assert true, ffc.target?('lib/libtscffc.so.*.17')
+        assert true, ffc.destination?(%r{^contents/location-\d+/libtscffc\.so\.\*\.17$})
 
-	rltconfig = distributor.filesets[0].descriptors(package)[6]
+        rltconfig = distributor.filesets[0].descriptors(package)[6]
 
-	assert rltconfig.source?(%r{src/conf/rltconfig$})
-	assert rltconfig.action?('install')
-	assert rltconfig.checksum_source?(nil)
-	assert rltconfig.target?('/etc/init.d/reliatel')
-	assert rltconfig.destination?(%r{^contents/location-\d+/rltconfig$})
+        assert rltconfig.source?(%r{src/conf/rltconfig$})
+        assert rltconfig.action?('install')
+        assert rltconfig.checksum_source?(nil)
+        assert rltconfig.target?('/etc/init.d/reliatel')
+        assert rltconfig.destination?(%r{^contents/location-\d+/rltconfig$})
 
-	reliatel = distributor.filesets[0].descriptors(package)[7]
-	assert reliatel.action?('symlink')
-	assert reliatel.source?('/etc/init.d/reliatel')
-	assert reliatel.target?('/etc/rc2.d/S94reliatel')
-	assert reliatel.destination?(nil)
+        reliatel = distributor.filesets[0].descriptors(package)[7]
+        assert reliatel.action?('symlink')
+        assert reliatel.source?('/etc/init.d/reliatel')
+        assert reliatel.target?('/etc/rc2.d/S94reliatel')
+        assert reliatel.destination?(nil)
 
-	task = distributor.filesets[1].descriptors(package)[4]
-	assert task.action?('install')
-	assert task.source?(%r{bin/conf/make-config\.rb$})
-	assert task.destination?('meta-inf/installation/tasks/make-config.rb')
-	assert task.target?('.meta-inf/packages/abcdef/installation/tasks/make-config.rb')
+        task = distributor.filesets[1].descriptors(package)[4]
+        assert task.action?('install')
+        assert task.source?(%r{bin/conf/make-config\.rb$})
+        assert task.destination?('meta-inf/installation/tasks/make-config.rb')
+        assert task.target?('.meta-inf/packages/abcdef/installation/tasks/make-config.rb')
 
-	reliatel = distributor.filesets[0].descriptors(package)[10]
-	assert reliatel.action?('directory')
-	assert reliatel.source?(%r{log$})
-	assert reliatel.target?('log')
-	assert reliatel.destination?(nil)
+        reliatel = distributor.filesets[0].descriptors(package)[10]
+        assert reliatel.action?('directory')
+        assert reliatel.source?(%r{log$})
+        assert reliatel.target?('log')
+        assert reliatel.destination?(nil)
       end
     end
   end
