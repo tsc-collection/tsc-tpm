@@ -167,14 +167,10 @@ module TSC
       rescue Exception => exception
         case exception
           when TSC::UsageError, GetoptLong::InvalidOption, GetoptLong::MissingArgument
-            print_error(exception)
+            print_error exception
             print_usage('===')
             exit 2
-          when TSC::Error
-            exception.each_error do |_error, *_strings|
-              print_error _error, *_strings
-            end
-          when StandardError, Interrupt, *errors
+          when TSC::Error, StandardError, Interrupt, *errors
             print_error exception
           else
             raise
@@ -284,28 +280,18 @@ module TSC
       ]
     end
 
-    def print_error(exception, *strings)
-      message = [ 'ERROR', script_name ] + strings.flatten + [ exception.message.strip ].map { |_m|
-        _m.empty? ? exception.class.to_s : _m
-      }
-      print_diagnostics [
-        message.join(': '),
-        if exception.kind_of? TSC::Launcher::TerminateError
-          exception.errors.map { |_error|
-            "  stderr> #{_error}"
+    def print_error(exception)
+      print_diagnostics TSC::Error.textualize(
+        exception, Hash[
+          :source => script_name, 
+          :stderr => proc { |_line| 
+            '  stderr> ' + _line 
+          },
+          :backtrace => verbose? && proc { |_line|
+            '  ' + _line.sub(%r{^#{script_location}/}, '')
           }
-        end,
-        if verbose?
-          [
-            '<' + exception.class.name + '>',
-            if exception.backtrace
-              exception.backtrace.map { |_line|
-                '  ' + _line.sub(%r{^#{script_location}/}, '')
-              }
-            end
-          ]
-        end
-      ]
+        ]
+      )
     end
 
     def print_diagnostics(*args)
@@ -315,7 +301,6 @@ module TSC
     def check_directory_exists(path)
       File.stat(path).directory? if Dir[path].size == 1
     end
-
   end
 end
 
@@ -336,8 +321,8 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           [ 'install', 'Install' ]
         )
         ARGV.replace %w{ -v -ta -Tb -v --test c --install }
-        result = app.start { |_options|
-          _options
+        result = app.start { |_app|
+          _app.options
         }
         assert_equal 3, result.size
         assert_equal '', result.fetch('verbose')

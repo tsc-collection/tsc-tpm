@@ -99,6 +99,13 @@ module TSC
         end
       end
 
+      # Executes all code blocks collecting exceptions that may occur along
+      # the way. If called with the block itself, invokes the block with a
+      # queue instance to add code blocks scheduled for launch into. When all
+      # all code blocks are processed, raises the resulting exeptions
+      # either re-raising if a single one, or combining all into a single
+      # TSC::Error instance.
+      #
       def persist(*blocks, &block)
         operations = collector.concat blocks
         block.call(operations) if block
@@ -111,6 +118,52 @@ module TSC
         end
         raise errors.first if errors.size == 1
         raise self.new(*errors) unless errors.empty?
+      end
+
+      def textualize(exception, options = {}, &block)
+        stderr_processor = case processor = options[:stderr] 
+          when Proc, nil, false then processor
+          else proc { |_line|
+            '  stderr> ' + _line
+          }
+        end
+
+        backtrace_processor = case processor = options[:backtrace] 
+          when Proc, nil, false then processor
+          else proc { |_line|
+            '  ' + _line
+          }
+        end
+
+        generator = proc { |_error, *_strings|
+          message = [ 'ERROR', options[:originator], Array(options[:strings]) ] + [ _error.message.strip ].map { |_m|
+            _m.empty? ? _error.class.to_s : _m
+          }
+          [
+            message.flatten.compact.join(': '),
+
+            if TSC::Launcher::TerminateError === _error and stderr_processor
+              _error.errors.map(&stderr_processor)
+            end,
+
+            if _error.backtrace and backtrace_processor
+              [
+                '<' + _error.class.name + '>',
+                _error.backtrace.map(&backtrace_processor)
+              ]
+            end
+          ].flatten.compact
+        }
+
+        if self === exception
+          result = []
+          exception.each_error do |_error, *_strings|
+            result << generator.call(_error, *_strings)
+          end
+          result
+        else
+          generator.call(exception)
+        end
       end
 
       private
