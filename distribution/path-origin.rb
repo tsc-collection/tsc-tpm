@@ -10,7 +10,8 @@ require 'tsc/path.rb'
 module Distribution
   class PathOrigin < Origin
     def descriptors
-      @descriptors ||= modules.map { |_module|
+      modules.map { |_module|
+        original_entries = _module.entries.clone
         _module.entries.replace _module.entries.map { |_entry|
           entry = File.smart_join(_entry)
           directory = path.entries.detect { |_directory|
@@ -19,7 +20,10 @@ module Distribution
 
           [ directory, *Array(_entry) ]
         }
-	_module.descriptors '/'
+	descriptors = _module.descriptors '/'
+        _module.entries.replace original_entries
+
+        descriptors
       }.flatten
     end
 
