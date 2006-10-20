@@ -145,6 +145,7 @@ module Distribution
     end
 
     def copy_source_to(destination)
+      File.rm_f destination
       File.copy @source, destination, false
     end
 

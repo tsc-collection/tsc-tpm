@@ -176,7 +176,7 @@ process_archive()
 
 list()
 {
-  trace_and_run ${STREAM_UNCOMPRESS_COMMAND} | trace_and_run cpio -tdcv "${@}"
+  trace_and_run ${STREAM_UNCOMPRESS_COMMAND} | trace_and_run cpio -itdcv "${@}"
 }
 
 extract()
