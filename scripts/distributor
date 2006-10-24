@@ -66,19 +66,20 @@ class Application < TSC::Application
 
   def initialize
     super('<product description> [<package> ...]',
-      [ '--install',  'Install',              nil,              '-i' ],
-      [ '--source',   'Source top directory', 'directory'            ],
-      [ '--binary',   'Binary top directory', 'directory'            ],
-      [ '--product',  'Product name',         'string',         '-P' ],
-      [ '--version',  'Product version',      'string',         '-V' ],
-      [ '--tag',      'Product tag',          'string',         '-T' ],
-      [ '--build',    'Broduct build',        'build no',       '-b', '-B' ],
-      [ '--prefix',   'Library prefix',       'string',         '-p' ],
-      [ '--major',    'Library major number', 'value',          '-l' ],
-      [ '--mode',     'Operational mode',     'mode',           '-m' ],
-      [ '--output',   'Output directory',     'directory',      '-o' ],
-      [ '--force',    'Force installation',   nil,              '-f' ],
-      [ '--require',  'File to require',      'file',           '-r' ]
+      [ '--install',   'Install',                  nil,         '-i' ],
+      [ '--source',    'Source top directory',     'directory'  ],
+      [ '--binary',    'Binary top directory',     'directory'  ],
+      [ '--product',   'Product name',             'string',    '-P' ],
+      [ '--version',   'Product version',          'string',    '-V' ],
+      [ '--tag',       'Product tag',              'string',    '-T' ],
+      [ '--build',     'Broduct build',            'number',    '-b', '-B' ],
+      [ '--prefix',    'Library prefix',           'string',    '-p' ],
+      [ '--extention', 'Shared library extention', 'string',    '-E' ],
+      [ '--major',     'Library major number',     'number',    '-l' ],
+      [ '--mode',      'Operational mode',         'number',    '-m' ],
+      [ '--output',    'Output directory',         'directory', '-o' ],
+      [ '--force',     'Force installation',       nil,         '-f' ],
+      [ '--require',   'File to require',          'file',      '-r' ]
     )
   end
 
@@ -104,6 +105,7 @@ class Application < TSC::Application
           when 'version' then distributor.product_version = _value
           when 'tag' then distributor.product_tag = _value
           when 'prefix' then distributor.product_library_prefix = _value
+          when 'extention' then distributor.product_library_extention = _value
           when 'major' then distributor.product_library_major = convert_to_integer(_value)
           when 'force' then distributor.force = true
         end

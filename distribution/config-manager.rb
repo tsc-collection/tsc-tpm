@@ -109,6 +109,10 @@ module Distribution
       @product.library_prefix = prefix
     end
 
+    def product_library_extention=(extention)
+      Module.library_extention = extention
+    end
+
     def product_library_major=(major)
       Module.library_major = major
       @product.library_major = major

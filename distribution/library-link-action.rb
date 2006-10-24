@@ -73,15 +73,19 @@ module Distribution
     private
     #######
     def prefix
-      LibraryModule.prefix
+      LibraryModule.library_prefix
+    end
+
+    def extention
+      LibraryModule.library_extention
     end
 
     def major
-      LibraryModule.major
+      LibraryModule.library_major
     end 
 
     def make_library_name(dir,name)
-      File.join dir, "lib#{prefix}#{name}.so.#{major}"
+      File.join dir, "lib#{prefix}#{name}.#{extention}.#{major}"
     end
 
     def make_descriptor(original,target)

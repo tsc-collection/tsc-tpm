@@ -1,3 +1,4 @@
+=begin
 #
 #            Tone Software Corporation BSD License ("License")
 # 
@@ -46,7 +47,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-
+=end
 
 require 'binary-exec-module'
 
@@ -55,12 +56,25 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0..-2] + [ "lib#{self.class.library_prefix}#{_entry.last}.so.*.#{self.class.library_major}" ]
+	_entry[0..-2] + [ "lib#{prefix}#{_entry.last}.#{extention}.*.#{major}" ]
       }
     end
+
+    def prefix
+      self.class.library_prefix
+    end
+
+    def major
+      self.class.library_major
+    end
+
+    def extention
+      self.class.library_extention
+    end
+
     def process_file_entry(file)
       super
-      file.path_for_checksum = file.path.sub(/[.]so[.][^.]*[.][^.]*$/,'.so.reloc.o')
+      file.path_for_checksum = file.path.sub(%r{[.]#{extention}[.][^.]*[.][^.]*$}, ".#{extention}.reloc.o")
     end
   end
 end

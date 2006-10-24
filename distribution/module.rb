@@ -57,6 +57,7 @@ module Distribution
     attr_reader :entries
 
     @@build = 0
+    @@library_extention = 'so'
     @@library_prefix = nil
     @@library_major = nil
 
@@ -75,6 +76,14 @@ module Distribution
 
       def library_prefix=(prefix)
         @@library_prefix = prefix
+      end
+
+      def library_extention
+        @@library_extention
+      end
+
+      def library_extention=(extention)
+        @@library_extention = extention
       end
 
       def library_major
