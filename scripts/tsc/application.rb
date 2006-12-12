@@ -54,7 +54,7 @@ module TSC
   # information.
   #
   class Application
-    attr_reader :script_name, :script_location
+    attr_reader :script_name, :script_location, :options
 
     # Creates and application, passing it optional command line descriptor 
     # (if the first argument is aString) and an array of option descriptors  
@@ -89,8 +89,9 @@ module TSC
       @registry.add_bulk(*args)
 
       @script_location, @script_name = File.split($0)
-      @options = nil
+      @options = Hash.new
 
+      verbose = ENV['TRACE'].to_s.split.include?(script_name)
       start(&block) if block
     end
 
@@ -106,15 +107,7 @@ module TSC
       end
     end
 
-    # Returns a hash of parsed option values or an empty hash if 
-    # options not processed yet.
-    #
-    def options
-      @options or Hash.new
-    end
-
     def verbose=(state)
-      @options ||= Hash.new
       if state 
         @options['verbose'] = true
       else
@@ -183,9 +176,6 @@ module TSC
     # creation.
     #
     def process_command_line(order = false)
-      return @options if @options
-      @options = Hash.new
-
       require 'getoptlong'
       require 'set'
 
@@ -219,8 +209,7 @@ module TSC
     # was specified.
     #
     def verbose?
-      return true unless @options
-      @options.has_key? 'verbose'
+      @options.has_key?('verbose')
     end
 
     def find_in_path(command)
