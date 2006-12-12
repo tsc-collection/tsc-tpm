@@ -91,7 +91,7 @@ module TSC
       @script_location, @script_name = File.split($0)
       @options = Hash.new
 
-      verbose = ENV['TRACE'].to_s.split.include?(script_name)
+      self.verbose = ENV['TRACE'].to_s.split.include?(script_name)
       start(&block) if block
     end
 
