@@ -79,19 +79,31 @@ class Application < TSC::Application
       [ '--mode',      'Operational mode',         'number',    '-m' ],
       [ '--output',    'Output directory',         'directory', '-o' ],
       [ '--force',     'Force installation',       nil,         '-f' ],
-      [ '--require',   'File to require',          'file',      '-r' ]
+      [ '--require',   'File to require',          'file',      '-r' ],
+      [ '--test',      'Setup unit tests',         nil,         '-t' ]
     )
   end
 
   def start
     handle_errors {
       process_command_line
-
       prepare_environment
-      guess_source_and_binary
+
+      require 'test/unit' if options.key?('test')
 
       file_to_require = options['require']
       require file_to_require if file_to_require
+
+      if options.key?('test')
+        exit Test::Unit::AutoRunner.run
+      end
+
+      raise "No product description file specified" if ARGV.size == 0 
+
+      @prodinfo = ARGV.shift
+      @args = ARGV
+
+      guess_source_and_binary
 
       distributor = Distribution::Distributor.new(@prodinfo, binary_directory)
 
@@ -109,6 +121,7 @@ class Application < TSC::Application
           when 'force' then distributor.force = true
         end
       end
+      
       if options.key? 'install'
         @args.clear unless ([ options['source'], options['binary'] ] & @args).empty?
 
@@ -118,20 +131,13 @@ class Application < TSC::Application
       else
         distributor.create_packages options['output'], *@args
       end
-      exit! 0
+
+      exit 0
     }
   end
 
   private
   #######
-  def process_command_line
-    super
-
-    raise "No product description file specified" if ARGV.size == 0 
-
-    @prodinfo = ARGV.shift
-    @args = ARGV
-  end
 
   def convert_to_integer(value)
     number = value.to_i

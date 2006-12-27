@@ -38,11 +38,12 @@ end
 unless defined? Test::Unit::TestCase
   catch :TEST do
     Application.new.start
-    exit 0
   end
 end
 
 require 'test/unit'
+require 'mocha'
+require 'stubba'
 
 class ApplicationTest < Test::Unit::TestCase
   def test_something
@@ -57,3 +58,5 @@ class ApplicationTest < Test::Unit::TestCase
     @app = nil
   end
 end
+
+exit Test::Unit::AutoRunner.run
