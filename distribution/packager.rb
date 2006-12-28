@@ -113,6 +113,7 @@ module Distribution
     def figure_ruby_library_files
       loaded_files = $".clone
       loaded_files.push 'irb/**/*' if loaded_files.include? 'irb.rb'
+      loaded_files.push 'net/ssh/**/*' if loaded_files.include? 'net/ssh.rb'
       loaded_files.push 'rexml/**/*' if loaded_files.include? 'rexml/rexml.rb'
       figure_library_files 'lib/ruby', loaded_files
     end
