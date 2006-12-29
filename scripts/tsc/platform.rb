@@ -234,7 +234,7 @@ module TSC
     @supported = Hash[
       [ 'win-x86', :windows, :x86 ]  => %w{ i386-cygwin },
       [ 'sol-x86', :solaris, :x86 ]  => %w{ i386-solaris2.8 i386-solaris2.10 },
-      [ 'sol-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.6 },
+      [ 'sol-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.6 sparc-solaris2.7 },
       [ 'sol9-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.9 },
       [ 'sol8-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.8 },
       [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu },
