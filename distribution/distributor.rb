@@ -98,7 +98,7 @@ module Distribution
     def file_located_in(file, *dirs)
       return true if dirs.empty?
       dirs.each do |_dir|
-        return true if File.expand_path(file).index(_dir + '/') == 0
+        return true if file.index(_dir + '/') == 0
       end
       false
     end
