@@ -91,8 +91,9 @@ class Application < TSC::Application
 
       require 'test/unit' if options.key?('test')
 
-      file_to_require = options['require']
-      require file_to_require if file_to_require
+      Array(options['require']).each do |_file|
+        require _file
+      end
 
       if options.key?('test')
         exit Test::Unit::AutoRunner.run
