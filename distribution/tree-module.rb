@@ -53,6 +53,15 @@ require 'find'
 
 module Distribution
   class TreeModule < Module
+    def initialize(*args, &block)
+      b = nil
+      super *args, &b
+
+      @filter = block || proc { |_location, _item|
+        true
+      }
+    end
+
     def descriptors(origin)
       files.map { |_file|
 	dirname, basename = File.split _file.path
@@ -83,7 +92,13 @@ module Distribution
     def tree(top)
       entries = []
       Find.find(top + File::SEPARATOR) { |_path|
-        entries.push _path
+        case @filter.call *File.split(_path)
+          when nil
+            Find.prune
+          when false
+          else
+            entries.push _path
+        end
       }
       entries
     end
