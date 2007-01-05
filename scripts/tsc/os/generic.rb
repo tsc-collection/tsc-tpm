@@ -5,6 +5,8 @@
 # You must read and accept the license prior to use.
 
 require 'tsc/launch.rb'
+require 'set'
+require 'etc'
 
 module TSC
   module OS
@@ -45,6 +47,28 @@ module TSC
 
       def remove_group(group)
         launch "groupdel #{group}"
+      end
+
+      def set_user_groups(user, *groups)
+        launch "usermod -G '#{groups.flatten.join(',')}' #{user}"
+      end
+
+      def add_user_to_group(user, group)
+        groups = supplementary_groups_for(user)
+        set_user_groups(user, groups.map) if groups.add?(group)
+      end
+
+      def remove_user_from_groups(user, *groups)
+        set_user_groups user, (supplementary_groups_for(user) - groups).map
+      end
+
+      def supplementary_groups_for(user)
+        groups = Set.new
+        Etc.group do |_group|
+          groups << _group.name if _group.mem.include?(user)
+        end
+
+        groups
       end
     end
   end
