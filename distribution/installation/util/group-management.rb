@@ -50,50 +50,31 @@
 =end
 
 require 'etc'
+require 'tsc/launch'
 require 'tsc/errors'
-
-require 'installation/util/user-management.rb'
-require 'installation/util/group-management.rb'
+require 'ftools'
 
 module Installation
   module Tasks
-    class QueryUserTask < Task
-      include UserManagement
-      include GroupManagement
+    module GroupManagement
+      def create_group(group)
+	raise TSC::OperationCanceled unless communicator.ask "Create group #{group.inspect}", true
+	
+	launch "groupadd #{group}"
+	communicator.report "Group #{group.inspect} created"
+	@created_group = group
 
-      def provides
-	'system-query-user'
+	Etc::getgrnam group
       end
 
-      def execute
-	user = communicator.ask 'User', self.class.installation_user
-	user_entry = (Etc::getpwnam user rescue create_user user)
-	group_entry = Etc::getgrgid(user_entry.gid)
-
-	self.class.installation_user_entry = user_entry
-	self.class.installation_user = user_entry.name
-
-	self.class.installation_group_entry = group_entry
-	self.class.installation_group = group_entry.name
-
-	self.class.installation_top = user_entry.dir
-
-	File.makedirs user_entry.dir
-	File.chown user_entry.uid, user_entry.gid, user_entry.dir
-	File.chmod 0755, user_entry.dir
-      end
-
-      def revert
-	errors = []
-	[ :remove_user, :remove_group ].each do |_method|
+      def remove_group
+	unless @created_group.nil?
 	  begin
-	    self.send _method
-	  rescue Exception => exception
-	    errors << exception
+	    launch "groupdel #{@created_group}"
+	    communicator.report "Group #{@created_group.inspect} removed"
+	  rescue
 	  end
-	end
-	unless errors.empty?
-	  raise TSC::Error.new(*errors)
+	  @created_group = nil
 	end
       end
     end
