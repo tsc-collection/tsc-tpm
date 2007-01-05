@@ -50,7 +50,8 @@
 =end
 
 require 'etc'
-require 'tsc/errors'
+require 'tsc/errors.rb'
+require 'tsc/platform.rb'
 
 require 'installation/util/user-management.rb'
 require 'installation/util/group-management.rb'
@@ -63,6 +64,10 @@ module Installation
 
       def provides
 	'system-query-user'
+      end
+
+      def os
+        @os ||= TSC::Platform.current.driver
       end
 
       def execute

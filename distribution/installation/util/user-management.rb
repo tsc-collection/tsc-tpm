@@ -50,14 +50,16 @@
 =end
 
 require 'etc'
-require 'tsc/launch'
-require 'tsc/errors'
 require 'ftools'
+require 'tsc/errors.rb'
 
 require 'installation/util/group-management.rb'
 
 module Installation
   module Tasks
+    # This module assumes availability of method "os" provided by the host
+    # class, that would give access to os specific functionality.
+    #
     module UserManagement
       include GroupManagement
 
@@ -70,7 +72,7 @@ module Installation
 	home = ask_home_directory user, self.class.installation_top
 	raise "Wrong home directory" if home.index(Dir.getwd) == 0
 
-	launch "useradd -g #{group} -d #{home} -s /bin/sh #{user}"
+        os.add_user(user, group, home)
 	communicator.report "User #{user.inspect} created"
 	@created_user = user
 
@@ -79,7 +81,7 @@ module Installation
 
       def remove_user
 	unless @created_user.nil?
-	  launch "userdel #{@created_user}"
+          os.remove_user(@created_user)
 	  communicator.report "User #{@created_user.inspect} removed"
 	  @created_user = nil
 	end

@@ -50,17 +50,19 @@
 =end
 
 require 'etc'
-require 'tsc/launch'
 require 'tsc/errors'
 require 'ftools'
 
 module Installation
   module Tasks
+    # This module assumes availability of method "os" provided by the host
+    # class, that would give access to os specific functionality.
+    #
     module GroupManagement
       def create_group(group)
 	raise TSC::OperationCanceled unless communicator.ask "Create group #{group.inspect}", true
 	
-	launch "groupadd #{group}"
+        os.add_group(group)
 	communicator.report "Group #{group.inspect} created"
 	@created_group = group
 
@@ -70,7 +72,7 @@ module Installation
       def remove_group
 	unless @created_group.nil?
 	  begin
-	    launch "groupdel #{@created_group}"
+            os.remove_group(@created_group)
 	    communicator.report "Group #{@created_group.inspect} removed"
 	  rescue
 	  end

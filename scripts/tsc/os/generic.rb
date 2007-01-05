@@ -4,6 +4,8 @@
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
 
+require 'tsc/launch.rb'
+
 module TSC
   module OS
     class Generic
@@ -27,6 +29,22 @@ module TSC
 
       def stream_uncompress_command
         'uncompress -c'
+      end
+
+      def add_user(user, group, home)
+	launch "useradd -g #{group} -d #{home} -s /bin/sh #{user}"
+      end
+
+      def remove_user(user)
+        launch "userdel #{user}"
+      end
+
+      def add_group(group)
+	launch "groupadd #{group}"
+      end
+
+      def remove_group(group)
+        launch "groupdel #{group}"
       end
     end
   end
