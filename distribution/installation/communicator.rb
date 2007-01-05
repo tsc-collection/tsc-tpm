@@ -54,39 +54,135 @@ require 'tsc/cli/communicator.rb'
 
 module Installation
   class Communicator < TSC::CLI::Communicator
+    def initialize(*args)
+      super
+
+      @booleans ||= {
+        true => %w{ yes y yep true t }, 
+        false => %w{ no n nope false f } 
+      }
+    end
+
     def report(*args)
-      $stderr.puts "### #{args.join(' ')}"
+      communicator.say "### #{args.join(' ')}"
     end
 
     def error(*args)
-      $stderr.puts "ERROR: #{args.join(' ')}"
+      communicator.say "ERROR: #{args.join(' ')}"
+    end
+
+    def warning(*args)
+      communicator.say "WARNING: #{args.join(' ')}"
     end
 
     def progress(*args, &block)
       TSC::Progress.new((args.shift || ' '), *args, &block)
     end
 
-    def ask(request, *default_value)
-      table = Hash[ true => %w{ yes y yep true t }, false => %w{ no n nope false f } ]
-      value = table[default_value.first]
-      if value.nil?
-        value = default_value.join.strip
-        $stderr.print "#{request}? |#{value}| "
-        reply = $stdin.gets.chomp.strip
-        reply = value if reply.empty?
-        raise "#{request} not specified" if reply.empty?
-        reply
+    def ask(request, *values)
+      aliases = @booleans[values.first]
+
+      if aliases
+        booleanize ask(request, aliases.first).downcase
       else
-        reply = ask(request, value.first).downcase
-        (table.detect { |_key, _value|
-          _value.detect { |_entry| _entry == reply } && true
-        } || [ false ]).first
+        communicator.ask("#{request}? ") { |_controller|
+          _controller.default = values.join.strip unless values.empty?
+        }.strip
       end
+    end
+
+    private
+    #######
+
+    def booleanize(item)
+      @booleans.select { |_key, _values|
+        _values.include? item
+      }.flatten.first or false
     end
   end
 end
 
-if $0 == __FILE__
-  communicator = Installation::Communicator.new
-  p communicator.ask('Test string', true)
+if $0 == __FILE__ or defined? Test::Unit::TestCase
+  require 'test/unit'
+  require 'mocha'
+  require 'stubba'
+
+  module Installation
+    class CommunicatorTest < Test::Unit::TestCase
+      attr_reader :communicator, :controller
+
+      def test_no_default_stripped
+        communicator.communicator.expects(:ask).yields(controller).with('What? ').returns('   ooo    ')
+        assert_equal 'ooo', communicator.ask('What')
+        assert_equal nil, controller.default
+      end
+
+      def test_report
+        communicator.communicator.expects(:say).with('### aaa bbb ccc')
+        communicator.report 'aaa', 'bbb', 'ccc'
+      end
+
+      def test_error
+        communicator.communicator.expects(:say).with('ERROR: aaa bbb ccc')
+        communicator.error 'aaa', 'bbb', 'ccc'
+      end
+
+      def test_warning
+        communicator.communicator.expects(:say).with('WARNING: aaa bbb ccc')
+        communicator.warning 'aaa', 'bbb', 'ccc'
+      end
+
+      def test_string
+        communicator.communicator.expects(:ask).yields(controller).with('Test? ').returns('zzz')
+
+        assert_equal 'zzz', communicator.ask('Test', 'aaa', 'bbb', 'ccc') 
+        assert_equal 'aaabbbccc', controller.default
+      end
+
+      def test_boolean_positive
+        communicator.communicator.expects(:ask).yields(controller).with('Test? ').returns('yes')
+
+        assert_equal true, communicator.ask('Test', true)
+        assert_equal 'yes', controller.default
+      end
+
+      def test_boolean_positive_alternative
+        communicator.communicator.expects(:ask).yields(controller).with('Test? ').returns('t')
+
+        assert_equal true, communicator.ask('Test', true)
+        assert_equal 'yes', controller.default
+      end
+
+      def test_boolean_negative
+        communicator.communicator.expects(:ask).yields(controller).with('Test? ').returns('no')
+
+        assert_equal false, communicator.ask('Test', true)
+        assert_equal 'yes', controller.default
+      end
+
+      def test_boolean_negative_alternative
+        communicator.communicator.expects(:ask).yields(controller).with('Test? ').returns('n')
+
+        assert_equal false, communicator.ask('Test', true)
+        assert_equal 'yes', controller.default
+      end
+
+      def test_boolean_negative_garbage
+        communicator.communicator.expects(:ask).yields(controller).with('Test? ').returns('7687678678')
+
+        assert_equal false, communicator.ask('Test', true)
+        assert_equal 'yes', controller.default
+      end
+
+      def setup
+        @communicator = Communicator.new
+        @controller = Struct.new(:default).new
+      end
+
+      def teardown
+        @communicator = nil
+        @controller = nil
+      end
+    end
+  end
 end
