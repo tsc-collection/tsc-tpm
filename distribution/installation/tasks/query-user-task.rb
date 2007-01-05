@@ -90,7 +90,7 @@ module Installation
 
       def revert
 	errors = []
-	[ :remove_user, :remove_group ].each do |_method|
+	[ :remove_added_users, :remove_added_groups ].each do |_method|
 	  begin
 	    self.send _method
 	  rescue Exception => exception

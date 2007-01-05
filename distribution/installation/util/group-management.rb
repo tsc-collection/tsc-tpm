@@ -50,8 +50,9 @@
 =end
 
 require 'etc'
-require 'tsc/errors'
-require 'ftools'
+require 'set'
+
+require 'tsc/errors.rb'
 
 module Installation
   module Tasks
@@ -59,25 +60,37 @@ module Installation
     # class, that would give access to os specific functionality.
     #
     module GroupManagement
+      def new_group_registry
+        @new_group_registry ||= begin
+          self.class.installation_parameters[:new_group_registry] ||= Set.new
+        end
+      end
+
       def create_group(group)
 	raise TSC::OperationCanceled unless communicator.ask "Create group #{group.inspect}", true
 	
         os.add_group(group)
 	communicator.report "Group #{group.inspect} created"
-	@created_group = group
 
+	new_group_registry << group
 	Etc::getgrnam group
       end
 
-      def remove_group
-	unless @created_group.nil?
-	  begin
-            os.remove_group(@created_group)
-	    communicator.report "Group #{@created_group.inspect} removed"
-	  rescue
-	  end
-	  @created_group = nil
-	end
+      def remove_added_groups
+        removed_groups = []
+        begin
+          TSC::Error.persist do |_queue|
+            new_group_registry.each do |_group|
+              _queue.add {
+                os.remove_group(_group)
+                communicator.report "Group #{_group.inspect} removed"
+                removed_groups << _group
+              }
+            end
+          end
+        ensure
+          new_group_registry.subtract removed_groups
+        end
       end
     end
   end

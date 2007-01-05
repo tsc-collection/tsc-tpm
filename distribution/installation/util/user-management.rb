@@ -50,9 +50,9 @@
 =end
 
 require 'etc'
-require 'ftools'
-require 'tsc/errors.rb'
+require 'set'
 
+require 'tsc/errors.rb'
 require 'installation/util/group-management.rb'
 
 module Installation
@@ -63,6 +63,12 @@ module Installation
     module UserManagement
       include GroupManagement
 
+      def new_user_registry
+        @new_user_registry ||= begin
+          self.class.installation_parameters[:new_user_registry] ||= Set.new
+        end
+      end
+
       def create_user(user)
 	raise TSC::OperationCanceled unless communicator.ask "Create user #{user.inspect}", true
 
@@ -70,21 +76,30 @@ module Installation
 	Etc::getgrnam group rescue create_group group
 
 	home = ask_home_directory user, self.class.installation_top
-	raise "Wrong home directory" if home.index(Dir.getwd) == 0
+	raise 'Wrong home directory' if home.index(Dir.getwd) == 0
 
         os.add_user(user, group, home)
 	communicator.report "User #{user.inspect} created"
-	@created_user = user
 
+	new_user_registry << user
 	Etc::getpwnam user
       end
 
-      def remove_user
-	unless @created_user.nil?
-          os.remove_user(@created_user)
-	  communicator.report "User #{@created_user.inspect} removed"
-	  @created_user = nil
-	end
+      def remove_added_users
+        removed_users = []
+        begin
+          TSC::Error.persist do |_queue|
+            new_user_registry.each do |_user|
+              _queue.add {
+                os.remove_user(_user)
+                communicator.report "User #{_user.inspect} removed"
+                removed_users << _user
+              }
+            end
+          end
+        ensure
+          new_user_registry.subtract removed_users
+        end
       end
 
       def ask_home_directory(user, directory)
