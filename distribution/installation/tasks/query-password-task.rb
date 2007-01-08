@@ -10,7 +10,7 @@ require 'installation/util/user-management.rb'
 module Installation
   module Tasks
     class QueryPasswordTask < Installation::Task
-      include UserManagement
+      include Installation::Util::UserManagement
 
       def provides
         'system-query-password'

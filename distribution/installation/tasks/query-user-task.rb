@@ -59,8 +59,8 @@ require 'installation/util/group-management.rb'
 module Installation
   module Tasks
     class QueryUserTask < Task
-      include UserManagement
-      include GroupManagement
+      include Installation::Util::UserManagement
+      include Installation::Util::GroupManagement
 
       def provides
 	'system-query-user'

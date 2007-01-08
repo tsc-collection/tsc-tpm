@@ -55,7 +55,7 @@ require 'set'
 require 'tsc/errors.rb'
 
 module Installation
-  module Tasks
+  module Util
     # This module assumes availability of method "os" provided by the host
     # class, that would give access to os specific functionality.
     #
