@@ -64,6 +64,7 @@ module TSC
 
       def supplementary_groups_for(user)
         groups = Set.new
+        Etc.endgrent
         Etc.group do |_group|
           groups << _group.name if _group.mem.include?(user)
         end
