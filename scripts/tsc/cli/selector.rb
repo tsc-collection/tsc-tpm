@@ -19,7 +19,7 @@ module TSC
 
       def start
         pool = [ preferred, current, *choices ].compact.uniq
-        if none or select or pool.size > 1
+        if none or select or pool.size > 1 or Array(pool.first).size > 1
           menu
         else
           question pool.first
@@ -39,7 +39,16 @@ module TSC
           end
 
           choices.each do |_choice|
-            add_choice _menu, _choice if register_item(:choice, _choice)
+            item = Array(_choice)
+
+            result = item.first
+            display = item.last
+            
+            if register_item(:choice, result)
+              add_choice _menu, display do
+                result
+              end
+            end
           end
 
           add_category _menu, :other do
@@ -86,7 +95,7 @@ module TSC
       end
 
       def choices
-        @choices ||= Array(config[:choices]).flatten.compact
+        @choices ||= Array(config[:choices]).compact
       end
 
       def add_choice(menu, choice, &block)
