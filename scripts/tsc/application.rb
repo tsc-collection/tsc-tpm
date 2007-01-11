@@ -184,11 +184,14 @@ module TSC
       processor.quiet = true
       processor.ordering = GetoptLong::REQUIRE_ORDER if order
 
-      processor.map.to_set.divide { |_item1, _item2|
-        _item1.first == _item2.first
-      }.each do |_set|
-        option, args = _set.to_a.transpose
-        @options[option.first.slice(2..-1)] = args.size==1 ? args.first : args
+      processor.each do |_option, _argument|
+        key = _option.slice(2..-1)
+
+        if @options.key?(key)
+          @options[key] = [ @options[key], _argument ].flatten
+        else
+          @options[key] = _argument
+        end
       end
 
       return @options unless @options.has_key? 'help'
@@ -314,7 +317,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           _app.options
         }
         assert_equal 3, result.size
-        assert_equal '', result.fetch('verbose')
+        assert_equal [ '', '' ], result.fetch('verbose')
         assert_equal '', result.fetch('install')
 
         test = result.fetch('test')
