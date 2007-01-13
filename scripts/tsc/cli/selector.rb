@@ -118,7 +118,7 @@ module TSC
               when false
                 _category
               when String
-                "#{_category} #{item} ..."
+                "#{item} ..."
             end
 
             add_choice menu, "<#{label}>", &block
