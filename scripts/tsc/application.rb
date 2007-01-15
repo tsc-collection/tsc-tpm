@@ -54,7 +54,7 @@ module TSC
   # information.
   #
   class Application
-    attr_reader :script_name, :script_location, :options
+    attr_reader :script_name, :script_location, :options, :config
 
     # Creates and application, passing it optional command line descriptor 
     # (if the first argument is aString) and an array of option descriptors  
@@ -81,18 +81,22 @@ module TSC
       require 'tsc/launch.rb'
       require 'tsc/option-registry.rb'
 
-      @arguments = args.shift if String === args.first
+      @config = Struct.new(:subcommand, :arguments, :options, :description, :verbose).new
+      block.call(config) if block
+
+      config.arguments ||= args.shift if String === args.first
       @registry = OptionRegistry.new
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
       @registry.add 'help', 'Prints out this message', nil, 'h', '?'
-      @registry.add_bulk(*args)
+
+      @registry.add_bulk *args
+      @registry.add_bulk *Array(config.options)
 
       @script_location, @script_name = File.split($0)
       @options = Hash.new
 
-      self.verbose = ENV['TRACE'].to_s.split.include?(script_name)
-      start(&block) if block
+      self.verbose = ENV['TRACE'].to_s.split.include?(script_name) || config.verbose
     end
 
     # Default start method that processes the command line arguments and
@@ -253,20 +257,40 @@ module TSC
       }
     end
 
-    def extra_usage_info
-      []
+    def usage_description
+      config.description
     end
 
     def print_usage(*args)
       print_diagnostics args + [
-        "USAGE: #{script_name} [<options>] #{@arguments}",
+        'USAGE',
+        '  ' + [
+          script_name, 
+          '[<options>]', 
+          if config.subcommand
+            [
+              config.subcommand,
+              '[<sub-options>]'
+            ]
+          end,
+          config.arguments
+        ].flatten.compact.join(' '),
         unless @registry.entries.empty?
           [
-            'Options:',
+            '',
+            (config.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
             @registry.format_entries.map { |_aliases, _option, _description|
               "  #{_aliases}#{_option}   #{_description}"
             },
-            extra_usage_info
+            if usage_description 
+              [
+                '',
+                'DESCRIPTION',
+                [ usage_description ].flatten.join("\n").map { |_line|
+                  '  ' + _line
+                }
+              ]
+            end
           ]
         end
       ]
@@ -329,7 +353,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
       def test_error
         begin
           ARGV.replace %w{}
-          TSC::Application.new {
+          TSC::Application.new.start {
             raise 'Sample error'
           }
           flunk 'No expected exception (SystemError)'
@@ -352,7 +376,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
       def test_successful_exit
         begin
           ARGV.replace %w{}
-          TSC::Application.new {
+          TSC::Application.new.start {
             exit 0
           }
           flunk 'No expected exception (SystemError)'
