@@ -54,7 +54,7 @@ module TSC
   # information.
   #
   class Application
-    attr_reader :script_name, :script_location, :options, :config
+    attr_reader :script_name, :script_location, :options, :conf
 
     # Creates and application, passing it optional command line descriptor 
     # (if the first argument is aString) and an array of option descriptors  
@@ -81,22 +81,22 @@ module TSC
       require 'tsc/launch.rb'
       require 'tsc/option-registry.rb'
 
-      @config = Struct.new(:subcommand, :arguments, :options, :description, :verbose).new
-      block.call(config) if block
+      @conf = Struct.new(:subcommand, :arguments, :options, :description, :verbose).new
+      block.call(conf) if block
 
-      config.arguments ||= args.shift if String === args.first
+      conf.arguments ||= args.shift if String === args.first
       @registry = OptionRegistry.new
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
       @registry.add 'help', 'Prints out this message', nil, 'h', '?'
 
       @registry.add_bulk *args
-      @registry.add_bulk *Array(config.options)
+      @registry.add_bulk *Array(conf.options)
 
       @script_location, @script_name = File.split($0)
       @options = Hash.new
 
-      self.verbose = ENV['TRACE'].to_s.split.include?(script_name) || config.verbose
+      self.verbose = ENV['TRACE'].to_s.split.include?(script_name) || conf.verbose
     end
 
     # Default start method that processes the command line arguments and
@@ -258,7 +258,7 @@ module TSC
     end
 
     def usage_description
-      config.description
+      conf.description
     end
 
     def print_usage(*args)
@@ -267,18 +267,18 @@ module TSC
         '  ' + [
           script_name, 
           '[<options>]', 
-          if config.subcommand
+          if conf.subcommand
             [
-              config.subcommand,
+              conf.subcommand,
               '[<sub-options>]'
             ]
           end,
-          config.arguments
+          conf.arguments
         ].flatten.compact.join(' '),
         unless @registry.entries.empty?
           [
             '',
-            (config.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
+            (conf.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
             @registry.format_entries.map { |_aliases, _option, _description|
               "  #{_aliases}#{_option}   #{_description}"
             },
