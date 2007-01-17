@@ -56,6 +56,7 @@ require 'md5'
 module Distribution
   class Descriptor
     attr_reader :source, :file, :origin
+    attr_accessor :fileset
 
     def initialize(file,origin = nil)
       @file, @origin = file, origin
@@ -133,7 +134,8 @@ module Distribution
         :build => @file.build,
         :permission => @file.mode,
         :checksum => (calculate_checksum(@checksum_source) if @checksum_source),
-        :base => @base
+        :base => @base,
+        :fileset => (fileset.name if fileset)
       ]
     end
 

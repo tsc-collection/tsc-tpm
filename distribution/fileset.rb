@@ -125,6 +125,8 @@ module Distribution
       }.flatten.each { |_descriptor|
 	_descriptor.set_exclude_patterns *@patterns
         _descriptor.set_base(@base || package.base || package.product.base)
+
+        _descriptor.fileset = self
       }
     end
 
