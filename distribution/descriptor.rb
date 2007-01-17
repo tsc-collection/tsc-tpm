@@ -134,6 +134,7 @@ module Distribution
         :build => @file.build,
         :permission => @file.mode,
         :checksum => (calculate_checksum(@checksum_source) if @checksum_source),
+        :size => (File.size(@source) if File.file?(source)),
         :base => @base,
         :fileset => (fileset.name if fileset)
       ]
