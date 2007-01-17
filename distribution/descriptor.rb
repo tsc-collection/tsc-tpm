@@ -119,20 +119,22 @@ module Distribution
     end
 
     def info
-      return nil if figure_target.nil?
+      return unless figure_target
 
-      target = (@print_target ? figure_target : nil).inspect
-      destination = (@print_destination ? (figure_destination || @source) : nil).inspect
+      "#{@action} #{dataset.inspect.slice(1...-1)}"
+    end
 
-      owner = @file.owner.inspect
-      group = @file.group.inspect
-      build = @file.build.inspect
-
-      mode = @file.mode.nil? ? @file.mode.inspect : "0%o" % @file.mode
-      checksum = (@checksum_source.nil? ? nil : calculate_checksum(@checksum_source)).inspect
-      base = @base.inspect
-
-      "#{@action} #{target}, #{destination}, #{owner}, #{group}, #{mode}, #{build}, #{checksum}, #{keep?}, #{base}"
+    def dataset
+      Hash[
+        :target => (figure_target if @print_target),
+        :source => (figure_destination || @source if @print_destination),
+        :user => @file.owner,
+        :group => @file.group,
+        :build => @file.build,
+        :permission => @file.mode,
+        :checksum => (calculate_checksum(@checksum_source) if @checksum_source),
+        :base => @base
+      ]
     end
 
     def install_to_destination(directory)

@@ -64,10 +64,12 @@ module Distribution
 
       File.makedirs package_temp_directory
       begin
+        info = Array(@package.product.info) + Array(@package.info)
+
         package_info = copy_files_and_collect_info package_temp_directory
         tools_info = make_tools package_temp_directory
 
-        make_prodinfo tools_info + package_info, package_temp_directory
+        make_prodinfo info + tools_info + package_info, package_temp_directory
         make_package package_temp_directory, package_path
       ensure
         Dir.rm_r package_temp_directory
@@ -173,12 +175,14 @@ module Distribution
           }
         }
       end
-      info + [
-        "symlink '.meta-inf/tools/bin/tpm-info', 'tpm-install'",
-        "symlink '.meta-inf/tools/bin/tpm-remove', 'tpm-install'",
-        "symlink '.meta-inf/tools/bin/tpm-revert', 'tpm-install'",
-        "symlink '.meta-inf/tools/bin/tpm-commit', 'tpm-install'"
-      ]
+      info + SymlinkAction.new(nil, 
+        '.meta-inf/tools/bin/tpm-info'   => 'tpm-install',
+        '.meta-inf/tools/bin/tpm-remove' => 'tpm-install',
+        '.meta-inf/tools/bin/tpm-revert' => 'tpm-install',
+        '.meta-inf/tools/bin/tpm-commit' => 'tpm-install'
+      ).descriptors(@package).map { |_descriptor|
+        _descriptor.info
+      }
     end
 
     def add_metainf_directories(info)
@@ -217,7 +221,7 @@ module Distribution
     end
 
     def copy_files_and_collect_info(directory)
-      info = Array(@package.product.info) + Array(@package.info)
+      info = []
       TSC::Progress.new 'Copying package contents' do |_progress|
         @package.descriptors.each do |_descriptor|
           info << _descriptor.info

@@ -86,11 +86,11 @@ module Installation
       user = Etc::getpwuid(stat.uid).name rescue Task.installation_user
       group = Etc::getgrgid(stat.gid).name rescue Task.installation_group
 
-      DirectoryAction.new target, nil, user, group, stat.mode
+      DirectoryAction.new self, :target => target, :source =>nil, :user => user, :group => group, :permisison => stat.mode
     end
 
     def undo_for_non_existing
-      RemoveAction.new target
+      RemoveAction.new self, :target => target
     end
   end
 end

@@ -75,11 +75,11 @@ module Installation
       user = Etc::getpwuid(stat.uid).name rescue Task.installation_user
       group = Etc::getgrgid(stat.gid).name rescue Task.installation_group
 
-      InstallAction.new target, figure_saved_target_path, user, group, stat.mode
+      InstallAction.new self, :target => target, :source => figure_saved_target_path, :user => user, :group => group, :permission => stat.mode
     end
 
     def undo_for_non_existing
-      RemoveAction.new target
+      RemoveAction.new self, :target => target
     end
 
     def preserve_target

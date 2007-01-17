@@ -111,7 +111,12 @@ module Distribution
     end
 
     def info
-      "package #{name.inspect}, #{description.inspect}, #{tasks.inspect}"
+      dataset = Hash[
+        :name => name,
+        :description => description,
+        :tasks => tasks
+      ]
+      "package #{dataset.inspect.slice(1...-1)}"
     end
 
     private
@@ -119,9 +124,5 @@ module Distribution
     def normalize_tasks(tasks)
       tasks.join("\n").map { |_line| _line.split }.reject { |_entry| _entry.empty? }
     end
-
   end
-end
-
-if $0 == __FILE__
 end

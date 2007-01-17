@@ -88,12 +88,12 @@ module Installation
       group = Etc::getgrgid(info.gid).name rescue Task.installation_group
       case 
         when info.directory?
-          DirectoryAction.new target, nil, user, group, info.mode
+          DirectoryAction.new self, :target => target, :source => nil, :user => user, :group => group, :permission => info.mode
         when info.symlink?
-          SymlinkAction.new target, File.readlink(target)
+          SymlinkAction.new self, :target => target, :source => File.readlink(target)
         else
           preserve = File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
-          InstallAction.new target, preserve, user, group, info.mode
+          InstallAction.new self, :target => target, :source => preserve, :user => user, :group => group, :permission => info.mode
       end
     end
 
@@ -102,7 +102,7 @@ module Installation
     end
 
     def undo_for_non_existing
-      RemoveAction.new target
+      RemoveAction.new self, :target => target
     end
 
     def change_file_mode(*args)

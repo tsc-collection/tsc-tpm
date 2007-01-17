@@ -49,31 +49,27 @@
   
 =end
 
-require 'tsc/errors'
+require 'tsc/errors.rb'
+require 'tsc/dataset.rb'
+
 require 'ftools'
 require 'scanf'
 require 'etc'
 
 module Installation
-  class Action 
-    attr_reader :source, :user, :group, :permission, :build, :checksum, :keep_existing
-    attr_writer :keep_existing, :undoable, :reportable, :link_count
+  class Action < TSC::Dataset
+    attr_writer :undoable, :reportable
 
     def target
-      File.expand_path @target, base
+      File.expand_path super, base
     end
 
     def base
-      File.expand_path(@base || '.', Task.installation_top)
+      File.expand_path(super || '.', Task.installation_top)
     end
 
-    def initialize(target, *optional_arguments)
-      @target, @source, *rest = target, *optional_arguments
-      @user, @group, @permission, *rest = *rest
-      @build, @checksum, *rest = *rest
-      @keep_existing, @base, @link_count, *rest = *rest
-
-      @link_count ||= 0
+    def initialize(*args)
+      super :base => '', *args
 
       @undo_action = nil
       @undoable = true
@@ -81,18 +77,6 @@ module Installation
       @file_ownership_changed = false
 
       @communicator = nil
-    end
-
-    def info
-      "#{name} #{parameters.join(', ')}"
-    end
-
-    def parameters
-      [ 
-        @target, @source, @user, @group, @permission, @build, @checksum, @keep_existing, @link_count 
-      ].map do |_parameter| 
-        _parameter.inspect 
-      end
     end
 
     def create(communicator)
@@ -141,7 +125,7 @@ module Installation
     end
 
     def set_permissions
-      change_file_mode @permission || 0644, target if @permission
+      change_file_mode permission || 0644, target if permission
     end
 
     def set_user_and_group
@@ -203,11 +187,11 @@ module Installation
     end
 
     def user_entry
-      @user_entry ||= figure_user_entry(@user)
+      @user_entry ||= figure_user_entry(user)
     end
 
     def group_entry
-      @group_entry ||= figure_group_entry(@group)
+      @group_entry ||= figure_group_entry(group)
     end
 
     def figure_user_entry(user)

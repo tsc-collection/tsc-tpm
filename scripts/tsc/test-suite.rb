@@ -48,7 +48,6 @@ require 'test/unit'
 
 require 'application.rb'
 require 'array.rb'
-require 'attribute-set.rb'
 require 'simple-config.rb'
 require 'dtools.rb'
 require 'errors.rb'

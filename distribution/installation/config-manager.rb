@@ -49,8 +49,8 @@
   
 =end
 
-require 'installation/product.rb'
-require 'installation/package.rb'
+require 'tsc/dataset.rb'
+
 require 'installation/install-action.rb'
 require 'installation/generate-action.rb'
 require 'installation/expand-action.rb'
@@ -129,7 +129,7 @@ module Installation
       private
       #######
       def product(*credentials)
-	@actions[:product].call Product.new(*credentials)
+	@actions[:product].call TSC::Dataset.new(*credentials)
       end
 
       def params(hash)
@@ -137,7 +137,7 @@ module Installation
       end
 
       def package(*credentials)
-	@actions[:package].call Package.new(*credentials)
+	@actions[:package].call TSC::Dataset.new(*credentials)
       end
 
       def install(*data)

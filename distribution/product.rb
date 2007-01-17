@@ -98,20 +98,22 @@ module Distribution
     end
 
     def info
-      name = self.name.inspect
-      description = self.description.inspect
-      version = self.version.inspect
-      build = self.build.inspect
-      platform = self.platform.inspect
-      user = self.user.inspect
-      group = self.group.inspect
-      top = self.top.inspect
-      prefix = self.library_prefix.inspect
-      major = self.library_major.inspect
+      dataset = Hash[
+        :name => name,
+        :description => description,
+        :version => version,
+        :build => build,
+        :platform => platform,
+        :user => user,
+        :group => group,
+        :top => top,
+        :library_prefix => library_prefix,
+        :library_major => library_major
+      ]
 
       [
-        "product #{name}, #{description}, #{top}, #{version}, #{build}, #{platform}, #{prefix}, #{major}, #{user}, #{group}",
-        "params(#{params.inspect})"
+        "product #{dataset.inspect.slice(1...-1)}",
+        ("params #{params.inspect.slice(1...-1)}" unless params.empty?)
       ]
     end
   end

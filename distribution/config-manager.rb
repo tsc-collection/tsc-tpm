@@ -49,7 +49,7 @@
   
 =end
 
-require 'tsc/attribute-set.rb'
+require 'tsc/open-dataset.rb'
 
 require 'module.rb'
 require 'binary-origin.rb'
@@ -66,7 +66,7 @@ module Distribution
     def initialize
       @product = nil
       @filesets = []
-      @cache = TSC::AttributeSet.new
+      @cache = TSC::OpenDataset.new
 
       @parser = ConfigParser.new @cache, Hash[
         :product => proc { |_block| 
