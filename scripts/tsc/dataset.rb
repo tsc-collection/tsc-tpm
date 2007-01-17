@@ -5,7 +5,9 @@
 # You must read and accept the license prior to use.
 
 module TSC
-  class Stub
+  class Dataset
+    include Enumerable
+
     def initialize(*args)
       @hash = Hash.new
       args.each do |_origin|
@@ -13,6 +15,14 @@ module TSC
           @hash[_key.to_s] = _value
         end
       end
+    end
+
+    def each_pair(&block)
+      @hash.each_pair(&block)
+    end
+
+    def each(&block)
+      @hash.each(&block)
     end
 
     def method_missing(name, *args)
@@ -45,38 +55,45 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'stubba'
   
   module TSC
-    class StubTest < Test::Unit::TestCase
-      attr_reader :stub
+    class DatasetTest < Test::Unit::TestCase
+      attr_reader :dataset
 
       def test_methods
-        assert_equal 17, stub.aaa
-        assert_equal 'zzz', stub.bbb
+        assert_equal 17, dataset.aaa
+        assert_equal 'zzz', dataset.bbb
       end
 
       def test_missing
         assert_raises NoMethodError do
-          stub.ccc
+          dataset.ccc
         end
 
         assert_raises NoMethodError do
-          stub.ccc = 'ooo'
+          dataset.ccc = 'ooo'
         end
       end
 
-      def test_assignment
-        stub.aaa = 'abc'
-        stub.bbb = 99
+      def test_delegate
+        other = TSC::Dataset.new(dataset)
 
-        assert_equal 'abc', stub.aaa
-        assert_equal 99, stub.bbb
+        assert_equal 17, dataset.aaa
+        assert_equal 'zzz', dataset.bbb
+      end
+
+      def test_assignment
+        dataset.aaa = 'abc'
+        dataset.bbb = 99
+
+        assert_equal 'abc', dataset.aaa
+        assert_equal 99, dataset.bbb
       end
 
       def setup
-        @stub = TSC::Stub.new( :aaa => 17, :bbb => "zzz" )
+        @dataset = TSC::Dataset.new( :aaa => 17, :bbb => "zzz" )
       end
       
       def teardown
-        @stub = nil
+        @dataset = nil
       end
     end
   end

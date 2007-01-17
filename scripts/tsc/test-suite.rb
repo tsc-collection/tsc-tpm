@@ -65,6 +65,8 @@ require 'trace.rb'
 require 'pipeline.rb'
 require 'synchro-queue.rb'
 require 'byte-units.rb'
+require 'dataset.rb'
+require 'open-dataset.rb'
 
 require 'os/generic.rb'
 require 'os/cygwin.rb'

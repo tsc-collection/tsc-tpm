@@ -4,10 +4,10 @@
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
 
-require 'tsc/stub.rb'
+require 'tsc/dataset.rb'
 
 module TSC
-  class OpenStub < TSC::Stub
+  class OpenDataset < TSC::Dataset
     private
     #######
 
@@ -23,37 +23,37 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'stubba'
   
   module TSC
-    class OpenStubTest < Test::Unit::TestCase
-      attr_reader :stub
+    class OpenDatasetTest < Test::Unit::TestCase
+      attr_reader :dataset
 
       def test_methods
-        assert_equal 17, stub.aaa
-        assert_equal 'zzz', stub.bbb
+        assert_equal 17, dataset.aaa
+        assert_equal 'zzz', dataset.bbb
       end
 
       def test_missing
         assert_raises NoMethodError do
-          stub.ccc
+          dataset.ccc
         end
 
-        stub.ccc = 'ooo'
-        assert_equal 'ooo', stub.ccc
+        dataset.ccc = 'ooo'
+        assert_equal 'ooo', dataset.ccc
       end
 
       def test_assignment
-        stub.aaa = 'abc'
-        stub.bbb = 99
+        dataset.aaa = 'abc'
+        dataset.bbb = 99
 
-        assert_equal 'abc', stub.aaa
-        assert_equal 99, stub.bbb
+        assert_equal 'abc', dataset.aaa
+        assert_equal 99, dataset.bbb
       end
 
       def setup
-        @stub = TSC::OpenStub.new( :aaa => 17, :bbb => 'zzz' )
+        @dataset = TSC::OpenDataset.new( :aaa => 17, :bbb => 'zzz' )
       end
       
       def teardown
-        @stub = nil
+        @dataset = nil
       end
     end
   end
