@@ -70,7 +70,13 @@ module Installation
     @@installation_user = nil
     @@installation_group = nil
     @@installation_parameters = Hash.new
-    
+    @@installation_filesets = Hash.new { |_hash, _key|
+      _hash[_key] = TSC::Dataset.new(
+        :top => Installation::Task.installation_top,
+        :user => Installation::Task.installation_user,
+        :group => Installation::Task.installation_group
+      )
+    }
     @subclasses = []
 
     class << self
@@ -143,6 +149,10 @@ module Installation
 
       def installation_parameters
 	@@installation_parameters
+      end
+
+      def installation_filesets
+	@@installation_filesets
       end
 
       def installation_top

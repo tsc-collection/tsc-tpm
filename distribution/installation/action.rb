@@ -65,11 +65,11 @@ module Installation
     end
 
     def base
-      File.expand_path(super || '.', Task.installation_top)
+      File.expand_path(super || '.', Task.installation_filesets[fileset].top)
     end
 
     def initialize(*args)
-      super :base => '', *args
+      super :base => nil, *args
 
       @undo_action = nil
       @undoable = true
