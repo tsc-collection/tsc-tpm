@@ -57,6 +57,7 @@ module Distribution
       super *args
       @block = block
     end
+
     def copy_source_to(destination)
       File.open(destination, 'w') do |_io|
 	@block.call(@source).each do |_line, |

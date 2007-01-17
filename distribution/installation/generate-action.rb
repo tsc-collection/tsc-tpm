@@ -59,6 +59,7 @@ module Installation
     def name
       :generate
     end
+
     def make_target
       begin
         generators = []

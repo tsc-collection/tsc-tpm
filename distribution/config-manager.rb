@@ -172,6 +172,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
         assert_equal 3, fileset_dap.actions.size
         assert_equal 3, fileset_sys.actions.size
       end
+
       def show(config)
         p config.product
         p config.filesets

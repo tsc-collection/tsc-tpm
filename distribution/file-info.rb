@@ -56,6 +56,7 @@ module Distribution
     def initialize(path,mode = nil,owner = nil, group = nil)
       @path, @mode, @owner, @group  = path, mode, owner, group
     end
+
     def ==(other)
       if other.kind_of? self.class
 	other.path == @path and other.owner == @owner and 

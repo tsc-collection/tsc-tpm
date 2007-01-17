@@ -56,6 +56,7 @@ module Distribution
     def initialize(*args)
       super Hash[:mode=>0755], *args
     end
+
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
@@ -66,6 +67,7 @@ module Distribution
 	_entry[0...-1] + last
       }
     end
+
     def process_file_entry(file)
       super
       file.path_for_checksum = "#{file.path}.reloc.o"
@@ -85,6 +87,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
 	  FileInfo.new("bbb/bbb",0755) 
 	], _module.files
       end
+
       def test_components
 	_module = BinaryExecModule.new "dapsys/modules" => %w{ 
 	  exec modem/imodem 

@@ -65,6 +65,7 @@ module Installation
     def name
       :symlink
     end
+
     def make_target
       TSC::Error.ignore(SystemCallError) {
         info = File.lstat(target)
@@ -77,8 +78,10 @@ module Installation
       }
       File.symlink source, target
     end
+
     def preserve_target
     end
+
     def undo_for_existing
       info = File.lstat(target)
       user = Etc::getpwuid(info.uid).name rescue Task.installation_user
@@ -93,15 +96,19 @@ module Installation
           InstallAction.new target, preserve, user, group, info.mode
       end
     end
+
     def target_type
       [ :link, :directory, :file ]
     end
+
     def undo_for_non_existing
       RemoveAction.new target
     end
+
     def change_file_mode(*args)
       File.lchmod *args
     end
+
     def change_file_ownership(*args)
       File.lchown *args
     end

@@ -16,6 +16,7 @@ module Distribution
 	_entry[0..-2] + [ "lib#{self.class.library_prefix}#{_entry.last}.a" ]
       }
     end
+
     def process_file_entry(file)
       super
       file.path_for_checksum = file.path

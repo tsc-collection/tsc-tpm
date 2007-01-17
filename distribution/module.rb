@@ -162,6 +162,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
         m = Module.new "aaa", "bbb", "ccc"
         assert_equal [ "aaa", "bbb", "ccc" ], m.entries
       end
+
       def test_hash
         m = Module.new "aaa" => [ "bbb", "ccc"]
         assert_equal [ 
@@ -169,6 +170,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
           ["aaa", "ccc"] 
         ], m.entries
       end
+
       def test_mixture
         m = Module.new "zzz", 
                              {
@@ -195,6 +197,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
           FileInfo.new("ooo") 
         ], m.files
       end
+
       def test_info_set
         m = Module.new Hash[
           :mode => 0754,
@@ -204,6 +207,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
         ]
         assert_equal [ FileInfo.new("aaa/bbb",0754,"root","bin") ], m.files
       end
+
       def test_module
         m = Module.new "aaa" => [ "bbb", "ccc"]
         m1 = Module.new m
