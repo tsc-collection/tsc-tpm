@@ -64,15 +64,15 @@ module Installation
     end
 
     def report(*args)
-      communicator.say "### #{args.join(' ')}"
+      post '###', args
     end
 
     def error(*args)
-      communicator.say "ERROR: #{args.join(' ')}"
+      post 'ERROR:', args
     end
 
     def warning(*args)
-      communicator.say "WARNING: #{args.join(' ')}"
+      post 'WARNING:', args
     end
 
     def progress(*args, &block)
@@ -93,6 +93,13 @@ module Installation
 
     private
     #######
+    
+    def post(label, *content)
+      [ content, '' ].flatten.compact.join("\n").map.inject(label) { |_label, _item|
+        communicator.say "#{_label} #{_item.strip}\n"
+        ' ' * _label.size
+      }
+    end
 
     def booleanize(item)
       @booleans.select { |_key, _values|
