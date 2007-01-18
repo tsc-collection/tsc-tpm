@@ -53,13 +53,14 @@ require 'tsc/launch'
 require 'tsc/dtools'
 require 'tsc/progress'
 require 'tsc/object-space'
-require 'ftools'
+require 'tsc/byte-units.rb'
 
 require 'config-parser.rb'
+require 'ftools'
 
 module Distribution
   class Package
-    attr_reader :name, :description, :product, :tasks, :base
+    attr_reader :name, :description, :product, :tasks, :base, :reserve
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
@@ -78,6 +79,10 @@ module Distribution
         },
         :base => proc { |_block, _argument|
           @base = _argument
+        },
+        :reserve => proc { |_block, _argument|
+          raise 'Space reservation must be numeric' unless Numeric === _argument
+          @reserve = _argument
         },
         :params => proc {
           product.params
@@ -114,8 +119,10 @@ module Distribution
       dataset = Hash[
         :name => name,
         :description => description,
-        :tasks => tasks
+        :tasks => tasks,
+        :reserve => [ 0, reserve.to_i ].max
       ]
+
       "package #{dataset.inspect.slice(1...-1)}"
     end
 

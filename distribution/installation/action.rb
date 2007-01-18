@@ -65,7 +65,11 @@ module Installation
     end
 
     def base
-      File.expand_path(super || '.', Task.installation_filesets[fileset].top)
+      File.expand_path(super || '.', top)
+    end
+
+    def top
+      Task.installation_filesets[fileset].top
     end
 
     def initialize(*args)
@@ -80,6 +84,8 @@ module Installation
     end
 
     def create(communicator)
+      return unless top
+
       set_communicator communicator do
         if File.exists?(target)
           return if @keep_existing
@@ -100,6 +106,7 @@ module Installation
     end
 
     def undo_create(communicator)
+      return unless top
       return unless @undo_action
 
       set_communicator communicator do
@@ -125,10 +132,14 @@ module Installation
     end
 
     def set_permissions
+      return unless top
+
       change_file_mode permission || 0644, target if permission
     end
 
     def set_user_and_group
+      return unless top
+
       change_file_ownership user_entry.uid, group_entry.gid, target
       @file_ownership_changed = true
     end

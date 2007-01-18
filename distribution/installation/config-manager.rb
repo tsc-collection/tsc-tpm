@@ -64,7 +64,7 @@ module Installation
     end
 
     class ProductError < Error
-      def initialize(name,package)
+      def initialize
 	super 'Multiple product definition'
       end
     end

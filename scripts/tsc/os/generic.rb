@@ -5,6 +5,7 @@
 # You must read and accept the license prior to use.
 
 require 'tsc/launch.rb'
+require 'tsc/byte-units.rb'
 require 'set'
 require 'etc'
 
@@ -47,6 +48,10 @@ module TSC
 
       def remove_group(group)
         launch "groupdel #{group}"
+      end
+
+      def free_space(location)
+        launch( [ 'df', '-k', location] ).first.slice(1).split.slice(3).to_i * 1.KB
       end
 
       def set_user_groups(user, *groups)

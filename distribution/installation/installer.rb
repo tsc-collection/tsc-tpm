@@ -206,7 +206,7 @@ module Installation
 
       puts "Installing #{info}"
       
-      task_manager = TaskManager.new(product,  package, config.params, actions)
+      task_manager = TaskManager.new(product, package, config.params, actions)
       task_manager.execute !@options.key?("nocleanup")
     end
 
