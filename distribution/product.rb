@@ -55,8 +55,11 @@ require 'package.rb'
 
 module Distribution
   class Product
-    attr_reader :description, :user, :group, :top, :packages, :base, :params
-    attr_accessor :library_prefix, :library_major, :build, :name, :version, :tag
+    attr_reader :description, :user, :group, :top, :packages,
+                :base, :params, :compatibility
+
+    attr_accessor :library_prefix, :library_major, :build, :name, 
+                  :version, :tag
 
     def initialize(cache, &block)
       @parser = ConfigParser.new cache, Hash[
@@ -81,6 +84,9 @@ module Distribution
         :package => proc { |_block|
           @packages.push Package.new(self, cache, &_block)
         },
+        :compatible => proc { |_block, _argument|
+          compatibility.update _argument
+        },
         :base => proc { |_block, _argument|
           @base = _argument
         },
@@ -90,11 +96,12 @@ module Distribution
       ]
       @packages = []
       @params = Hash.new
+      @compatibility = Hash.new
       @parser.process &block
     end
 
     def platform
-      TSC::Platform.current.name
+      @platform ||= TSC::Platform.current
     end
 
     def info
@@ -103,10 +110,11 @@ module Distribution
         :description => description,
         :version => version,
         :build => build,
-        :platform => platform,
+        :platform => platform.name,
         :user => user,
         :group => group,
         :top => top,
+        :compatible => Array(compatibility[platform.name]),
         :library_prefix => library_prefix,
         :library_major => library_major
       ]
