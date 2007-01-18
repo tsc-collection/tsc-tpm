@@ -115,14 +115,12 @@ module Distribution
         :group => group,
         :top => top,
         :compatible => Array(compatibility[platform.name]),
+        :params => params,
         :library_prefix => library_prefix,
         :library_major => library_major
       ]
 
-      [
-        "product #{dataset.inspect.slice(1...-1)}",
-        ("params #{params.inspect.slice(1...-1)}" unless params.empty?)
-      ]
+      "product #{dataset.inspect.slice(1...-1)}"
     end
   end
 end

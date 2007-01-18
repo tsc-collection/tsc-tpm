@@ -83,7 +83,6 @@ module Installation
 
       @config = Config.new Hash[
 	:product => proc { |_product| process_product _product },
-	:params => proc { |_params| process_params _params },
 	:package => proc { |_package| process_package _package },
 	:action  => proc { |_action|  process_action  _action  }
       ]
@@ -103,10 +102,7 @@ module Installation
     def process_product(product)
       raise ProductError unless @product.nil?
       @product = product
-    end
-
-    def process_params(params)
-      @params.update(params)
+      @params.update(product.params)
     end
 
     def process_package(package)
@@ -130,10 +126,6 @@ module Installation
       #######
       def product(*credentials)
 	@actions[:product].call TSC::Dataset.new(*credentials)
-      end
-
-      def params(hash)
-	@actions[:params].call(hash)
       end
 
       def package(*credentials)
