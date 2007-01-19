@@ -62,7 +62,8 @@ module Distribution
       @force = force
       @info = info
       @product = product
-      @communicator = Installation::Communicator.new
+      @logger = Installation::Logger.new
+      @communicator = Installation::Communicator.new(@logger)
     end
 
     def install_from(directory)
@@ -86,7 +87,7 @@ module Distribution
 	@config.actions.each do |_action|
 	  _action.keep_existing = false if @force
 	  _action.create(@communicator)
-	  _action.set_user_and_group
+	  _action.set_user_and_group if Process.uid == 0
 	  _action.set_permissions
 	end
       end
