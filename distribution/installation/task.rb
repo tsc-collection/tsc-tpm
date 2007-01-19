@@ -51,6 +51,7 @@
 
 require 'tsc/errors'
 require 'installation/communicator.rb'
+require 'installation/logger.rb'
 
 module Installation
   class Task
@@ -184,10 +185,11 @@ module Installation
       end
     end
 
-    attr_reader :communicator
+    attr_reader :communicator, :logger
 
     def initialize
-      @communicator = Communicator.new
+      @logger = Logger.new
+      @communicator = Communicator.new(logger)
     end
 
     def execute

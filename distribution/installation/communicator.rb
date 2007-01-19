@@ -54,8 +54,11 @@ require 'tsc/cli/communicator.rb'
 
 module Installation
   class Communicator < TSC::CLI::Communicator
-    def initialize(*args)
-      super
+    attr_reader :logger
+
+    def initialize(logger, *args)
+      @logger = logger
+      super *args
 
       @booleans ||= {
         true => %w{ yes y yep true t }, 
