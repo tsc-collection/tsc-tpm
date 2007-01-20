@@ -86,7 +86,7 @@ module Distribution
 
       Dir.cd directory do
 	@config.actions.each do |_action|
-	  _action.keep_existing = false if @force
+	  _action.keep = false if @force
 	  _action.create(@communicator)
 	  _action.set_user_and_group if Process.uid == 0
 	  _action.set_permissions

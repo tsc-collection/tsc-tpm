@@ -192,7 +192,7 @@ module Installation
 
       if @options.key? 'force'
         actions.each do |_action|
-          _action.keep_existing = false
+          _action.keep = false
         end
       end
 

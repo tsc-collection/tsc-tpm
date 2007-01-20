@@ -136,7 +136,8 @@ module Distribution
         :checksum => (calculate_checksum(@checksum_source) if @checksum_source),
         :size => (File.size(@source) if File.file?(source)),
         :base => @base,
-        :fileset => (fileset.name if fileset)
+        :fileset => (fileset.name if fileset),
+        :keep => keep?
       ]
     end
 

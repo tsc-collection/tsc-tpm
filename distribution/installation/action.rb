@@ -88,7 +88,7 @@ module Installation
 
       set_communicator communicator do
         if File.exists?(target)
-          return if @keep_existing
+          return if keep
           ensure_target_type
         end
         if @undoable

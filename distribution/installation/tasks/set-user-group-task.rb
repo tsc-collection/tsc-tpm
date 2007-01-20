@@ -50,11 +50,13 @@
 =end
 
 require 'installation/task.rb'
+require 'etc'
 
 module Installation
   module Tasks
     class SetUserGroupTask < Installation::Task
-      def execute
+      def execute(*args)
+        return unless args.empty? || args.include?(Etc.getpwuid.name)
 	communicator.progress 'Setting file ownerships' do |_progress|
 	  self.class.installation_actions.each do |_action|
 	    _action.set_user_and_group
@@ -63,7 +65,7 @@ module Installation
 	end
       end
 
-      def revert
+      def revert(*args)
       end
 
       def provides
