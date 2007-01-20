@@ -79,18 +79,18 @@ module Installation
     def execute(perform_undo = true)
       task_undo_stack = []
       begin
-	apply_services task_undo_stack
+        apply_services task_undo_stack
       rescue Exception => exception
-	errors = []
-	errors = revert_tasks task_undo_stack if perform_undo
-	raise TSC::Error.new(*(errors + [exception]))
+        errors = []
+        errors = revert_tasks task_undo_stack if perform_undo
+        raise TSC::Error.new(*(errors + [exception]))
       end
     end
 
     def revert
       tasks = [] 
       @services.each do |_service, *_params|
-	@task_table[_service].each do |_task|
+        @task_table[_service].each do |_task|
           tasks << [ _task, *_params ]
         end
       end
@@ -156,53 +156,53 @@ module Installation
 
       table = Hash.new
       Installation::Task.subclasses.each do |_class|
-	begin
-	  task = _class.new
-	  (table[task.provides.to_s] ||= []) << task
-	rescue Exception => exception
-	  raise TSC::Error.new(_class.to_s.split('::').last, exception)
-	end
+        begin
+          task = _class.new
+          (table[task.provides.to_s] ||= []) << task
+        rescue Exception => exception
+          raise TSC::Error.new(_class.to_s.split('::').last, exception)
+        end
       end
       table
     end
 
     def check_tasks_availability
       @services.each do |_service, *_params|
-	unless @task_table.include? _service
-	  raise "No task for service #{_service.inspect}"
-	end
+        unless @task_table.include? _service
+          raise "No task for service #{_service.inspect}"
+        end
       end
     end
 
     def apply_services(undo_stack)
       @services.each do |_service, *_params|
-	@task_table[_service].each do |_task|
-	  begin
-	    undo_stack.push [ _task, *_params ]
-	    _task.execute *_params
-	  rescue Exception => exception
-	    raise TSC::Error.new(_task.provides, exception)
-	  end
-	end
+        @task_table[_service].each do |_task|
+          begin
+            undo_stack.push [ _task, *_params ]
+            _task.execute *_params
+          rescue Exception => exception
+            raise TSC::Error.new(_task.provides, exception)
+          end
+        end
       end
     end
 
     def revert_tasks(undo_stack)
       errors = []
       unless undo_stack.empty?
-	undo_stack.reverse.each do |_task, *_params|
-	  begin
-	    _task.revert *_params
-	  rescue Exception => exception
-	    errors << TSC::Error.new(_task.provides, exception)
-	  end
-	end
-	begin
-	  directory = Task.installation_preserve_top
-	  Dir.rm_r directory unless directory.nil?
-	rescue Exception => exception
-	  errors << TSC::Error.new('cleanup', exception)
-	end
+        undo_stack.reverse.each do |_task, *_params|
+          begin
+            _task.revert *_params
+          rescue Exception => exception
+            errors << TSC::Error.new(_task.provides, exception)
+          end
+        end
+        begin
+          directory = Task.installation_preserve_top
+          Dir.rm_r directory unless directory.nil?
+        rescue Exception => exception
+          errors << TSC::Error.new('cleanup', exception)
+        end
       end
       errors
     end
