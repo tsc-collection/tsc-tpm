@@ -158,7 +158,12 @@ module TSC
     def collect_process_info(messages)
       problems = []
       @pids.each_with_index { |_pid, _index|
-        pid, status = Process.waitpid2 _pid
+        begin
+          pid, status = Process.waitpid2 _pid
+        rescue Errno::ECHILD
+          sleep 0.1
+          retry
+        end
         if status != 0
           command = @pipeline[_index]
           errors = messages[1..-1][_index]
