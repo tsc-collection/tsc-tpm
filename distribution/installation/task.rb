@@ -49,7 +49,9 @@
   
 =end
 
-require 'tsc/errors'
+require 'tsc/errors.rb'
+require 'tsc/platform.rb'
+
 require 'installation/communicator.rb'
 require 'installation/logger.rb'
 
@@ -202,6 +204,10 @@ module Installation
 
     def provides
       raise TSC::NotImplementedError, "provides"
+    end
+
+    def os
+      @os ||= TSC::Platform.current.driver
     end
   end
 end
