@@ -46,7 +46,7 @@
 all:: specs
 
 test tests::
-	ruby test-suite.rb
+	@ ruby test-suite.rb
 
 spec specs::
-	ls -1 SPECS/* | ruby -I.. -e 'load $$_.chomp, true while STDIN.gets' -- -rs
+	@ ls -1 SPECS/* | ruby -I.. -e 'load $$_.chomp, true while STDIN.gets' -- -rs
