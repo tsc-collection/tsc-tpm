@@ -43,7 +43,10 @@
 # 
 
 
-all::
+all:: specs
 
-test::
+test tests::
 	ruby test-suite.rb
+
+spec specs::
+	ls -1 SPECS/* | ruby -I.. -e 'load $$_.chomp, true while STDIN.gets' -- -rs
