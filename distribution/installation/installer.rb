@@ -55,6 +55,9 @@ require 'tsc/launch.rb'
 require 'tsc/progress.rb'
 require 'tsc/errors.rb'
 
+require 'installation/logger.rb'
+require 'installation/communicator.rb'
+
 module Installation
   class Installer
     class LocationError < TSC::Error
@@ -133,8 +136,9 @@ module Installation
 
         puts "Removing #{name}#{version}#{platform}"
 
+        @logger = Logger.new
         Dir.cd top_directory do
-          task_manager = TaskManager.new(product, package, _config.params, _config.actions)
+          task_manager = TaskManager.new(communicator, logger, _config)
           task_manager.revert
         end
       end
@@ -157,6 +161,14 @@ module Installation
 
     def revert(*args)
       raise TSC::NotImplementedError, "revert"
+    end
+
+    def logger
+      @logger or raise 'Logger not setup yet'
+    end
+
+    def communicator
+      @communicator ||= Communicator.new(logger)
     end
 
     private
@@ -206,8 +218,9 @@ module Installation
 
       puts "Installing #{info}"
       
-      task_manager = TaskManager.new(product, package, config.params, actions)
-      task_manager.execute !@options.key?("nocleanup")
+      @logger = Logger.new
+      task_manager = TaskManager.new(communicator, logger, config)
+      task_manager.execute !@options.key?('nocleanup')
     end
 
     def process_directory(directory)

@@ -75,11 +75,10 @@ module Installation
       end
     end
 
-    attr_reader :product, :package, :actions, :params
+    attr_reader :product, :package, :actions
 
     def initialize
       @actions = []
-      @params = Hash.new
 
       @config = Config.new Hash[
 	:product => proc { |_product| process_product _product },
@@ -102,7 +101,6 @@ module Installation
     def process_product(product)
       raise ProductError unless @product.nil?
       @product = product
-      @params.update(product.params)
     end
 
     def process_package(package)

@@ -54,18 +54,22 @@ require 'etc'
 
 module Installation
   class TaskManager
-    def initialize(product, package, params, actions)
-      @services = package.tasks
+    attr_reader :logger, :communicator
 
-      Task.installation_product = product
-      Task.installation_package = package
-      Task.installation_actions = actions
+    def initialize(communicator, logger, config)
+      @communicator = communicator
+      @logger = logger
+      @services = config.package.tasks
 
-      Task.installation_parameters.update(params)
+      Task.installation_product = config.product
+      Task.installation_package = config.package
+      Task.installation_actions = config.actions
 
-      setup_task_user(product.user)
-      setup_task_group(product.group)
-      setup_task_top(product.top)
+      Task.installation_parameters.update(config.product.params)
+
+      setup_task_user(config.product.user)
+      setup_task_group(config.product.group)
+      setup_task_top(config.product.top)
 
       adjust_loadpath_for_transient
       @task_table = create_task_table
@@ -157,7 +161,7 @@ module Installation
       table = Hash.new
       Installation::Task.subclasses.each do |_class|
         begin
-          task = _class.new
+          task = _class.new(communicator, logger)
           (table[task.provides.to_s] ||= []) << task
         rescue Exception => exception
           raise TSC::Error.new(_class.to_s.split('::').last, exception)

@@ -52,9 +52,6 @@
 require 'tsc/errors.rb'
 require 'tsc/platform.rb'
 
-require 'installation/communicator.rb'
-require 'installation/logger.rb'
-
 module Installation
   class Task
     class SubclassError < RuntimeError
@@ -189,9 +186,9 @@ module Installation
 
     attr_reader :communicator, :logger
 
-    def initialize
-      @logger = Logger.new
-      @communicator = Communicator.new(logger)
+    def initialize(communicator, logger)
+      @communicator = communicator
+      @logger = logger
     end
 
     def execute

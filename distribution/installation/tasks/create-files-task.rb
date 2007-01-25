@@ -55,11 +55,6 @@ require 'tsc/errors'
 module Installation
   module Tasks
     class CreateFilesTask < Installation::Task
-      def initialize
-        super
-        @applied_actions = nil
-      end
-
       def execute
         ask_confirmation
 
