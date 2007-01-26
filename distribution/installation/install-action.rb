@@ -62,7 +62,7 @@ module Installation
       :install
     end
 
-    def make_target
+    def make_target(progress, logger)
       File.smart_copy source, target
     end
 

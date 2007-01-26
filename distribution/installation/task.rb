@@ -206,5 +206,9 @@ module Installation
     def os
       @os ||= TSC::Platform.current.driver
     end
+
+    def log(label, message)
+      logger.log "#{self.provides}:#{label}: #{message}"
+    end
   end
 end

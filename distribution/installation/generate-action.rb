@@ -60,7 +60,7 @@ module Installation
       :generate
     end
 
-    def make_target
+    def make_target(progress, logger)
       begin
         generators = []
         generators << catch(:generator) {

@@ -50,7 +50,7 @@
 =end
 
 require 'installation/task.rb'
-require 'tsc/errors'
+require 'tsc/errors.rb'
 
 module Installation
   module Tasks
@@ -59,28 +59,30 @@ module Installation
         ask_confirmation
 
         @applied_actions = []
-        self.class.installation_actions.each do |_action|
-          @applied_actions << _action
-          _action.create communicator
+        communicator.progress 'Installing' do |_progress|
+          self.class.installation_actions.each do |_action|
+            @applied_actions << _action
+            _action.create _progress, self
+          end
         end
       end
 
       def revert
         if @applied_actions
-          errors = []
-          @applied_actions.reverse_each do |_action|
-            begin
-              _action.undo_create communicator
-            rescue Exception => exception
-              errors << exception
+          TSC::Error.persist do |_queue|
+            communicator.progress 'Restoring' do |_progress|
+              @applied_actions.reverse_each do |_action|
+                _queue.add {
+                  _action.undo_create _progress, self
+                }
+              end
             end
           end
-          unless errors.empty?
-            raise TSC::Error.new(*errors)
-          end
         else
-          self.class.installation_actions.reverse_each do |_action|
-            _action.remove communicator
+          communicator.progress 'Removing' do |_progress|
+            self.class.installation_actions.reverse_each do |_action|
+              _action.remove _progress, self
+            end
           end
         end
       end

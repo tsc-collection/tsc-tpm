@@ -66,7 +66,7 @@ module Installation
       :remove
     end
 
-    def make_target
+    def make_target(progress, logger)
       begin
 	if File.directory? target
 	  Dir.rm_r target

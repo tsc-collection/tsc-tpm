@@ -85,7 +85,7 @@ module Installation
       :expand
     end
 
-    def make_target
+    def make_target(progress, logger)
       super
 
       commands = source.split('.').map { |_component|
@@ -96,7 +96,7 @@ module Installation
         raise "#{name}: Unsupported file type for #{source.inspect}"
       end
 
-      expand_with commands.reverse
+      expand_with progress, logger, commands.reverse
     end
 
     private
@@ -109,13 +109,12 @@ module Installation
       end
     end
 
-    def expand_with(commands)
+    def expand_with(progress, logger, commands)
       file = File.expand_path(source)
       Dir.cd target do
-        communicator.progress do |_progress|
-          launch *inject_filenames(file, commands) do |_stdout_line, |
-            _progress.print if _stdout_line
-          end
+        logger.log name, "#{source} with #{commands.join(' | ')}"
+        launch *inject_filenames(file, commands) do |_stdout_line, |
+          progress.print if _stdout_line
         end
       end
     end

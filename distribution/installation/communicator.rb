@@ -100,7 +100,7 @@ module Installation
       if aliases
         booleanize ask(request, aliases.first).downcase
       else
-        log :question, "#{request}?"
+        log :ask, "#{request}?"
         response = communicator.ask("#{request}? ") { |_controller|
           _controller.default = values.join.strip unless values.empty?
         }.strip
@@ -122,7 +122,7 @@ module Installation
 
     def say(message)
       communicator.say message
-      log :post, message
+      log :say, message
     end
 
     def booleanize(item)

@@ -63,7 +63,7 @@ module Installation
       :directory
     end
 
-    def make_target
+    def make_target(progress, logger)
       File.makedirs target
     end
 

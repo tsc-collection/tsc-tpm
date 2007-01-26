@@ -58,7 +58,7 @@ require 'etc'
 
 module Installation
   class Action < TSC::Dataset
-    attr_writer :undoable, :reportable
+    attr_writer :undoable
 
     def target
       File.expand_path super, base
@@ -77,58 +77,51 @@ module Installation
 
       @undo_action = nil
       @undoable = true
-      @reportable = true
       @file_ownership_changed = false
-
-      @communicator = nil
     end
 
-    def create(communicator)
+    def create(progress = nil, logger = nil)
       return unless top
 
-      set_communicator communicator do
-        if File.exists?(target)
-          return if keep
-          ensure_target_type
-        end
-        if @undoable
-          if File.exists?(target)
-            preserve_target
-            @undo_action = undo_for_existing
-          else
-            @undo_action = undo_for_non_existing
-          end
-        end
-
-        $stderr.puts "+ #{target}" if @reportable
-        make_target
+      if File.exists?(target)
+        return if keep
+        ensure_target_type
       end
+
+      if @undoable
+        if File.exists?(target)
+          preserve_target
+          @undo_action = undo_for_existing
+        else
+          @undo_action = undo_for_non_existing
+        end
+      end
+
+      logger.log name, target if logger
+      progress.print if progress
+
+      make_target progress, logger
     end
 
-    def undo_create(communicator)
+    def undo_create(progress = nil, logger = nil)
       return unless top
       return unless @undo_action
 
-      set_communicator communicator do
-        @undo_action.undoable = false
-        @undo_action.reportable = false
-        @undo_action.create communicator
-        @undo_action.set_user_and_group if @file_ownership_changed
-        @undo_action.set_permissions
-        @undo_action = nil
+      @undo_action.undoable = false
+      @undo_action.create
+      @undo_action.set_user_and_group if @file_ownership_changed
+      @undo_action.set_permissions
+      @undo_action = nil
 
-        $stderr.puts "< #{target}" if @reportable
-      end
+      logger.log :restore, target if logger
+      progress.print if progress
     end
 
-    def remove(communicator)
-      set_communicator communicator do
-        begin
-          remove_target
-          $stderr.puts "- #{target}" if @reportable
-        rescue RuntimeError
-        end
-      end
+    def remove(progress = nil, logger = nil)
+      remove_target
+
+      logger.log :remove, target if logger
+      progress.print if progress
     end
 
     def set_permissions
@@ -146,9 +139,6 @@ module Installation
 
     protected
     #########
-    def communicator
-      @communicator or raise 'Not in communicative context'
-    end
 
     def remove_target
       File.unlink target
@@ -158,7 +148,7 @@ module Installation
       raise TSC::NotImplementedError, 'name'
     end
 
-    def make_target
+    def make_target(progress, logger)
       raise TSC::NotImplementedError, 'make_target'
     end
 
@@ -226,16 +216,6 @@ module Installation
     def check_numeric(name)
       result = name.to_s.scanf "%d%s"
       result.first if result.size == 1
-    end
-
-    def set_communicator(communicator)
-      return unless block_given?
-      begin
-        @communicator, communicator = communicator, @communicator
-        yield
-      ensure
-        @communicator, communicator = communicator, @communicator
-      end
     end
   end
 end

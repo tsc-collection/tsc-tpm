@@ -66,7 +66,7 @@ module Installation
       :symlink
     end
 
-    def make_target
+    def make_target(progress, logger)
       TSC::Error.ignore(SystemCallError) {
         info = File.lstat(target)
         case
