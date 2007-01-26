@@ -141,7 +141,7 @@ module Installation
       @responses.map { |_request, _response|
         next unless request =~ %r{#{Regexp.quote(_request)}}
         log :response, _response
-        _response
+        _response.to_s
       }.compact.first
     end
   end
