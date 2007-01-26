@@ -56,15 +56,15 @@ require 'package.rb'
 module Distribution
   class Product
     attr_reader :description, :user, :group, :top, :packages,
-                :base, :params, :compatibility
+                :base, :params, :compatibility, :name
 
-    attr_accessor :library_prefix, :library_major, :build, :name, 
+    attr_accessor :library_prefix, :library_major, :build,
                   :version, :tag
 
     def initialize(cache, &block)
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument| 
-          @name = _argument
+          self.name = _argument
         },
         :description => proc { |_block, _argument|
           @description = _argument
@@ -121,6 +121,10 @@ module Distribution
       ]
 
       "product #{dataset.inspect.slice(1...-1)}"
+    end
+
+    def name=(name)
+      @name = name.upcase
     end
   end
 end

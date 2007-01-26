@@ -53,7 +53,8 @@
 $VERBOSE = nil
 
 $:.push File.dirname(__FILE__)
-require 'tsc/application'
+require 'tsc/application.rb'
+require 'tsc/config.rb'
 
 class Application < TSC::Application
   class ActionArgumentError < ArgumentError
@@ -63,19 +64,31 @@ class Application < TSC::Application
   end
 
   def initialize
-    super("[ [<package> | <location>] ... ]",
-      [ "--info", "Print information about installed packages", nil ],
-      [ "--install", "Perform product installation", nil ],
-      [ "--remove", "Perform product deinstallation", nil ],
-      [ "--commit", "Commit last installation", nil ],
-      [ "--revert", "Revert last installation", nil ],
-      [ "--tmp", "Temporary directory location", "directory", "-t" ],
-      [ "--force", "Unconditionally update existing files", nil, "-f" ],
-      [ "--no-cleanup", "Do not perform cleanup on failure", nil ],
-      [ "--nocleanup", "Same as --no-cleanup, for compatibility", nil ],
-      [ "--list", "List the content of the archive", nil ],
-      [ "--extract", "Extract the archive into the current directory", nil ]
-    )
+    super { |_conf|
+      _conf.arguments = '[ [<package> | <location>] ... ]'
+      _conf.options = [
+        [ '--info', 'Print information about installed packages', nil ],
+        [ '--install', 'Perform product installation', nil ],
+        [ '--remove', 'Perform product deinstallation', nil ],
+        [ '--commit', 'Commit last installation', nil ],
+        [ '--revert', 'Revert last installation', nil ],
+        [ '--tmp', 'Temporary directory location', 'directory', '-t' ],
+        [ '--force', 'Unconditionally update existing files', nil, '-f' ],
+        [ '--no-cleanup', 'Do not perform cleanup on failure', nil ],
+        [ '--nocleanup', 'Same as --no-cleanup, for compatibility', nil ],
+        [ '--list', 'List the content of the archive', nil ],
+        [ '--extract', 'Extract the archive into the current directory', nil ],
+        [ '--responses', 'Use the responses from a specified file', 'yaml file' ]
+      ]
+      _conf.description = [
+        'Provides package management facilities. Packages can be installed, removed,',
+        'reverted or committed. The utility also figures out its role based on the',
+        'command name of its invocation path. For example, "tpm-install" is treated',
+        'as "tpm --install", "tpm-remove" as "tpm --remove", etc.',
+        '  It can also be invoked as part of a self extracting package invocation,',
+        'in which case it is treated as "tpm --install".'
+      ]
+    }
   end
 
   def start
@@ -84,6 +97,11 @@ class Application < TSC::Application
       process_command_line
 
       options['nocleanup'] = true if options.key? 'no-cleanup'
+      options['no-cleanup'] = true if options.key? 'nocleanup'
+
+      if options.key? 'responses'
+        options['responses'] = TSC::Config.parse(options['responses']).hash
+      end
 
       require 'installation/installer.rb'
 
@@ -96,20 +114,24 @@ class Application < TSC::Application
 
   private
   #######
+
   def prepare_environment
     @top = File.dirname File.dirname(__FILE__)
     add_installation_loadpath
   end
 
   def add_installation_loadpath
-    directories = [ @top, [ @top, '*'] ].map { |*_entry|
-      Dir[File.join(_entry + ['installation'])]
-    }.flatten.select { |_entry| 
-      File.stat(_entry).directory?
+    $:.concat installation_folder_locations.map { |_location|
+      File.dirname _location
     }
-    unless directories.empty?
-      $:.push File.dirname(directories.first)
-    end
+  end
+
+  def installation_folder_locations
+    [ @top, [ @top, '*'] ].map { |_entry|
+      Dir[ File.join(_entry, 'installation') ].select { |_item|
+        File.directory? _item
+      }
+    }.flatten
   end
 
   def process_command_line

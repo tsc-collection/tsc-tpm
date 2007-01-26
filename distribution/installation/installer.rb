@@ -168,7 +168,7 @@ module Installation
     end
 
     def communicator
-      @communicator ||= Communicator.new(logger)
+      @communicator ||= Communicator.new(logger, @options['responses'])
     end
 
     private

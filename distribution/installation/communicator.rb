@@ -56,9 +56,11 @@ module Installation
   class Communicator < TSC::CLI::Communicator
     attr_reader :logger
 
-    def initialize(logger, *args)
+    def initialize(logger, responses = nil)
       @logger = logger
-      super *args
+      @responses = responses
+
+      super()
 
       @booleans ||= {
         true => %w{ yes y yep true t }, 
@@ -88,7 +90,7 @@ module Installation
       choices = [ menu[:current], menu[:preferred], *Array(menu[:choices]) ].compact.uniq
       log :select, "#{menu[:header]} from #{choices.inspect}"
 
-      response = super
+      response = figure_response(menu[:header]) || super
       log :answer, response
 
       response
@@ -97,17 +99,15 @@ module Installation
     def ask(request, *values)
       aliases = @booleans[values.first]
 
-      if aliases
-        booleanize ask(request, aliases.first).downcase
-      else
-        log :ask, "#{request}?"
-        response = communicator.ask("#{request}? ") { |_controller|
-          _controller.default = values.join.strip unless values.empty?
-        }.strip
+      return booleanize(ask(request, aliases.first).downcase) if aliases
 
-        log :answer, response
-        response
-      end
+      log :ask, "#{request}?"
+      response = figure_response(request) || communicator.ask("#{request}? ") { |_controller|
+        _controller.default = values.join.strip unless values.empty?
+      }.strip
+
+      log :answer, response
+      response.to_s
     end
 
     private
@@ -133,6 +133,16 @@ module Installation
 
     def log(label, message)
       logger.log "communicator:#{label}: #{message}"
+    end
+
+    def figure_response(request)
+      return unless @responses
+
+      @responses.map { |_request, _response|
+        next unless request =~ %r{#{Regexp.quote(_request)}}
+        log :response, _response
+        _response
+      }.compact.first
     end
   end
 end
