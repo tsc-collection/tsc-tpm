@@ -79,7 +79,19 @@ module Installation
     end
 
     def progress(*args, &block)
-      TSC::Progress.new((args.shift || ' '), *args, &block)
+      message = args.shift || ' '
+      log "P: #{message}"
+      TSC::Progress.new(message, *args, &block)
+    end
+
+    def select(menu)
+      choices = [ menu[:current], menu[:preferred], *Array(menu[:choices]) ].compact.uniq
+      log "S: #{menu[:header]} from #{choices.inspect}"
+
+      response = super
+      log "A: #{response}"
+
+      response
     end
 
     def ask(request, *values)
@@ -88,9 +100,13 @@ module Installation
       if aliases
         booleanize ask(request, aliases.first).downcase
       else
-        communicator.ask("#{request}? ") { |_controller|
+        log "Q: #{request}?"
+        response = communicator.ask("#{request}? ") { |_controller|
           _controller.default = values.join.strip unless values.empty?
         }.strip
+
+        log "A: #{response}"
+        response
       end
     end
 
@@ -106,13 +122,17 @@ module Installation
 
     def say(message)
       communicator.say message
-      logger.log message
+      log message
     end
 
     def booleanize(item)
       @booleans.select { |_key, _values|
         _values.include? item
       }.flatten.first or false
+    end
+
+    def log(message)
+      logger.log "Communicator> #{message}"
     end
   end
 end
