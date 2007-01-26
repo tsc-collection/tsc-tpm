@@ -55,17 +55,12 @@ require 'etc'
 require 'installation/config-manager.rb'
 require 'installation/task.rb'
 
-require 'installation/logger.rb'
-require 'installation/communicator.rb'
-
 module Distribution
   class Installer
     def initialize(info, force, product)
       @force = force
       @info = info
       @product = product
-      @logger = Installation::Logger.new
-      @communicator = Installation::Communicator.new(@logger)
     end
 
     def install_from(directory)
@@ -89,11 +84,18 @@ module Distribution
       Dir.cd directory do
 	@config.actions.each do |_action|
 	  _action.keep = false if @force
-	  _action.create(@communicator)
+	  _action.create self, self
 	  _action.set_user_and_group if Process.uid == 0
 	  _action.set_permissions
 	end
       end
+    end
+
+    def print
+    end
+
+    def log(label, message)
+      puts message
     end
   end
 end
