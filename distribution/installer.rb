@@ -54,6 +54,8 @@ require 'etc'
 
 require 'installation/config-manager.rb'
 require 'installation/task.rb'
+
+require 'installation/logger.rb'
 require 'installation/communicator.rb'
 
 module Distribution

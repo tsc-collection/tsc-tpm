@@ -299,7 +299,7 @@ module TSC
     def print_error(exception)
       print_diagnostics TSC::Error.textualize(
         exception, Hash[
-          :source => script_name, 
+          :originator => script_name, 
           :stderr => proc { |_line| 
             '  stderr> ' + _line 
           },

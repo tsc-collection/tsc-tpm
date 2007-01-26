@@ -211,16 +211,27 @@ module Installation
       description = [ product.description, package.description ].compact.join('/')
       puts "[#{description}]" unless description.empty?
 
-      info = [ product.name, package.name ].compact.join
+
+      info = [ product.name, package.name ].join
+
+      @logger = Logger.new('INSTALL', info, product.version)
+
       info = [ info, product.version ].compact.join(' ')
       info = [ info, product.build ].compact.join(' build ')
       info = [ info, product.platform ].compact.join(' for ')
 
-      puts "Installing #{info}"
-      
-      @logger = Logger.new
-      task_manager = TaskManager.new(communicator, logger, config)
-      task_manager.execute !@options.key?('nocleanup')
+      begin
+        communicator.report "Installing #{info}"
+
+        task_manager = TaskManager.new(communicator, logger, config)
+        task_manager.execute !@options.key?('nocleanup')
+      rescue => exception
+        logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
+        raise
+      ensure
+        logger.close
+        box "See details in #{logger.path}"
+      end
     end
 
     def process_directory(directory)
@@ -292,6 +303,15 @@ module Installation
       files = Dir[ 'meta-inf/prodinfo' ]
       raise "No prodinfo file" if files.empty?
       files
+    end
+
+    def box(message)
+      $stderr.puts [
+        '',
+        "+-#{'-' * message.size}-+",
+        "| #{message} |",
+        "+-#{'-' * message.size}-+"
+      ]
     end
   end
 end

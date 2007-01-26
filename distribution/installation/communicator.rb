@@ -99,9 +99,14 @@ module Installation
     
     def post(label, *content)
       [ content, '' ].flatten.compact.join("\n").map.inject(label) { |_label, _item|
-        communicator.say "#{_label} #{_item.strip}\n"
+        say "#{_label} #{_item.strip}\n"
         ' ' * _label.size
       }
+    end
+
+    def say(message)
+      communicator.say message
+      logger.log message
     end
 
     def booleanize(item)
