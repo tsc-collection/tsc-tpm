@@ -183,6 +183,7 @@ module Installation
         @task_table[_service].each do |_task|
           begin
             undo_stack.push [ _task, *_params ]
+            log :execute, "#{_task.provides} #{_params.join(', ')}"
             _task.execute *_params
           rescue Exception => exception
             raise TSC::Error.new(_task.provides, exception)
@@ -196,6 +197,7 @@ module Installation
       unless undo_stack.empty?
         undo_stack.reverse.each do |_task, *_params|
           begin
+            log :revert, "#{_task.provides} #{_params.join(', ')}"
             _task.revert *_params
           rescue Exception => exception
             errors << TSC::Error.new(_task.provides, exception)
@@ -209,6 +211,10 @@ module Installation
         end
       end
       errors
+    end
+
+    def log(label, message)
+      logger.log "task-manager:#{label}: #{message}"
     end
   end
 end

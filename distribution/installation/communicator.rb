@@ -80,16 +80,16 @@ module Installation
 
     def progress(*args, &block)
       message = args.shift || ' '
-      log "P: #{message}"
+      log :progress, message
       TSC::Progress.new(message, *args, &block)
     end
 
     def select(menu)
       choices = [ menu[:current], menu[:preferred], *Array(menu[:choices]) ].compact.uniq
-      log "S: #{menu[:header]} from #{choices.inspect}"
+      log :select, "#{menu[:header]} from #{choices.inspect}"
 
       response = super
-      log "A: #{response}"
+      log :answer, response
 
       response
     end
@@ -100,12 +100,12 @@ module Installation
       if aliases
         booleanize ask(request, aliases.first).downcase
       else
-        log "Q: #{request}?"
+        log :question, "#{request}?"
         response = communicator.ask("#{request}? ") { |_controller|
           _controller.default = values.join.strip unless values.empty?
         }.strip
 
-        log "A: #{response}"
+        log :answer, response
         response
       end
     end
@@ -122,7 +122,7 @@ module Installation
 
     def say(message)
       communicator.say message
-      log message
+      log :post, message
     end
 
     def booleanize(item)
@@ -131,8 +131,8 @@ module Installation
       }.flatten.first or false
     end
 
-    def log(message)
-      logger.log "Communicator> #{message}"
+    def log(label, message)
+      logger.log "communicator:#{label}: #{message}"
     end
   end
 end
