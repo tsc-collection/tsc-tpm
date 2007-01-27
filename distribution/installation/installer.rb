@@ -313,7 +313,6 @@ module Installation
 
     def box(message)
       $stderr.puts [
-        '',
         "+-#{'-' * message.size}-+",
         "| #{message} |",
         "+-#{'-' * message.size}-+"
