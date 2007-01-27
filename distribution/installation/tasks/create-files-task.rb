@@ -70,13 +70,17 @@ module Installation
       def revert
         if @applied_actions
           TSC::Error.persist do |_queue|
-            communicator.progress 'Restoring' do |_progress|
-              @applied_actions.reverse_each do |_action|
-                _queue.add {
-                  _action.undo_create _progress, self
-                }
-              end
+            progress = communicator.progress 'Restoring'
+
+            @applied_actions.reverse_each do |_action|
+              _queue.add {
+                _action.undo_create progress, self
+              }
             end
+
+            _queue.add {
+              progress.done
+            }
           end
         else
           communicator.progress 'Removing' do |_progress|

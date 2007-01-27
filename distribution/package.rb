@@ -60,7 +60,7 @@ require 'ftools'
 
 module Distribution
   class Package
-    attr_reader :name, :description, :product, :tasks, :base, :reserve
+    attr_reader :name, :description, :product, :tasks, :base, :reserve, :log
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
@@ -86,11 +86,15 @@ module Distribution
         },
         :params => proc {
           product.params
+        },
+        :log => proc {
+          @log = true
         }
       ]
       @product = product
       @filesets = []
       @tasks = []
+      @log = false
 
       @parser.process(&block)
     end
@@ -120,6 +124,7 @@ module Distribution
         :name => name,
         :description => description,
         :tasks => tasks,
+        :log => log,
         :reserve => [ 0, reserve.to_i ].max
       ]
 

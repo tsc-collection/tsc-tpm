@@ -56,7 +56,7 @@ require 'package.rb'
 module Distribution
   class Product
     attr_reader :description, :user, :group, :top, :packages,
-                :base, :params, :compatibility, :name
+                :base, :params, :compatibility, :name, :log
 
     attr_accessor :library_prefix, :library_major, :build,
                   :version, :tag
@@ -92,11 +92,16 @@ module Distribution
         },
         :params => proc {
           params
+        },
+        :log => proc {
+          @log = true
         }
       ]
       @packages = []
       @params = Hash.new
       @compatibility = Hash.new
+      @log = false
+
       @parser.process &block
     end
 
@@ -117,7 +122,8 @@ module Distribution
         :compatible => Array(compatibility[platform.name]),
         :params => params,
         :library_prefix => library_prefix,
-        :library_major => library_major
+        :library_major => library_major,
+        :log => log
       ]
 
       "product #{dataset.inspect.slice(1...-1)}"

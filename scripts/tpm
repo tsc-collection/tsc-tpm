@@ -78,7 +78,8 @@ class Application < TSC::Application
         [ '--nocleanup', 'Same as --no-cleanup, for compatibility', nil ],
         [ '--list', 'List the content of the archive', nil ],
         [ '--extract', 'Extract the archive into the current directory', nil ],
-        [ '--responses', 'Use the responses from a specified file', 'yaml file' ]
+        [ '--responses', 'Use the responses from a specified file', 'yaml file' ],
+        [ '--log', 'Leave the installation log file', nil ]
       ]
       _conf.description = [
         'Provides package management facilities. Packages can be installed, removed,',
