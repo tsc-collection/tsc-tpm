@@ -54,6 +54,7 @@ $:.concat ENV.to_hash['PATH'].to_s.split(':')
 
 require 'tsc/application.rb'
 require 'tsc/path.rb'
+require 'tsc/config.rb'
 
 class Application < TSC::Application
 
@@ -65,23 +66,30 @@ class Application < TSC::Application
   end
 
   def initialize
-    super('<product description> [<package> ...]',
-      [ '--install',   'Install',                  nil,         '-i' ],
-      [ '--source',    'Source top directory',     'directory'  ],
-      [ '--binary',    'Binary top directory',     'directory'  ],
-      [ '--product',   'Product name',             'string',    '-P' ],
-      [ '--version',   'Product version',          'string',    '-V' ],
-      [ '--tag',       'Product tag',              'string',    '-T' ],
-      [ '--build',     'Broduct build',            'number',    '-b', '-B' ],
-      [ '--prefix',    'Library prefix',           'string',    '-p' ],
-      [ '--extention', 'Shared library extention', 'string',    '-E' ],
-      [ '--major',     'Library major number',     'number',    '-l' ],
-      [ '--mode',      'Operational mode',         'number',    '-m' ],
-      [ '--output',    'Output directory',         'directory', '-o' ],
-      [ '--force',     'Force installation',       nil,         '-f' ],
-      [ '--require',   'File to require',          'file',      '-r' ],
-      [ '--test',      'Setup unit tests',         nil,         '-t' ]
-    )
+    super { |_conf|
+      _conf.arguments = '<product description> [<package> ...]'
+      _conf.options = [
+        [ '--install',   'Install',                  nil,         '-i' ],
+        [ '--source',    'Source top directory',     'directory'  ],
+        [ '--binary',    'Binary top directory',     'directory'  ],
+        [ '--product',   'Product name',             'string',    '-P' ],
+        [ '--version',   'Product version',          'string',    '-V' ],
+        [ '--tag',       'Product tag',              'string',    '-T' ],
+        [ '--build',     'Broduct build',            'number',    '-b', '-B' ],
+        [ '--prefix',    'Library prefix',           'string',    '-p' ],
+        [ '--extention', 'Shared library extention', 'string',    '-E' ],
+        [ '--major',     'Library major number',     'number',    '-l' ],
+        [ '--mode',      'Operational mode',         'number',    '-m' ],
+        [ '--output',    'Output directory',         'directory', '-o' ],
+        [ '--force',     'Force installation',       nil,         '-f' ],
+        [ '--require',   'File to require',          'file',      '-r' ],
+        [ '--test',      'Setup unit tests',         nil,         '-t' ]
+      ]
+      _conf.description = [
+        'Creates a self-installable distribution package according to a specified',
+        'product description file. In-place installations are supported as well.'
+      ]
+    }
   end
 
   def start
