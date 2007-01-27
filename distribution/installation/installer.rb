@@ -78,12 +78,13 @@ module Installation
       end
     end
 
+    attr_reader :options
     attr_accessor :top_directory
 
     def initialize(options, binary_directory)
       @binary_directory = binary_directory
       @options = options
-      @tmp_directory = @options['tmp'] || "/tmp"
+      @tmp_directory = options['tmp'] || "/tmp"
     end
 
     def install(*args)
@@ -168,7 +169,7 @@ module Installation
     end
 
     def communicator
-      @communicator ||= Communicator.new(logger, @options['responses'])
+      @communicator ||= Communicator.new(logger, options['responses'])
     end
 
     private
@@ -202,7 +203,7 @@ module Installation
       raise 'No product name' unless product.name
       raise 'No package name' unless package.name
 
-      if @options.key? 'force'
+      if options.key? 'force'
         actions.each do |_action|
           _action.keep = false
         end
@@ -224,13 +225,18 @@ module Installation
         communicator.report "Installing #{info}"
 
         task_manager = TaskManager.new(communicator, logger, config)
-        task_manager.execute !@options.key?('nocleanup')
+        task_manager.execute !options.key?('nocleanup')
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
         raise
       ensure
         logger.close
-        box "See details in #{logger.path}"
+
+        if options['log'] || product.log || package.log
+          box "See details in #{logger.path}"
+        else
+          logger.remove
+        end
       end
     end
 
@@ -280,7 +286,7 @@ module Installation
     end
 
     def build_options
-      @options.map { |_key, _value|
+      options.map { |_key, _value|
         [ "--#{_key}", _value ]
       }.flatten.reject { |_value| 
         _value.nil? or _value.strip.empty? 

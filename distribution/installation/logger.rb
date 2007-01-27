@@ -37,13 +37,20 @@ module Installation
     end
 
     def close
-      @io.puts "[Finished on #{Time.now}]"
-      @io.flush
-      @io.close
+      TSC::Error.ignore do
+        @io.puts "[Finished on #{Time.now}]"
+        @io.flush
+        @io.close
+      end
     end
 
     def path
       File.join @location, "#{@name}.log"
+    end
+
+    def remove
+      close
+      File.rm_f path
     end
 
     protected
