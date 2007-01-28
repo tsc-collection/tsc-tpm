@@ -22,6 +22,9 @@ module Installation
         needed = calculate_package_size + package.reserve 
         free = TSC::Platform.current.driver.free_space(top)
 
+        log :available, free
+        log :needed, needed
+
         raise "Insufficient room in #{top} (#{needed} needed, #{free} available)" if needed > free
       end
 

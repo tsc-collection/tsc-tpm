@@ -48,12 +48,17 @@
 =end 
 
 require 'tsc/ftools.rb'
+require 'tsc/platform.rb'
 
 module Distribution
   class Packager
+    attr_reader :platform, :os
+
     def initialize(package, config)
       @package = package
       @config = config
+      @platform = TSC::Platform.current
+      @os = platform.driver
     end
 
     def create(directory)
@@ -80,10 +85,6 @@ module Distribution
     #######
     def figure_ruby_path
       find_in_path(os.exe('ruby'), ENV.to_hash['PATH'].split(':')).first
-    end
-
-    def os
-      @os ||= TSC::Platform.current.driver
     end
 
     def find_in_path(what, where)
