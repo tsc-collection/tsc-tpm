@@ -112,7 +112,7 @@ module Installation
     def expand_with(progress, logger, commands)
       file = File.expand_path(source)
       Dir.cd target do
-        logger.log name, "#{source} with #{commands.join(' | ')}"
+        logger.log name, "#{File.basename source} with #{commands.join(' | ').inspect}"
         launch *inject_filenames(file, commands) do |_stdout_line, |
           progress.print if _stdout_line
         end
