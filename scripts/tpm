@@ -73,13 +73,14 @@ class Application < TSC::Application
         [ '--commit', 'Commit last installation', nil ],
         [ '--revert', 'Revert last installation', nil ],
         [ '--tmp', 'Temporary directory location', 'directory', '-t' ],
+        [ '--directory', 'Working directory', 'directory', '-d' ],
         [ '--force', 'Unconditionally update existing files', nil, '-f' ],
         [ '--no-cleanup', 'Do not perform cleanup on failure', nil ],
         [ '--nocleanup', 'Same as --no-cleanup, for compatibility', nil ],
         [ '--list', 'List the content of the archive', nil ],
         [ '--extract', 'Extract the archive into the current directory', nil ],
-        [ '--responses', 'Use the responses from a specified file', 'yaml file' ],
-        [ '--log', 'Leave the installation log file', nil ]
+        [ '--responses', 'Use the responses from a specified file', 'yaml file', '-r' ],
+        [ '--log', 'Leave the installation log file', nil, '-l'  ]
       ]
       _conf.description = [
         'Provides package management facilities. Packages can be installed, removed,',
@@ -101,7 +102,7 @@ class Application < TSC::Application
       options['no-cleanup'] = true if options.key? 'nocleanup'
 
       if options.key? 'responses'
-        options['responses'] = TSC::Config.parse(options['responses']).hash
+        options['responses'] = TSC::Config.parse(response_file_path).hash
       end
 
       require 'installation/installer.rb'
@@ -115,6 +116,10 @@ class Application < TSC::Application
 
   private
   #######
+
+  def response_file_path
+    File.expand_path options['responses'], Array(options['directory']).first
+  end
 
   def prepare_environment
     @top = File.dirname File.dirname(__FILE__)

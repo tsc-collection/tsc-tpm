@@ -145,9 +145,10 @@ process_package()
     process_archive extract "${package}"
     return ${?}
   }
+  cwd=`pwd`
   trace_and_run cd "${tempdir}" && {
     process_archive extract "${package}"  && {
-      trace_and_run tools/bin/ruby tools/bin/tpm --install "${@}" 0<&9
+      trace_and_run tools/bin/ruby tools/bin/tpm --install "${@}" -d "${cwd}" 0<&9
       return "${?}"
     }
   }
