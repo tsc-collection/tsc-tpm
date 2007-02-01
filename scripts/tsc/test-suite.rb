@@ -70,5 +70,7 @@ require 'open-dataset.rb'
 require 'os/generic.rb'
 require 'os/cygwin.rb'
 require 'os/linux.rb'
+require 'os/hpux.rb'
+require 'os/aix.rb'
 
 # require 'tty-process.rb'
