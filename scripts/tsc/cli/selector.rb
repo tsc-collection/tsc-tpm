@@ -13,8 +13,8 @@ module TSC
         @config = config
         @communicator = communicator
 
-        @config[:other] ||= true if choices.empty?
-        @config[:other] = nil if @config[:other] == false
+        config[:other] = true if other.nil? && choices.empty?
+        config[:other] = nil if other == false
       end
 
       def start
@@ -22,7 +22,7 @@ module TSC
         if none or select or pool.size > 1 or Array(pool.first).size > 1
           menu
         else
-          question pool.first
+          (pool.empty? or other) ? question(pool.first) : menu
         end
       end
 
@@ -84,6 +84,10 @@ module TSC
 
       def current
         config[:current]
+      end
+
+      def other
+        config[:other]
       end
 
       def select

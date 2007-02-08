@@ -42,7 +42,18 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
   
   class TSC::CLI::CommunicatorTest < Test::Unit::TestCase
+    attr_reader :communicator
+
+    def NO_test_select_output
+      communicator.select Hash[
+        :header => 'Test item',
+        :other => false,
+        :current => 'aaa'
+      ]
+    end
+
     def setup
+      @communicator = TSC::CLI::Communicator.new
     end
     
     def teardown
