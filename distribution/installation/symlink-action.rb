@@ -112,5 +112,9 @@ module Installation
     def change_file_ownership(*args)
       File.lchown *args
     end
+
+    def target_stat
+      File.lstat(target)
+    end
   end
 end

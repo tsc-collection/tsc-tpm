@@ -133,12 +133,21 @@ module Installation
     def set_user_and_group
       return unless top
 
-      change_file_ownership user_entry.uid, group_entry.gid, target
+      stat = target_stat
+
+      uid = user_entry.uid unless user_entry.uid == stat.uid
+      gid = group_entry.gid unless group_entry.gid == stat.gid
+
+      change_file_ownership uid, gid, target
       @file_ownership_changed = true
     end
 
     protected
     #########
+
+    def target_stat
+      File.stat(target)
+    end
 
     def remove_target
       File.unlink target
