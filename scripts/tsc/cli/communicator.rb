@@ -9,6 +9,28 @@ require 'tsc/cli/selector.rb'
 
 module TSC
   module CLI
+    class HighLine < ::HighLine
+      def ask(*args, &block)
+        super(*args) { |_question|
+          class << _question
+            def append_default
+              if @question =~ /([\t ]+)\Z/
+                @question << "[#{@default}]#{$1}"
+              elsif @question == ""
+                @question << "[#{@default}]  "
+              elsif @question[-1, 1] == "\n"
+                @question[-2, 0] =  "  [#{@default}]"
+              else
+                @question << "  [#{@default}]"
+              end
+            end
+          end
+
+          block.call(_question) if block
+        }
+      end
+    end
+
     class Communicator
       attr_reader :communicator
 
@@ -47,7 +69,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
     def NO_test_select_output
       communicator.select Hash[
         :header => 'Test item',
-        :other => false,
+        :other => true,
         :current => 'aaa'
       ]
     end
