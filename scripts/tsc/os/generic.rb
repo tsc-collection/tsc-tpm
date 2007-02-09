@@ -51,7 +51,7 @@ module TSC
       end
 
       def free_space(location)
-        launch( [ 'df', '-k', location] ).first.slice(1).split.slice(3).to_i.KB
+        launch( [ 'df', '-k', location] ).first.slice(1..-1).join(' ').split.slice(3).to_i.KB
       end
 
       def set_user_groups(user, *groups)

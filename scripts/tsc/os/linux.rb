@@ -27,10 +27,34 @@ end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
+  require 'tsc/after-end-reader.rb'
+
+  require 'mocha'
+  require 'stubba'
   
   module TSC
     module OS
       class LinuxTest < Test::Unit::TestCase
+        include TSC::AfterEndReader
+
+        attr_reader :os
+
+        def test_free_space_one_line
+          os.expects(:launch).with(['df', '-k', '/tmp']).returns [
+            read_after_end_marker(__FILE__, 0).map
+          ]
+
+          assert_equal 15233436.KB, os.free_space('/tmp')
+        end
+
+        def test_free_space_multi_line
+          os.expects(:launch).with(['df', '-k', '/tmp']).returns [
+            read_after_end_marker(__FILE__, 1).map
+          ]
+
+          assert_equal 49206148.KB, os.free_space('/tmp')
+        end
+
         def test_name
           assert_equal 'linux', @os.name
         end
@@ -46,3 +70,11 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
     end
   end
 end
+
+__END__
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/hda1             20161172   3903596  15233436  21% /
+__END__
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/mapper/VolGroup00-LogVol00
+                      73575592  20571636  49206148  30% /
