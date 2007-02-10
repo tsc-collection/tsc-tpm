@@ -191,13 +191,8 @@ module Distribution
     def add_metainf_directories(info)
       metainf_directories = []
       info.each { |_entry|
-        if _entry =~ /^install/
-          entries = _entry.split(/[ ,"]/)
-          entries.delete_if { |_entry| _entry == '' }
-          if entries[1] =~ /^\.meta-inf/
-            check_metainf_directories metainf_directories, File.dirname(entries[1])
-          end
-        end
+        target = _entry.scan(%r{^install\s+.*?:target=>"(\.meta-inf/.+?)".*$}).flatten.compact.first
+        check_metainf_directories metainf_directories, File.dirname(target) if target
       }
       metainf_directories = metainf_directories.sort
       metainf_directories.each { |_directory|
