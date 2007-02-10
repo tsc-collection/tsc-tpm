@@ -230,6 +230,9 @@ module Installation
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
         raise
       ensure
+        TSC::Error.ignore {
+          Dir.rm_r Task.installation_preserve_top
+        }
         logger.close
 
         if options['log'] || product.log || package.log
