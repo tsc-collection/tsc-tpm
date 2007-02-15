@@ -89,6 +89,7 @@ module TSC
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
       @registry.add 'help', 'Prints out this message', nil, 'h', '?'
+      @registry.add 'debug', 'Starts the interactive debugger', nil
 
       @registry.add_bulk *args
       @registry.add_bulk *Array(conf.options)
@@ -197,6 +198,8 @@ module TSC
           @options[key] = _argument
         end
       end
+
+      require 'debug' if @options.has_key? 'debug'
 
       return @options unless @options.has_key? 'help'
       print_usage
