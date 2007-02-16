@@ -124,7 +124,7 @@ module Distribution
       loaded_files.push 'test/unit/**/*' if loaded_files.include? 'test/unit.rb'
       loaded_files.push 'test/spec/**/*' if loaded_files.include? 'test/spec.rb'
 
-      loaded_files.push 'debug.rb' if loaded_files.include? 'test/spec.rb'
+      loaded_files.push 'debug.rb'
       figure_library_files 'lib/ruby', loaded_files
     end
 
