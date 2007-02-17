@@ -45,6 +45,10 @@
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # Distributed under the MIT Licence.
 
+SCRIPT_LINES__ = Hash.new { |_hash, _key|
+  _hash[_key] = IO.readlines(_key) rescue []
+}
+
 module TSC
   # This class provides an application framework for any Ruby application.
   # It accepts option descriptions and provides command line parsing as well

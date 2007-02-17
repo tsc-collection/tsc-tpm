@@ -54,7 +54,6 @@ $VERBOSE = nil
 
 $:.push File.dirname(__FILE__)
 require 'tsc/application.rb'
-require 'tsc/config.rb'
 
 class Application < TSC::Application
   class ActionArgumentError < ArgumentError
@@ -98,6 +97,12 @@ class Application < TSC::Application
       prepare_environment
       process_command_line
 
+      actions = %w{ install remove commit revert info } & options.keys
+      raise ActionArgumentError unless actions.size == 1
+
+      require 'installation/installer.rb'
+      require 'tsc/config.rb'
+
       options['nocleanup'] = true if options.key? 'no-cleanup'
       options['no-cleanup'] = true if options.key? 'nocleanup'
 
@@ -105,12 +110,11 @@ class Application < TSC::Application
         options['responses'] = TSC::Config.parse(response_file_path).hash
       end
 
-      require 'installation/installer.rb'
 
       installer = Installation::Installer.new(options, script_location)
       installer.top_directory = File.dirname @top
 
-      installer.send @action, *@packages
+      installer.send actions.first.intern, *ARGV
     }
   end
 
@@ -138,17 +142,6 @@ class Application < TSC::Application
         File.directory? _item
       }
     }.flatten
-  end
-
-  def process_command_line
-    @options = super
-
-    actions = %w{ install remove commit revert info }.select { |_action| 
-      @options.key? _action 
-    }
-    raise ActionArgumentError unless actions.size == 1
-    @action = actions.first.intern
-    @packages = ARGV
   end
 end
 
