@@ -8,6 +8,12 @@ module TSC
   class Dataset
     include Enumerable
 
+    class << self
+      def [](*args)
+        new(*args)
+      end
+    end
+
     def initialize(*args)
       @hash = Hash.new
       args.each do |_origin|
