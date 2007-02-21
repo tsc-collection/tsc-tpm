@@ -13,7 +13,7 @@ module TSC
     attr_reader :padding
 
     def initialize(*args)
-      options, messages = args.flatten.partition { |_item|
+      options, items = args.flatten.partition { |_item|
         Hash === _item
       }
       params = options.inject { |_result, _item|
@@ -25,30 +25,88 @@ module TSC
         :top_pad => (params[:top_pad] || params[:hight_pad] || 0),
         :bottom_pad => (params[:bottom_pad] || params[:hight_pad] || 0)
       ]
-      @lines = extract_right_stripped_lines(messages)
-      @line.shift while @lines.first and @lines.first.empty?
-      @margin, @size = collect_spaces_and_sizes(@lines).map { |_spaces, _sizes|
-        [ _spaces.compact.min, _sizes.max ]
-      }.first
+
+      @content = [ MessageChunk.new ]
+      items.flatten.each do |_item|
+        case _item
+          when Box
+            @content << BoxChunk.new(_item) << MessageChunk.new
+          else
+            @content.last << _item
+        end
+      end
+
+      @content.first.remove_leading_empty_lines
+      @content.last.remove_trailing_emtpy_lines
     end
 
-    protected
-    #########
-
-    def extract_right_stripped_lines(source)
-      source.map { |_item|
-        _item.map { |_item|
-          _item.to_s.rstrip
-        }
-      }.flatten
+    def hight
+      @hight ||= @content.inject(0) { |_sum, _item|
+        _sum + _item.lines
+      } + padding.top + padding.bottom
     end
 
-    def collect_spaces_and_sizes(source)
-      [ 
-        source.map { |_line|
-          [ _line.index(%r{\S}), _line.size ]
-        }.transpose
-      ]
+    def width
+      @width ||= @content.map { |_item|
+        _item.size
+      }.max + padding.left + padding.right
+    end
+
+    private
+    #######
+
+    class MessageChunk < Array
+      attr_reader :margin, :size
+
+      def << (item)
+        self.concat item.map { |_item|
+          _item.map { |_item|
+            _item.to_s.rstrip
+          }
+        }.flatten
+      end
+
+      def remove_leading_empty_lines
+        shift while first and first.empty?
+      end
+
+      def remove_trailing_emtpy_lines
+        pop while last and last.empty?
+      end
+
+      def process
+        @margin, @size = collect_margins_and_sizes.map { |_margins, _sizes|
+          [ _margins.compact.min, _sizes.max ]
+        }.first
+      end
+
+      private
+      #######
+
+      def collect_margins_and_sizes
+        [ 
+          self.map { |_line|
+            [ _line.index(%r{\S}), _line.size ]
+          }.transpose
+        ]
+      end
+
+    end
+
+    class BoxChunk
+      attr_reader :margin, :size
+
+      def initialize(box)
+        @box = box
+        @margin = 0
+        @size = box.width
+      end
+
+      def remove_leading_empty_lines
+      end
+
+      def remove_trailing_emtpy_lines
+      end
     end
   end
 end
