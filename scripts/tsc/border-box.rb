@@ -17,13 +17,17 @@ module TSC
     def each(&block)
       horizontal(&block)
       super do |_line|
-        block.call "|#{_line}|"
+        block.call enclose('|', _line)
       end
       horizontal(&block)
     end
 
     def horizontal
-      yield '+' + ('-' * (width - 2)) + '+'
+      yield enclose('+', '-' * (width - 2))
+    end
+
+    def enclose(left, line, right = left)
+      [ left, line, right ].join
     end
 
     def width
