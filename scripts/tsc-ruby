@@ -53,9 +53,9 @@ class Application < TSC::Application
       end
 
       unless ARGV.empty? 
-        program = ARGV.fisrt.strip
+        program = ARGV.first.strip
         unless program.slice(0) == ?-
-          shift ARGV
+          ARGV.shift
           File.open(program) do |_io|
             workspace.process _io, program
           end
