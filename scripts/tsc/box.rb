@@ -10,74 +10,85 @@ require 'tsc/dataset.rb'
 
 module TSC
   class Box
-    attr_reader :padding
+    include Enumerable
 
-    def initialize(*args)
-      options, items = args.flatten.partition { |_item|
-        Hash === _item
-      }
-      params = options.inject { |_result, _item|
-        _result.update(_item)
-      }
-      @padding = TSC::Dataset[ 
-        :left_pad => (params[:left_pad] || params[:width_pad] || 0),
-        :right_pad => (params[:right_pad] || params[:width_pad] || 0),
-        :top_pad => (params[:top_pad] || params[:hight_pad] || 0),
-        :bottom_pad => (params[:bottom_pad] || params[:hight_pad] || 0)
-      ]
-
-      @content = [ MessageChunk.new ]
-      items.flatten.each do |_item|
-        case _item
-          when Box
-            @content << BoxChunk.new(_item) << MessageChunk.new
-          else
-            @content.last << _item
-        end
+    class << self
+      def [](*args)
+        new *args
       end
+    end
 
-      @content.first.remove_leading_empty_lines
-      @content.last.remove_trailing_emtpy_lines
+    def initialize(item, params = {})
+      @params = params
+      @item = (Box === item ? item : Chunk.new(item))
+    end
+
+    def padding
+      @padding ||= TSC::Dataset[ 
+        :left => (@params[:left_pad] || @params[:width_pad] || 0),
+        :right => (@params[:right_pad] || @params[:width_pad] || 0),
+        :top => (@params[:top_pad] || @params[:hight_pad] || 0),
+        :bottom => (@params[:bottom_pad] || @params[:hight_pad] || 0)
+      ]
+    end
+
+    def each(&block)
+      generate_lines padding.top, &block
+      @item.each do |_line|
+        block.call [ ' ' * padding.left, _line, ' ' * padding.right ].join
+      end
+      generate_lines padding.bottom, &block
     end
 
     def hight
-      @hight ||= @content.inject(0) { |_sum, _item|
-        _sum + _item.lines
-      } + padding.top + padding.bottom
+      @hight ||= @item.hight + padding.top + padding.bottom
     end
 
     def width
-      @width ||= @content.map { |_item|
-        _item.size
-      }.max + padding.left + padding.right
+      @width ||= @item.width + padding.left + padding.right
+    end
+
+    def to_s
+      map.join("\n")
     end
 
     private
     #######
 
-    class MessageChunk < Array
-      attr_reader :margin, :size
+    def generate_lines(number)
+      number.times do
+        yield ' ' * width
+      end
+    end
 
-      def << (item)
-        self.concat item.map { |_item|
+    class Chunk < Array
+      def initialize(*items)
+        super items.flatten.map { |_item|
           _item.map { |_item|
             _item.to_s.rstrip
           }
         }.flatten
-      end
 
-      def remove_leading_empty_lines
         shift while first and first.empty?
-      end
-
-      def remove_trailing_emtpy_lines
         pop while last and last.empty?
-      end
 
-      def process
         @margin, @size = collect_margins_and_sizes.map { |_margins, _sizes|
           [ _margins.compact.min, _sizes.max ]
         }.first
+      end
+
+      def each
+        super do |_item|
+          yield _item.slice(@margin .. -1) + (' ' * (@size - _item.size))
+        end
+      end
+
+      def hight
+        @hight ||= self.size
+      end
+
+      def width
+        @width ||= @size - @margin
       end
 
       private
@@ -90,23 +101,6 @@ module TSC
           }.transpose
         ]
       end
-
-    end
-
-    class BoxChunk
-      attr_reader :margin, :size
-
-      def initialize(box)
-        @box = box
-        @margin = 0
-        @size = box.width
-      end
-
-      def remove_leading_empty_lines
-      end
-
-      def remove_trailing_emtpy_lines
-      end
     end
   end
 end
@@ -118,15 +112,28 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   
   module TSC
     class BoxTest < Test::Unit::TestCase
-      def test_box
-
-        box = Box.new("aaa\nbbb\nccc", :width_pad => 2, :hight_pad => 1)
+      def test_indented
+        box = Box.new '
+          111
+            2222
+          33333
+        '
+        assert_equal [ '111   ', '  2222', '33333 ' ], box.map
       end
 
-      def setup
+      def test_simple
+        box = Box["   aaa\n   bbbb\n   ccc\n\n\n"]
+        assert_equal [ 
+          'aaa ', 'bbbb', 'ccc '
+        ], box.map
       end
-      
-      def teardown
+
+      def test_padded
+
+        box = Box.new "   aaa\n   bbb\n   ccc", :width_pad => 2, :hight_pad => 1
+        assert_equal [ 
+          '       ', '  aaa  ', '  bbb  ', '  ccc  ', '       ' 
+        ], box.map
       end
     end
   end

@@ -72,5 +72,7 @@ require 'os/cygwin.rb'
 require 'os/linux.rb'
 require 'os/hpux.rb'
 require 'os/aix.rb'
+require 'box.rb'
+require 'border-box.rb'
 
 # require 'tty-process.rb'
