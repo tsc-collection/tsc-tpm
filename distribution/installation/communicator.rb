@@ -91,7 +91,7 @@ module Installation
       log :select, "#{menu[:header]} from #{choices.inspect}"
 
       response = figure_response(menu[:header]) || super
-      log :answer, response
+      log :answer, response.inspect
 
       response
     end
@@ -106,7 +106,7 @@ module Installation
         _controller.default = values.join.strip unless values.empty?
       }.strip
 
-      log :answer, response
+      log :answer, response.inspect
       response.to_s
     end
 
@@ -140,7 +140,7 @@ module Installation
 
       @responses.map { |_request, _response|
         next unless request =~ %r{#{Regexp.quote(_request)}}
-        log :response, _response
+        log :response, _response.inspect
         _response.to_s
       }.compact.first
     end
