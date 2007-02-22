@@ -54,6 +54,7 @@ require 'tsc/dtools.rb'
 require 'tsc/launch.rb'
 require 'tsc/progress.rb'
 require 'tsc/errors.rb'
+require 'tsc/border-box.rb'
 
 require 'installation/logger.rb'
 require 'installation/communicator.rb'
@@ -236,7 +237,7 @@ module Installation
         logger.close
 
         if options['log'] || product.log || package.log
-          box "See details in #{logger.path}"
+          $stderr.puts TSC::BorderBox["See details in #{logger.path}"]
         else
           logger.remove
         end
@@ -312,14 +313,6 @@ module Installation
       files = Dir[ 'meta-inf/prodinfo' ]
       raise "No prodinfo file" if files.empty?
       files
-    end
-
-    def box(message)
-      $stderr.puts [
-        "+-#{'-' * message.size}-+",
-        "| #{message} |",
-        "+-#{'-' * message.size}-+"
-      ]
     end
   end
 end

@@ -63,7 +63,7 @@ module TSC
 
     class Chunk < Array
       def initialize(*items)
-        super items.flatten.map { |_item|
+        super items.flatten.compact.map { |_item|
           _item.map { |_item|
             _item.to_s.rstrip
           }
