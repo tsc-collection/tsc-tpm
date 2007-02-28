@@ -98,8 +98,11 @@ module TSC
       @registry.add_bulk *args
       @registry.add_bulk *Array(conf.options)
 
-      @script_location, @script_name = File.split($0)
+      location, name = File.split($0)
       @options = Hash.new
+
+      @script_location = location
+      @script_name = name.sub(%r{[.]rb$}i, '')
 
       self.verbose = ENV['TRACE'].to_s.split.include?(script_name) || conf.verbose
     end
@@ -122,6 +125,17 @@ module TSC
       else
         @options.delete('verbose')
       end
+    end
+
+    def platform 
+      @platform ||= begin
+        require 'tsc/platform.rb'
+        TSC::Platform.current
+      end
+    end
+
+    def os
+      @os ||= platform.driver
     end
 
     class Content < ::Array
@@ -226,9 +240,10 @@ module TSC
       @options.has_key?('verbose')
     end
 
-    def find_in_path(command)
-      ENV.to_hash['PATH'].split(File::PATH_SEPARATOR).map { |_location|
-        Dir[ File.join(_location, command) ].first
+    def find_in_path(command) 
+      ENV['PATH'].to_s.split(File::PATH_SEPARATOR).map { |_location|
+        location = _location.gsub(File::ALT_SEPARATOR, File::SEPARATOR)
+	Dir[File.join(location, command)].first
       }.compact
     end
 
