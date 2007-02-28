@@ -18,6 +18,10 @@ module TSC
         suffix = '.exe'
         [ path.sub(%r{#{Regexp.quote(suffix)}$}, ''), suffix ].join
       end
+
+      def path(path)
+        path.gsub(File::ALT_SEPARATOR, File::SEPARATOR)
+      end
     end
   end
 end
