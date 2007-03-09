@@ -31,8 +31,9 @@ class Application < TSC::Application
     handle_errors {
       process_command_line
 
-      file_to_require = options['require']
-      require file_to_require if file_to_require
+      Array(options['require']).each do |_file|
+        require _file
+      end
 
       throw :TEST if options.has_key?('test')
 
