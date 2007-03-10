@@ -4,6 +4,8 @@
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
 
+require 'tsc/cli/response.rb'
+
 module TSC
   module CLI
     class Selector
@@ -46,7 +48,7 @@ module TSC
             
             if register_item(:choice, result)
               add_choice _menu, display do
-                result
+                Response.selected(result)
               end
             end
           end
@@ -62,9 +64,11 @@ module TSC
       end
 
       def question(answer)
-        communicator.ask("#{header}? ") { |_question|
-          _question.default = answer if answer
-        }
+        Response.entered(
+          communicator.ask("#{header}? ") { |_question|
+            _question.default = answer if answer
+          }
+        )
       end
 
       private
@@ -128,7 +132,7 @@ module TSC
             add_choice menu, "<#{label}>", &block
           else
             add_choice(menu, "#{_category} => #{item}") {
-              item
+              Response.selected(item)
             }
           end
         end

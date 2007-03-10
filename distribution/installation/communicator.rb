@@ -91,7 +91,7 @@ module Installation
       log :select, "#{menu[:header]} from #{choices.inspect}"
 
       response = figure_response(menu[:header]) || super
-      log :answer, response.inspect
+      log response.category, response.inspect
 
       response
     end
@@ -102,11 +102,12 @@ module Installation
       return booleanize(ask(request, aliases.first).downcase) if aliases
 
       log :ask, "#{request}?"
-      response = figure_response(request) || communicator.ask("#{request}? ") { |_controller|
-        _controller.default = values.join.strip unless values.empty?
-      }.strip
-
-      log :answer, response.inspect
+      response = figure_response(request) || TSC::CLI::Response.entered(
+        communicator.ask("#{request}? ") { |_controller|
+          _controller.default = values.join.strip unless values.empty?
+        }.strip
+      )
+      log response.category, response.inspect
       response.to_s
     end
 
@@ -142,7 +143,8 @@ module Installation
         next unless request =~ %r{#{Regexp.quote(_request)}}
         log :request, _request.inspect
         log :response, _response.inspect
-        _response.to_s
+
+        TSC::CLI::Response.preset(_response.to_s)
       }.compact.first
     end
   end
