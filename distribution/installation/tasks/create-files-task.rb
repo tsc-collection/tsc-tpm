@@ -56,9 +56,10 @@ module Installation
   module Tasks
     class CreateFilesTask < Installation::Task
       def execute
+        @applied_actions = []
+
         ask_confirmation
 
-        @applied_actions = []
         communicator.progress 'Installing' do |_progress|
           self.class.installation_actions.each do |_action|
             @applied_actions << _action
