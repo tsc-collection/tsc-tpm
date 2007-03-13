@@ -72,20 +72,27 @@ module Distribution
 
       File.makedirs package_temp_directory
       begin
-        info = Array(@package.product.info) + Array(@package.info)
+        content_info = copy_files_and_collect_info(package_temp_directory)
+        tools_info = make_tools(package_temp_directory)
+        prodinfo_info = prodinfo_descriptor.info
+        metainf_dirs_info = metainf_directories(content_info, tools_info, prodinfo_info)
 
-        package_info = copy_files_and_collect_info package_temp_directory
-        tools_info = make_tools package_temp_directory
+        info = [
+          @package.product.info, 
+          @package.info,
+          metainf_dirs_info,
+          tools_info, 
+          content_info,
+          prodinfo_info
+        ]
 
-        make_prodinfo info + tools_info + package_info, package_temp_directory
+        make_prodinfo info.flatten.compact, package_temp_directory
         make_package package_temp_directory, package_path
       ensure
         Dir.rm_r package_temp_directory
       end
     end
 
-    private
-    #######
     def figure_ruby_path
       find_in_path(os.exe('ruby'), ENV.to_hash['PATH'].split(':')).first
     end
@@ -144,11 +151,10 @@ module Distribution
       end
     end
 
-    def check_metainf_directories(directories, path)
-      while (path != nil) and (path != ".")
-        directories << path if directories.index(path) == nil
-        path = File.dirname(path)
-      end
+    def combinations(*components)
+      components.inject([]) { |_result, _item|
+        _result << (Array(_result.last) + Array(_item) )
+      }
     end
 
     def make_tools(directory)
@@ -193,33 +199,39 @@ module Distribution
       }
     end
 
-    def add_metainf_directories(info)
-      metainf_directories = []
-      info.each { |_entry|
+    def metainf_directories(*args)
+      args.flatten.map { |_entry|
         target = _entry.scan(%r{^install\s+.*?:target=>"(\.meta-inf/.+?)".*$}).flatten.compact.first
-        check_metainf_directories metainf_directories, File.dirname(target) if target
-      }
-      metainf_directories = metainf_directories.sort
-      metainf_directories.each { |_directory|
+        next unless target
+
+        combinations(*target.split(File::SEPARATOR).slice(0...-1)).map { |_items|
+          File.join(_items)
+        }
+      }.flatten.compact.sort.uniq.map { |_directory|
         fileinfo = FileInfo.new _directory
         descriptor = Descriptor.new fileinfo
         descriptor.target_directory = File.dirname(_directory)
         descriptor.action = :directory
-        info << descriptor.info
+
+        descriptor.info
       }
     end
 
-    def make_prodinfo(info, directory)
-      add_metainf_directories(info)
-      prodinfo_path = File.join directory, "meta-inf", "prodinfo"
-      File.makedirs File.dirname(prodinfo_path)
+    def prodinfo_descriptor
       descriptor = Descriptor.new FileInfo.new("prodinfo", 0644)
       descriptor.action = "install"
       descriptor.add_destination_component "meta-inf"
       descriptor.target_directory = ".meta-inf/packages/#{@package.name}"
+
+      descriptor
+    end
+
+    def make_prodinfo(info, directory)
+      prodinfo_path = File.join directory, "meta-inf", "prodinfo"
+      File.makedirs File.dirname(prodinfo_path)
+
       File.open(prodinfo_path, "w") do |_io|
 	_io.puts *info.compact
-	_io.puts descriptor.info
       end
     end
 
@@ -263,6 +275,24 @@ module Distribution
       rescue Exception
         File.rm_f package_path
         raise
+      end
+    end
+  end
+end
+
+if $0 == __FILE__ or defined?(Test::Unit::TestCase)
+  require 'test/unit'
+
+  module Distribution
+    class PackagerTest < Test::Unit::TestCase
+      attr_reader :packager
+
+      def test_combinations
+        assert_equal [[1], [1,2], [1,2,3]], packager.combinations(1, 2, 3)
+      end
+
+      def setup
+        @packager = Packager.new(nil, nil)
       end
     end
   end
