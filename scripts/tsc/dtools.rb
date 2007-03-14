@@ -89,5 +89,11 @@ class Dir
 	self.rm_r directory
       end
     end
+
+    def mkdir_with_missing(path)
+      File.pathset(path).select { |_path|
+        Dir.mkdir(_path) unless File.directory?(_path)
+      }
+    end
   end
 end

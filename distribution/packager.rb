@@ -151,12 +151,6 @@ module Distribution
       end
     end
 
-    def combinations(*components)
-      components.inject([]) { |_result, _item|
-        _result << (Array(_result.last) + Array(_item) )
-      }
-    end
-
     def make_tools(directory)
       require_installation_code @config.library_directory
       locations = Hash[
@@ -202,11 +196,7 @@ module Distribution
     def metainf_directories(*args)
       action = DirectoryAction.new Hash[], '.', args.flatten.map { |_entry|
         target = _entry.scan(%r{^install\s+.*?:target=>"(\.meta-inf/.+?)".*$}).flatten.compact.first
-        next unless target
-
-        combinations(*target.split(File::SEPARATOR).slice(0...-1)).map { |_items|
-          File.join(_items)
-        }
+        File.pathset File.dirname(target) if target
       }.flatten.compact.sort.uniq
 
       action.descriptors(self).map { |_descriptor|
@@ -284,8 +274,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
     class PackagerTest < Test::Unit::TestCase
       attr_reader :packager
 
-      def test_combinations
-        assert_equal [[1], [1,2], [1,2,3]], packager.combinations(1, 2, 3)
+      def test_nothing
       end
 
       def setup

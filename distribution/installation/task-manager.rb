@@ -85,7 +85,7 @@ module Installation
       begin
         apply_services task_undo_stack
       rescue Exception => exception
-        communicator.communicator.say '... oops ...'
+        communicator.communicator.say '... failure detected, reverting ...'
 
         errors = []
         errors = revert_tasks task_undo_stack if perform_undo

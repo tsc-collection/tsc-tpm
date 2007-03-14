@@ -67,6 +67,14 @@ class File
       rm_f target, verbose
       copy source, target, verbose
     end
+
+    def pathset(path)
+      case path
+        when '.' then []
+        when '/' then [ '/' ]
+        else pathset(File.dirname(path)) + [ path ]
+      end
+    end
   end
 end
 
@@ -75,6 +83,12 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
 
   module TSC
     class FileTest < Test::Unit::TestCase
+      def test_pathset
+        assert_equal %w[ / /aaa /aaa/bbb /aaa/bbb/ccc ], File.pathset('/aaa/bbb/ccc')
+        assert_equal %w[ bbb bbb/ccc ], File.pathset('bbb/ccc')
+        assert_equal %w[ ./bbb ./bbb/ccc ], File.pathset('./bbb/ccc')
+      end
+
       def test_join
 	assert_nil File.smart_join
 	assert_equal 'aaa', File.smart_join('aaa')
