@@ -63,7 +63,7 @@ module Distribution
 	file = FileInfo.new _dir, 0755
 	descriptor = Descriptor.new(file)
 	descriptor.target = _dir
-	descriptor.action = "directory"
+	descriptor.action = :directory
 	descriptor.print_destination = false
 	descriptor
       end

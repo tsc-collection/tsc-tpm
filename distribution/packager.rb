@@ -200,20 +200,17 @@ module Distribution
     end
 
     def metainf_directories(*args)
-      args.flatten.map { |_entry|
+      action = DirectoryAction.new Hash[], '.', args.flatten.map { |_entry|
         target = _entry.scan(%r{^install\s+.*?:target=>"(\.meta-inf/.+?)".*$}).flatten.compact.first
         next unless target
 
         combinations(*target.split(File::SEPARATOR).slice(0...-1)).map { |_items|
           File.join(_items)
         }
-      }.flatten.compact.sort.uniq.map { |_directory|
-        fileinfo = FileInfo.new _directory
-        descriptor = Descriptor.new fileinfo
-        descriptor.target_directory = File.dirname(_directory)
-        descriptor.action = :directory
+      }.flatten.compact.sort.uniq
 
-        descriptor.info
+      action.descriptors(self).map { |_descriptor|
+        _descriptor.info
       }
     end
 
