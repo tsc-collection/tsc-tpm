@@ -210,5 +210,20 @@ module Installation
     def log(label, message)
       logger.log "#{self.provides}:#{label}: #{message}"
     end
+
+    protected
+    #########
+
+    def product
+      self.class.installation_product
+    end
+
+    def package
+      self.class.installation_package
+    end
+
+    def params
+      self.class.installation_parameters
+    end
   end
 end

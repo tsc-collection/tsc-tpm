@@ -32,14 +32,15 @@ module TSC
     end
 
     class Communicator
-      attr_reader :communicator
+      attr_reader :communicator, :decorators
 
       def initialize
         @communicator = HighLine.new
+        @decorators = Hash.new
       end
 
       def select(menu)
-        Selector.new(menu, communicator).start
+        Selector.new(menu, communicator, decorators).start
       end
 
       def ask_hash_key(hash, key, preferred = nil, other = true, &block)

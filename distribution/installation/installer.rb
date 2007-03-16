@@ -210,23 +210,25 @@ module Installation
         end
       end
 
-      description = [ product.description, package.description ].compact.join('/')
-      puts "[#{description}]" unless description.empty?
-
-
       info = [ product.name, package.name ].join
-
       @logger = Logger.new('INSTALL', info, product.version)
 
-      info = [ info, product.version ].compact.join(' ')
-      info = [ info, product.build ].compact.join(' build ')
-      info = [ info, product.platform ].compact.join(' for ')
-
       begin
-        communicator.report "Installing #{info}"
-
         task_manager = TaskManager.new(communicator, logger, config)
+
+        unless task_manager.welcome
+          description = [ product.description, package.description ].compact.join('/')
+          communicator.report "[#{description}]" unless description.empty?
+
+          info = [ info, product.version ].compact.join(' ')
+          info = [ info, product.build ].compact.join(' build ')
+          info = [ info, product.platform ].compact.join(' for ')
+
+          communicator.report "Installing #{info}"
+        end
+
         task_manager.execute !options.key?('nocleanup')
+
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
         raise

@@ -116,8 +116,13 @@ module Installation
     
     def post(label, *content)
       [ content, '' ].flatten.compact.join("\n").map.inject(label) { |_label, _item|
-        say "#{_label} #{_item.strip}\n"
-        ' ' * _label.size
+        if _item.strip.empty?
+          say "\n"
+          _label
+        else
+          say "#{_label} #{_item.chomp}\n"
+          ' ' * _label.size
+        end
       }
     end
 

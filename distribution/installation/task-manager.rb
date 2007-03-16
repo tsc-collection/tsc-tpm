@@ -80,6 +80,11 @@ module Installation
       Task.installation_top
     end
 
+    def welcome
+      tasks = @task_table['welcome']
+      tasks.first.execute if tasks
+    end
+
     def execute(perform_undo = true)
       task_undo_stack = []
       begin

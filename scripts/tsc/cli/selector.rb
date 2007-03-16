@@ -9,11 +9,20 @@ require 'tsc/cli/response.rb'
 module TSC
   module CLI
     class Selector
-      attr_reader :communicator, :config
+      attr_reader :communicator, :config, :decorators
 
-      def initialize(config, communicator)
+      def initialize(config, communicator, decorators = {})
         @config = config
         @communicator = communicator
+
+        @decorators = Hash[
+          :selector => proc { |_message|
+            "#{_message} (select a number)"
+          },
+          :question => proc { |_message|
+            _message
+          }
+        ].update(decorators)
 
         config[:other] = true if other.nil? && choices.empty?
         config[:other] = nil if other == false
@@ -32,7 +41,7 @@ module TSC
         @registry = []
         communicator.choose { |_menu|
           _menu.select_by = :index
-          _menu.header = "#{header} (select a number)"
+          _menu.header = decorators[:selector][header]
           _menu.default = default_item_number.to_s
 
           add_category _menu, :current, :preferred
@@ -65,7 +74,7 @@ module TSC
 
       def question(answer)
         Response.entered(
-          communicator.ask("#{header}? ") { |_question|
+          communicator.ask("#{decorators[:question][header]}? ") { |_question|
             _question.default = answer if answer
           }
         )
