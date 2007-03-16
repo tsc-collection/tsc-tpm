@@ -54,7 +54,7 @@ require 'module.rb'
 module Distribution
   class BinaryExecModule < Module
     def initialize(*args)
-      super Hash[:mode=>0755], *args
+      super Hash[ :mode => Defaults.mode.program ], *args
     end
 
     def entries

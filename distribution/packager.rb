@@ -111,8 +111,8 @@ module Distribution
 	find_in_path(_file, $:).each do |_path|
 	  _path.scan(%r{^(.*)/(#{library})/(.*)$}).each do |_target|
             permissions = case _target[2].split('.').last
-              when 'so', 'sl' then 0755
-              else 0644
+              when 'so', 'sl' then Defaults.mode.program
+              else Defaults.mode.file
             end
 	    result[ File.join(_target[1], _target[2]) ] ||= [ _target[0], permissions ]
 	  end
@@ -154,23 +154,23 @@ module Distribution
     def make_tools(directory)
       require_installation_code @config.library_directory
       locations = Hash[
-        [ "tools/lib", 0644] => figure_installation_library_files,
-        [ "tools", 0644] => figure_ruby_library_files,
-        [ "tools/bin", 0755] => [ 
+        [ "tools/lib", Defaults.mode.file ] => figure_installation_library_files,
+        [ "tools", Defaults.mode.file ] => figure_ruby_library_files,
+        [ "tools/bin", Defaults.mode.program ] => [ 
           File.split(figure_ruby_path).reverse,
           *%w{ 
             tpm-install 
             tpm 
           }.map { |_file| [ _file, @config.binary_directory ] }
         ],
-        [ "tools/bin", 0644] => figure_tsc_library_files
+        [ "tools/bin", Defaults.mode.file ] => figure_tsc_library_files
       ]
       info = []
       TSC::Progress.new "Copying tools" do |_progress|
         locations.each { |_key, _entry|
           destination, permissions = _key.to_a
           _entry.each { |_to, _from, _permissions|
-            fileinfo = FileInfo.new(_to, _permissions || permissions || 0644)
+            fileinfo = FileInfo.new(_to, _permissions || permissions || Defaults.mode.file)
             fileinfo.path_for_checksum = _to
 	    descriptor = Descriptor.new fileinfo, _from
 	    descriptor.add_destination_component File.join(destination, File.dirname(_to))
@@ -205,7 +205,7 @@ module Distribution
     end
 
     def prodinfo_descriptor
-      descriptor = Descriptor.new FileInfo.new("prodinfo", 0644)
+      descriptor = Descriptor.new FileInfo.new("prodinfo", Defaults.mode.file)
       descriptor.action = "install"
       descriptor.add_destination_component "meta-inf"
       descriptor.target_directory = ".meta-inf/packages/#{@package.name}"

@@ -54,7 +54,7 @@ require 'module.rb'
 module Distribution
   class ConfigModule < Module
     def initialize(*args)
-      super Hash[:mode=>0644], *args
+      super Hash[ :mode => Defaults.mode.file ], *args
     end
 
     def entries

@@ -60,7 +60,7 @@ module Distribution
 
     def descriptors(package)
       @dirs.map do |_dir|
-	file = FileInfo.new _dir, 0755
+	file = FileInfo.new _dir, Defaults.mode.directory
 	descriptor = Descriptor.new(file)
 	descriptor.target = _dir
 	descriptor.action = :directory

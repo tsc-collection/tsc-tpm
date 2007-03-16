@@ -58,6 +58,7 @@ require 'product.rb'
 require 'fileset.rb'
 
 require 'config-parser.rb'
+require 'defaults.rb'
 
 module Distribution
   class ConfigManager
@@ -75,6 +76,9 @@ module Distribution
         },
         :fileset => proc { |_block| 
           @filesets << Fileset.new(product, @cache, &_block)
+        },
+        :defaults => proc {
+          Distribution::Defaults
         }
       ]
     end

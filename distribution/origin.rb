@@ -76,10 +76,10 @@ module Distribution
     def initialize(cache)
       @parser = ConfigParser.new cache, Hash[
         :program => proc { |_block, *_parameters|
-          add_module Distribution::Module, Hash[:mode=>0755], *_parameters, &_block
+          add_module Distribution::Module, Hash[ :mode => Defaults.mode.program ], *_parameters, &_block
         },
         :file => proc { |_block, *_parameters|
-          add_module Distribution::Module, Hash[:mode=>0644], *_parameters, &_block
+          add_module Distribution::Module, Hash[ :mode => Defaults.mode.file ], *_parameters, &_block
         },
         :node => proc { |_block, *_parameters|
           add_module NodeModule, *_parameters, &_block

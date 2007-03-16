@@ -60,7 +60,8 @@ module Distribution
     
     def descriptors(package)
       @files.map do |_file|
-	file = FileInfo.new _file, 0755
+	file = FileInfo.new _file, Defaults.mode.file
+
 	descriptor = Descriptor.new(file)
 	descriptor.target = _file
 	descriptor.action = 'remove'

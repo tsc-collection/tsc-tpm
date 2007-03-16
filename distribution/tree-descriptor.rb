@@ -71,7 +71,7 @@ module Distribution
 
   class NodeTreeDescriptor < TreeDescriptor
     def initialize(file, origin)
-      file.mode ||= 0755
+      file.mode ||= Defaults.mode.directory
       super file, origin
 
       self.action = 'directory'
@@ -87,7 +87,7 @@ module Distribution
 
   class LeafTreeDescriptor < TreeDescriptor
     def initialize(file, origin)
-      file.mode ||= 0644
+      file.mode ||= Defaults.mode.file
       super file, origin
 
       directory = File.dirname file.path
