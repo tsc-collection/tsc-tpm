@@ -184,11 +184,12 @@ module Installation
       end
     end
 
-    attr_reader :communicator, :logger
+    attr_reader :communicator, :logger, :messenger
 
-    def initialize(communicator, logger)
+    def initialize(communicator, logger, messenger = nil)
       @communicator = communicator
       @logger = logger
+      @messenger = messenger || self
     end
 
     def execute

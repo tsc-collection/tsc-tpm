@@ -66,12 +66,11 @@ module Installation
 	'system-query-user'
       end
 
-      def os
-        @os ||= TSC::Platform.current.driver
-      end
-
       def execute
-	user = communicator.select :header => 'user', :preferred => self.class.installation_user
+	user = communicator.select Hash[
+          :header => messenger.user_request,
+          :preferred => self.class.installation_user
+        ]
 
 	user_entry = (Etc::getpwnam user rescue create_user user)
 	group_entry = Etc::getgrgid(user_entry.gid)

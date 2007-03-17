@@ -70,9 +70,12 @@ module Installation
       end
 
       def create_user(user)
-	raise TSC::OperationCanceled unless communicator.ask "Create user #{user.inspect}", true
+	raise TSC::OperationCanceled unless communicator.ask messenger.create_user_confirmation(user), true
 
-	group = communicator.select :header => "group for user #{user.inspect}", :preferred => self.class.installation_group
+	group = communicator.select Hash[
+          :header => messenger.group_for_user_request(user),
+          :preferred => self.class.installation_group
+        ]
 	Etc::getgrnam group rescue create_group group
 
 	home = ask_home_directory user, self.class.installation_top
@@ -108,6 +111,18 @@ module Installation
           :preferred => directory
         ]
 	File.expand_path directory
+      end
+
+      def user_request
+        'user'
+      end
+
+      def create_user_confirmation(user)
+	"Create user #{user.inspect}"
+      end
+
+      def group_for_user_request(user)
+        "group for user #{user.inspect}"
       end
     end
   end

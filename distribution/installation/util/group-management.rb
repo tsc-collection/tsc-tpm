@@ -67,10 +67,10 @@ module Installation
       end
 
       def create_group(group)
-	raise TSC::OperationCanceled unless communicator.ask "Create group #{group.inspect}", true
+	raise TSC::OperationCanceled unless communicator.ask messenger.create_group_confirmation(group), true
 	
         os.add_group(group)
-	communicator.report "Group #{group.inspect} created"
+	communicator.report messenger.create_group_report(group)
 
 	new_group_registry << group
 	Etc::getgrnam group
@@ -83,7 +83,7 @@ module Installation
             new_group_registry.each do |_group|
               _queue.add {
                 os.remove_group(_group)
-                communicator.report "Group #{_group.inspect} removed"
+                communicator.report messenger.remove_group_report(_group)
                 removed_groups << _group
               }
             end
@@ -91,6 +91,18 @@ module Installation
         ensure
           new_group_registry.subtract removed_groups
         end
+      end
+
+      def create_group_confirmation(group)
+	"Create group #{group.inspect}"
+      end
+
+      def create_group_report(group)
+	"Group #{group.inspect} created"
+      end
+
+      def remove_group_report(group)
+        "Group #{group.inspect} removed"
       end
     end
   end

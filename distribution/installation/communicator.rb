@@ -120,7 +120,7 @@ module Installation
     
     def post(label, *content)
       label = label.to_s
-      label << ' ' unless label.empty?
+      label += ' ' unless label.empty?
 
       [ content, '' ].flatten.compact.join("\n").map.inject(label) { |_label, _item|
         if _item.strip.empty?
