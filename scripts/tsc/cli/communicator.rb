@@ -34,9 +34,9 @@ module TSC
     class Communicator
       attr_reader :communicator, :decorators
 
-      def initialize
+      def initialize(decorators = {})
         @communicator = HighLine.new
-        @decorators = Hash.new
+        @decorators = decorators
       end
 
       def select(menu)

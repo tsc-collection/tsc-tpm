@@ -71,7 +71,8 @@ module Installation
       end
 
       def execute
-	user = communicator.ask 'User', self.class.installation_user
+	user = communicator.select :header => 'user', :preferred => self.class.installation_user
+
 	user_entry = (Etc::getpwnam user rescue create_user user)
 	group_entry = Etc::getgrgid(user_entry.gid)
 

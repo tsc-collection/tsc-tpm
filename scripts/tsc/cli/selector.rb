@@ -17,10 +17,10 @@ module TSC
 
         @decorators = Hash[
           :selector => proc { |_message|
-            "#{_message} (select a number)"
+            "#{_message.capitalize} (select a number)"
           },
           :question => proc { |_message|
-            _message
+            _message.capitalize
           }
         ].update(decorators)
 

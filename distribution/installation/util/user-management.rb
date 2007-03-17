@@ -72,7 +72,7 @@ module Installation
       def create_user(user)
 	raise TSC::OperationCanceled unless communicator.ask "Create user #{user.inspect}", true
 
-	group = communicator.ask "Group for user #{user.inspect}", self.class.installation_group
+	group = communicator.select :header => "group for user #{user.inspect}", :preferred => self.class.installation_group
 	Etc::getgrnam group rescue create_group group
 
 	home = ask_home_directory user, self.class.installation_top
@@ -103,7 +103,11 @@ module Installation
       end
 
       def ask_home_directory(user, directory)
-	File.expand_path communicator.ask("Home directory for user #{user.inspect}", directory)
+	directory = communicator.select Hash[
+          :header => "home directory for user #{user.inspect}", 
+          :preferred => directory
+        ]
+	File.expand_path directory
       end
     end
   end

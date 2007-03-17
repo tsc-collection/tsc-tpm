@@ -60,7 +60,11 @@ module Installation
       @logger = logger
       @responses = responses
 
-      super()
+      super Hash[
+        :report_label => '###',
+        :warning_label => 'WARNING:',
+        :error_label => 'ERROR:'
+      ]
 
       @booleans ||= {
         true => %w{ yes y yep true t }, 
@@ -69,15 +73,15 @@ module Installation
     end
 
     def report(*args)
-      post '###', args
+      post decorators[:report_label], args
     end
 
     def error(*args)
-      post 'ERROR:', args
+      post decorators[:error_label], args
     end
 
     def warning(*args)
-      post 'WARNING:', args
+      post decorators[:warning_label], args
     end
 
     def progress(*args, &block)
@@ -115,12 +119,15 @@ module Installation
     #######
     
     def post(label, *content)
+      label = label.to_s
+      label << ' ' unless label.empty?
+
       [ content, '' ].flatten.compact.join("\n").map.inject(label) { |_label, _item|
         if _item.strip.empty?
           say "\n"
           _label
         else
-          say "#{_label} #{_item.chomp}\n"
+          say "#{_label}#{_item.chomp}\n"
           ' ' * _label.size
         end
       }
