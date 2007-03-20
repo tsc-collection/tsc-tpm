@@ -63,6 +63,7 @@ module Installation
       super Hash[
         :report_label => '###',
         :warning_label => 'WARNING:',
+        :info_label => 'INFO:',
         :error_label => 'ERROR:'
       ]
 
@@ -82,6 +83,10 @@ module Installation
 
     def warning(*args)
       post decorators[:warning_label], args
+    end
+
+    def info(*args)
+      post decorators[:info_label], args
     end
 
     def progress(*args, &block)

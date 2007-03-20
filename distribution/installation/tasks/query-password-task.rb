@@ -12,6 +12,15 @@ require 'installation/util/user-management.rb'
 module Installation
   module Tasks
     class QueryPasswordTask < Installation::Task
+      class PasswordError < RuntimeError
+        attr_reader :user
+
+        def initialize(user)
+          @user = user
+          super "Password for #{user} not set"
+        end
+      end
+
       include Installation::Util::UserManagement
 
       def provides
@@ -21,10 +30,13 @@ module Installation
       def execute
         new_user_registry.each do |_user|
           begin
-            set_password _user
-          rescue
-            communicator.warning "Password for #{_user.inspect} not set"
+            if communicator.ask(messenger.create_password_confirmation(_user), true)
+              set_password _user
+              next
+            end
+          rescue PasswordError
           end
+          communicator.warning messenger.password_not_set_warning(_user)
         end
       end
 
@@ -35,7 +47,15 @@ module Installation
         Process.wait fork {
           exec 'passwd', user
         }
-        raise "Password for #{user} not set" if $?.exitstatus != 0
+        raise PasswordError, user if $?.exitstatus != 0
+      end
+
+      def create_password_confirmation(user)
+        "Create password for #{user.inspect}"
+      end
+
+      def password_not_set_warning(user)
+        "Password for #{user.inspect} not set"
       end
     end
   end

@@ -82,7 +82,7 @@ module Installation
 	raise 'Wrong home directory' if home.index(Dir.getwd) == 0
 
         os.add_user(user, group, home)
-	communicator.report "User #{user.inspect} created"
+	communicator.report messenger.create_user_report(user)
 
 	new_user_registry << user
 	Etc::getpwnam user
@@ -95,7 +95,7 @@ module Installation
             new_user_registry.each do |_user|
               _queue.add {
                 os.remove_user(_user)
-                communicator.report "User #{_user.inspect} removed"
+                communicator.report messenger.remove_user_report(_user)
                 removed_users << _user
               }
             end
@@ -107,7 +107,7 @@ module Installation
 
       def ask_home_directory(user, directory)
 	directory = communicator.select Hash[
-          :header => "home directory for user #{user.inspect}", 
+          :header => messenger.home_for_user_request(user), 
           :preferred => directory
         ]
 	File.expand_path directory
@@ -123,6 +123,18 @@ module Installation
 
       def group_for_user_request(user)
         "group for user #{user.inspect}"
+      end
+
+      def home_for_user_request(user)
+        "home directory for user #{user.inspect}"
+      end
+
+      def create_user_report(user)
+	"User #{user.inspect} created"
+      end
+
+      def remove_user_report(user)
+        "User #{user.inspect} removed"
       end
     end
   end
