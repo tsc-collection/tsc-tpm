@@ -229,7 +229,6 @@ module Installation
           communicator.report "Installing #{info}"
         }
         task_manager.execute !options.key?('nocleanup')
-        task_manager.event_processor.installation_finished
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
         raise
@@ -245,6 +244,7 @@ module Installation
           logger.remove
         end
       end
+      task_manager.event_processor.installation_finished
     end
 
     def process_directory(directory)

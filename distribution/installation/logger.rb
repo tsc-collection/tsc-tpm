@@ -33,7 +33,7 @@ module Installation
     end
 
     def log(*args)
-      @io.puts *args
+      @io.puts *args rescue nil
     end
 
     def close
