@@ -54,7 +54,6 @@ require 'tsc/dtools.rb'
 require 'tsc/launch.rb'
 require 'tsc/progress.rb'
 require 'tsc/errors.rb'
-require 'tsc/border-box.rb'
 
 require 'installation/logger.rb'
 require 'installation/communicator.rb'
@@ -136,12 +135,15 @@ module Installation
         version = product.version && " #{product.version}#{build}"
         platform = product.platform && " (#{product.platform})"
 
-        puts "Removing #{name}#{version}#{platform}"
+        task_manager.event_processor.remove_started do
+          communicator.report "Removing #{name}#{version}#{platform}"
+        end
 
         @logger = Logger.new
         Dir.cd top_directory do
           task_manager = TaskManager.new(communicator, logger, _config)
           task_manager.revert
+          task_manager.event_processor.remove_finished
         end
       end
       Dir.rm_r Task.installation_product_metainf
@@ -216,7 +218,7 @@ module Installation
       begin
         task_manager = TaskManager.new(communicator, logger, config)
 
-        unless task_manager.welcome
+        task_manager.event_processor.installation_started {
           description = [ product.description, package.description ].compact.join('/')
           communicator.report "[#{description}]" unless description.empty?
 
@@ -225,10 +227,9 @@ module Installation
           info = [ info, product.platform ].compact.join(' for ')
 
           communicator.report "Installing #{info}"
-        end
-
+        }
         task_manager.execute !options.key?('nocleanup')
-
+        task_manager.event_processor.installation_finished
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
         raise
@@ -239,7 +240,7 @@ module Installation
         logger.close
 
         if options['log'] || product.log || package.log
-          $stderr.puts TSC::BorderBox["See details in #{logger.path}"]
+          task_manager.event_processor.log_closed
         else
           logger.remove
         end

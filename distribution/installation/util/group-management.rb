@@ -61,9 +61,7 @@ module Installation
     #
     module GroupManagement
       def new_group_registry
-        @new_group_registry ||= begin
-          self.class.installation_parameters[:new_group_registry] ||= Set.new
-        end
+        @new_group_registry ||= Set.new
       end
 
       def create_group(group)

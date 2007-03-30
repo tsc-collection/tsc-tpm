@@ -50,6 +50,7 @@
 =end
 
 require 'tsc/errors.rb'
+require 'installation/event-processor.rb'
 require 'etc'
 
 module Installation
@@ -80,9 +81,12 @@ module Installation
       Task.installation_top
     end
 
-    def welcome
-      tasks = @task_table['welcome']
-      tasks.first.execute if tasks
+    def event_processor
+      @event_processor ||= begin
+        Array(@task_table['events']).first or begin
+          Installation::EventProcessor.new(communicator, logger, Array(@task_table['welcome']).first)
+        end
+      end
     end
 
     def execute(perform_undo = true)
@@ -90,7 +94,7 @@ module Installation
       begin
         apply_services task_undo_stack
       rescue Exception => exception
-        communicator.communicator.say '... failure detected, reverting ...'
+        event_processor.problem_detected
 
         errors = []
         errors = revert_tasks task_undo_stack if perform_undo

@@ -58,9 +58,9 @@ module Installation
       def execute
         @applied_actions = []
 
-        ask_confirmation
+        messenger.confirm_create_files
 
-        communicator.progress 'Installing' do |_progress|
+        communicator.progress messenger.progress_label_for_install do |_progress|
           self.class.installation_actions.each do |_action|
             @applied_actions << _action
             _action.create _progress, self
@@ -84,7 +84,7 @@ module Installation
             }
           end
         else
-          communicator.progress 'Removing' do |_progress|
+          communicator.progress messenger.progress_label_for_remove do |_progress|
             self.class.installation_actions.reverse_each do |_action|
               _action.remove _progress, self
             end
@@ -96,15 +96,21 @@ module Installation
         'system-create-files'
       end
       
-      private
-      #######
-      def ask_confirmation
+      def confirm_create_files
         user = self.class.installation_user
         group = self.class.installation_group
         top = self.class.installation_top
 
         communicator.report "Installing as user #{user.inspect}, group #{group.inspect} in #{top.inspect}."
         raise TSC::OperationCanceled unless communicator.ask 'Proceed', true
+      end
+
+      def progress_label_for_install
+       'Installing'
+      end
+
+      def progress_label_for_remove
+       'Removing'
       end
     end
   end
