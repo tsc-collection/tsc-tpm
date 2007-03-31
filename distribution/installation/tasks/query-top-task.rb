@@ -50,6 +50,7 @@
 =end
 
 require 'installation/task.rb'
+require 'pathname'
 
 module Installation
   module Tasks
@@ -59,7 +60,7 @@ module Installation
       end
 
       def execute
-	directory = File.expand_path ask_installation_directory, self.class.installation_top
+	directory = File.expand_path ask_installation_directory, top
 	raise "Wrong installation directory" if directory.index(Dir.getwd) == 0
 	self.class.installation_top = directory
       end
@@ -68,7 +69,11 @@ module Installation
       end
 
       def ask_installation_directory
-	communicator.ask "Installation directory", self.class.installation_top
+	communicator.ask "Installation directory", top
+      end
+
+      def top
+        Pathname.new(self.class.installation_top).realpath.to_s rescue self.class.installation_top
       end
     end
   end

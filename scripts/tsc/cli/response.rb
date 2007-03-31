@@ -14,6 +14,10 @@ module TSC
           new message, :selected
         end
 
+        def accepted(message)
+          new message, :accepted
+        end
+
         def entered(message)
           new message, :entered
         end

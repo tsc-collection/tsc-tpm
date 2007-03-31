@@ -56,7 +56,7 @@ module Installation
   class Communicator < TSC::CLI::Communicator
     attr_reader :logger
 
-    def initialize(logger, responses = nil)
+    def initialize(logger, responses = nil, defaults = nil)
       @logger = logger
       @responses = responses
 
@@ -64,7 +64,8 @@ module Installation
         :report_label => '###',
         :warning_label => 'WARNING:',
         :info_label => 'INFO:',
-        :error_label => 'ERROR:'
+        :error_label => 'ERROR:',
+        :defaults => defaults
       ]
 
       @booleans ||= {
@@ -111,11 +112,18 @@ module Installation
       return booleanize(ask(request, aliases.first).downcase) if aliases
 
       log :ask, "#{request}?"
-      response = figure_response(request) || TSC::CLI::Response.entered(
-        communicator.ask("#{request}? ") { |_controller|
-          _controller.default = values.join.strip unless values.empty?
-        }.strip
-      )
+      response = figure_response(request) || begin
+        default_value = (values.join.strip unless values.empty?)
+        if decorators[:defaults] && default_value
+          TSC::CLI::Response.accepted(default_value)
+        else
+          TSC::CLI::Response.entered(
+            communicator.ask("#{request}? ") { |_controller|
+              _controller.default = default_value if default_value
+            }.strip
+          )
+        end
+      end
       log response.category, response.inspect
       response.to_s
     end

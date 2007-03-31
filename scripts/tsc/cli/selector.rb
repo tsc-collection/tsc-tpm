@@ -73,11 +73,15 @@ module TSC
       end
 
       def question(answer)
-        Response.entered(
-          communicator.ask("#{decorators[:question][header]}? ") { |_question|
-            _question.default = answer if answer
-          }
-        )
+        if decorators[:defaults] && answer
+          Response.accepted(answer)
+        else
+          Response.entered(
+            communicator.ask("#{decorators[:question][header]}? ") { |_question|
+              _question.default = answer if answer
+            }
+          )
+        end
       end
 
       private

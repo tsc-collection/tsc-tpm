@@ -79,6 +79,7 @@ class Application < TSC::Application
         [ '--list', 'List the content of the archive', nil ],
         [ '--extract', 'Extract the archive into the current directory', nil ],
         [ '--responses', 'Use the responses from a specified file', 'yaml file', '-r' ],
+        [ '--defaults', 'Accept default answeres', nil, '-D' ],
         [ '--log', 'Leave the installation log file', nil, '-l'  ]
       ]
       _conf.description = [
@@ -109,7 +110,6 @@ class Application < TSC::Application
       if options.key? 'responses'
         options['responses'] = TSC::Config.parse(response_file_path).hash
       end
-
 
       installer = Installation::Installer.new(options, script_location)
       installer.top_directory = File.dirname @top
