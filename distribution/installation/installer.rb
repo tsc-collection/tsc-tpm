@@ -119,6 +119,29 @@ module Installation
       end
     end
 
+    def package_name(config)
+      config.package.build_name or begin 
+        "#{config.product.name.upcase}#{config.package.name.downcase}"
+      end
+    end
+
+    def package_description(config)
+      [ config.product.description, config.package.description ].compact.join('/')
+    end
+
+    def package_info(config)
+      [
+        [
+          [
+            package_name(config),
+            config.product.version 
+          ].compact.join(' '),
+          config.product.build 
+        ].compact.join(' build '),
+        config.product.platform 
+      ].compact.join(' for ')
+    end
+    
     def remove(*args)
       require 'installation/task-manager'
 
@@ -126,26 +149,21 @@ module Installation
       raise ArgumentError, :remove unless args.empty?
 
       collect_config_data.each do |_config|
-        product = _config.product
-        package = _config.package
-        
-        name = "#{product.name}#{package.name}"
+        @logger = Logger.new('REMOVE', package_name(_config), _config.product.version)
 
-        build = product.build && "/#{product.build}"
-        version = product.version && " #{product.version}#{build}"
-        platform = product.platform && " (#{product.platform})"
-
-        task_manager.event_processor.remove_started do
-          communicator.report "Removing #{name}#{version}#{platform}"
-        end
-
-        @logger = Logger.new
         Dir.cd top_directory do
           task_manager = TaskManager.new(communicator, logger, _config)
+
+          task_manager.event_processor.remove_started do
+            communicator.report "Removing #{package_info(_config)}"
+            communicator.report '[ ' + package_description(_config) + ' ]'
+          end
+
           task_manager.revert
           task_manager.event_processor.remove_finished
         end
       end
+
       Dir.rm_r Task.installation_product_metainf
     end
 
@@ -212,23 +230,17 @@ module Installation
         end
       end
 
-      info = package.build_name || "#{product.name.upcase}#{package.name.downcase}"
-      @logger = Logger.new('INSTALL', info, product.version)
+      @logger = Logger.new('INSTALL', package_name(config), config.product.version)
 
       begin
         task_manager = TaskManager.new(communicator, logger, config)
 
         task_manager.event_processor.installation_started {
-          description = [ product.description, package.description ].compact.join('/')
-          communicator.report "[#{description}]" unless description.empty?
-
-          info = [ info, product.version ].compact.join(' ')
-          info = [ info, product.build ].compact.join(' build ')
-          info = [ info, product.platform ].compact.join(' for ')
-
-          communicator.report "Installing #{info}"
+          communicator.report "Installing #{package_info(config)}"
+          communicator.report '[ ' + package_description(config) + ' ]'
         }
         task_manager.execute !options.key?('nocleanup')
+
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
         raise
