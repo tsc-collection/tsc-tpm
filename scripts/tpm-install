@@ -65,53 +65,60 @@ main()
   trap 'cleanup' EXIT HUP INT QUIT TERM
   unset VERBOSE TEMPDIR LIST EXTRACT EXTRACT_ITEMS
 
-  progname=`figure_script_name`
-  progdir=`figure_script_location` || {
+  options="${@}"
+
+  scan_options "${@}"
+  set entry `figure_script_name_and_location "${progpath}"`
+  shift
+
+  [ "${#}" -ne 2 ] && {
     print_location_problem
     return 2
   }
-  scan_options "${@}"
+  progdir="${1}"
+  progname="${2}"
+
   setup_temporary_directory
 
   case "${progname}" in
     *.tpm)
-      process_package "${@}"
+      process_package ${options}
     ;;
     *)
-      invoke_package_manager "${@}"
+      invoke_package_manager ${options}
     ;;
   esac
 }
 
 scan_options()
 {
-  for option in "${@}"; do
-    action="${ACTION}"
+  for _option in "${@}"; do
+    _action="${ACTION}"
     unset ACTION
 
-    [ "${action:+set}" = set ] && {
-      eval "${action}"
+    [ "${_action:+set}" = set ] && {
+      eval "${_action}"
       continue
     }
-    case "${option}" in
+    case "${_option}" in
       -v | --verbose)
         VERBOSE=yes
         TRACE=yes
       ;;
       --tmp | -t*)
-        value=`_echo "${option}" | sed -n 's/^-t\(.*\)$/\1/p'`
+        value=`_echo "${_option}" | sed -n 's/^-t\(.*\)$/\1/p'`
         [ "${value:+set}" = set ] && {
           TEMPDIR="${value}"
           continue
         }
-        ACTION='TEMPDIR=${option}'
+        ACTION='TEMPDIR=${_option}'
       ;;
       --list)
         LIST=yes
       ;;
       --extract)
         EXTRACT=yes
-        ACTION='EXTRACT_ITEMS="${EXTRACT_ITEMS} ${option}";ACTION=${action}'
+        ACTION='EXTRACT_ITEMS="${EXTRACT_ITEMS} ${_option}";ACTION=${_action}'
       ;;
     esac
   done
@@ -290,33 +297,75 @@ figure_package_manager()
   return 1
 }
 
-figure_script_name()
+figure_script_name_and_location()
 {
-  basename "${progpath}"
-}
+  _path="${1}"
+  is_path "${_path}" || return 1
 
-figure_script_location()
-{
-  case "${progpath}" in
-    /*)
-      _path="${progpath}"
-    ;;
-    */*)
-      _path="`pwd`/${progpath}"
+  _location=`absolute_location "${_path}"`
+  _name=`basename "${_path}"`
+
+  case "${_name}" in
+    tpm-*)
     ;;
     *)
-      return 1
+      set entry `ls -l "${_path}"`
+      shift
+
+      case "${1}" in
+        l*) 
+          while [ ${#} -ne 1 ]; do
+            shift
+          done
+
+          if is_absolute_path "${1}"; then
+            _link="${1}"
+          else
+            _link="${_location}/${1}"
+          fi
+
+          figure_script_name_and_location "${_link}"
+          return $?
+        ;;
+      esac
+  esac
+
+  echo "${_location}" "${_name}"
+  return 0
+}
+
+is_path()
+{
+  case "${1}" in
+    /* | */* | */ )
+      return 0
     ;;
   esac
 
-  (cd `dirname "${_path}"` && pwd)
+  return 1
+}
+
+is_absolute_path()
+{
+  case "${1}" in
+    /*)
+      return 0
+    ;;
+  esac
+
+  return 1
+}
+
+absolute_location()
+{
+  (cd `dirname "${1}"` && pwd)
 }
 
 print_location_problem()
 {
   print_error "
-    |${progname}: Cannot figure out own location.
-    |NOTE: Make sure \"${progname}\" is invoked either directly as a reqular
+    |${progpath}: Cannot figure out own location.
+    |NOTE: Make sure \"${progpath}\" is invoked either directly as a reqular
     |      executable or via a shell with a path specification for
     |      the script.
   " 
