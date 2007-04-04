@@ -212,7 +212,7 @@ module Installation
         end
       end
 
-      info = [ product.name, package.name ].join
+      info = package.build_name || "#{product.name.upcase}#{package.name.downcase}"
       @logger = Logger.new('INSTALL', info, product.version)
 
       begin

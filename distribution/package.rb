@@ -60,13 +60,16 @@ require 'ftools'
 
 module Distribution
   class Package
-    attr_reader :name, :description, :product, :tasks, :base, :reserve, :log
+    attr_reader :name, :description, :product, :tasks, :base, :reserve, :log, :build_name
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument|
           @name = _argument
+        },
+        :build_name => proc { |_block, _argument|
+          @build_name = _argument
         },
         :description => proc { |_block, _argument|
           @description = _argument
@@ -101,6 +104,7 @@ module Distribution
 
     def full_name
       "#{@name}@#{@product.name}"
+      self.build_name or "#{product.name.upcase}#{self.name.downcase}"
     end
 
     def descriptors
@@ -114,9 +118,8 @@ module Distribution
       build_string = "-b#{product.build}" unless product.build.nil?
       version_string = "-#{product.version}" unless product.version.nil?
       tag_string = "-#{product.tag}" unless product.tag.nil?
-      name = "#{product.name.upcase}#{self.name.downcase}"
 
-      "#{name}#{version_string}#{build_string}#{tag_string}#{platform_string}.tpm"
+      "#{full_name}#{version_string}#{build_string}#{tag_string}#{platform_string}.tpm"
     end
 
     def info
@@ -125,6 +128,7 @@ module Distribution
         :description => description,
         :tasks => tasks,
         :log => log,
+        :build_name => build_name,
         :reserve => [ 0, reserve.to_i ].max
       ]
 
