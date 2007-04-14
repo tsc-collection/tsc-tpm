@@ -155,7 +155,19 @@ process_package()
   cwd=`pwd`
   trace_and_run cd "${tempdir}" && {
     process_archive extract "${package}"  && {
-      trace_and_run tools/bin/ruby tools/bin/tpm --install "${@}" -d "${cwd}" 0<&9
+      RUBY='./tools/bin/ruby'
+      check_ruby_platform "${RUBY}" || {
+        print_error "
+          |${progname}: Platform mismatch
+          |
+          |NOTE: The package you are trying to install is not binary compatible 
+          |      with the current platform. Please locate the compatible package 
+          |      and try it again.
+          |
+        "
+        return 4
+      }
+      trace_and_run "${RUBY}" tools/bin/tpm --install "${@}" -d "${cwd}" 0<&9
       return "${?}"
     }
   }
@@ -171,7 +183,7 @@ process_archive()
 
   exec 9<&0 0<"${archive}"
   while read line; do
-    [ "${line}" = '__END__' ] && {
+    [ _"${line}"_ = _'__END__'_ ] && {
       "${action}" "${@}"
       return ${?}
     }
@@ -274,6 +286,18 @@ setup_ruby_executable()
       }
     }
   }
+}
+
+check_ruby_platform()
+{
+  (
+    "${1}" -I `dirname "${1}"` -r tsc/application -e '
+      TSC::Application.new.start { 
+        require "etc"
+        puts Etc.getlogin 
+      }
+    '
+  ) 1>/dev/null 2>&1
 }
 
 figure_package_action()
