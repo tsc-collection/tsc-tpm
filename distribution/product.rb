@@ -56,10 +56,10 @@ require 'package.rb'
 module Distribution
   class Product
     attr_reader :description, :user, :group, :top, :packages,
-                :base, :params, :compatibility, :name, :log
+                :base, :params, :compatibility, :name, :log, :tags
 
     attr_accessor :library_prefix, :library_major, :build,
-                  :version, :tag
+                  :version
 
     def initialize(cache, &block)
       @parser = ConfigParser.new cache, Hash[
@@ -93,11 +93,15 @@ module Distribution
         :params => proc {
           params
         },
+        :tags => proc {
+          @tags
+        },
         :log => proc {
           @log = true
         }
       ]
       @packages = []
+      @tags = []
       @params = Hash.new
       @compatibility = Hash.new
       @log = false

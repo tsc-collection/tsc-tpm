@@ -104,8 +104,8 @@ module Distribution
       @product.version = version if version
     end
 
-    def product_tag=(tag)
-      @product.tag = tag if tag
+    def product_tag=(tags)
+      @product.tags.unshift Array(tags)
     end
 
     def product_library_prefix=(prefix)

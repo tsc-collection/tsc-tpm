@@ -60,7 +60,8 @@ require 'ftools'
 
 module Distribution
   class Package
-    attr_reader :name, :description, :product, :tasks, :base, :reserve, :log, :build_name
+    attr_reader :name, :description, :product, :tasks, :base, :reserve, :log
+    attr_reader :build_name, :tags
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
@@ -90,11 +91,15 @@ module Distribution
         :params => proc {
           product.params
         },
+        :tags => proc {
+          @tags
+        },
         :log => proc {
           @log = true
         }
       ]
       @product = product
+      @tags = []
       @filesets = []
       @tasks = []
       @log = false
@@ -103,7 +108,6 @@ module Distribution
     end
 
     def full_name
-      "#{@name}@#{@product.name}"
       self.build_name or "#{product.name.upcase}#{self.name.downcase}"
     end
 
@@ -114,12 +118,14 @@ module Distribution
     end
 
     def build_package_name
-      platform_string = "-#{product.platform}" unless product.platform.nil?
-      build_string = "-b#{product.build}" unless product.build.nil?
-      version_string = "-#{product.version}" unless product.version.nil?
-      tag_string = "-#{product.tag}" unless product.tag.nil?
-
-      "#{full_name}#{version_string}#{build_string}#{tag_string}#{platform_string}.tpm"
+      [ 
+        full_name, 
+        product.version,
+        ("b#{product.build}" if product.build),
+        product.tags,
+        tags,
+        product.platform
+      ].flatten.compact.join('-') + '.tpm'
     end
 
     def info
