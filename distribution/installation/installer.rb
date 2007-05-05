@@ -231,10 +231,9 @@ module Installation
       end
 
       @logger = Logger.new('INSTALL', package_name(config), config.product.version)
+      task_manager = TaskManager.new(communicator, logger, config)
 
       begin
-        task_manager = TaskManager.new(communicator, logger, config)
-
         task_manager.event_processor.installation_started {
           communicator.report "Installing #{package_info(config)}"
           communicator.report '[ ' + package_description(config) + ' ]'
