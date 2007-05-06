@@ -149,7 +149,19 @@ module Distribution
       figure_library_files rubylib, [
 
         if package.include_ruby_gems?
-          File.join(rubylib_top, 'gems', ruby_version, '**', '*')
+          items = Dir[ File.join(rubylib_top, 'gems', ruby_version, '**', '*') ].select { |_path|
+            package.include_ruby_gems.empty? or package.include_ruby_gems.any? { |_item|
+              _path.include? _item
+            }
+          }
+          absent = package.include_ruby_gems.reject { |_item|
+            items.any? { |_path|
+              _path.include? _item
+            }
+          }
+          raise "Gems not available: #{absent.join(', ')}" unless absent.empty?
+
+          items
         end,
 
         if package.include_ruby_libraries?
