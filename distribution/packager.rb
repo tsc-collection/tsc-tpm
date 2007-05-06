@@ -55,7 +55,7 @@ require 'pp'
 
 module Distribution
   class Packager
-    attr_reader :platform, :os
+    attr_reader :package, :config, :platform, :os
 
     def initialize(package, config)
       @package = package
@@ -67,7 +67,7 @@ module Distribution
     def create(directory)
       directory ||= Dir.getwd
 
-      package_path = File.expand_path File.join("#{directory}", @package.build_package_name)
+      package_path = File.expand_path File.join("#{directory}", package.build_package_name)
       package_temp_directory = "#{package_path}-#{$$}"
 
       File.makedirs package_temp_directory
@@ -78,8 +78,8 @@ module Distribution
         metainf_dirs_info = metainf_directories(content_info, tools_info, prodinfo_info)
 
         info = [
-          @package.product.info, 
-          @package.info,
+          package.product.info, 
+          package.info,
           metainf_dirs_info,
           tools_info, 
           content_info,
@@ -98,8 +98,14 @@ module Distribution
     end
 
     def find_in_path(what, where)
-      where.map { |_path|
-	Dir[File.join(_path, what)].select { |_file| 
+      if what.index('/') == 0
+        [ what ]
+      else
+        where.map { |_path|
+          File.join(_path, what)
+        }
+      end.map { |_item|
+	Dir[_item].select { |_file| 
 	  File.file? _file 
 	}
       }.flatten
@@ -123,16 +129,46 @@ module Distribution
       }
     end
 
-    def figure_ruby_library_files
-      loaded_files = $".clone
-      loaded_files.push 'irb/**/*' if loaded_files.include? 'irb.rb'
-      loaded_files.push 'net/ssh/**/*' if loaded_files.include? 'net/ssh.rb'
-      loaded_files.push 'rexml/**/*' if loaded_files.include? 'rexml/rexml.rb'
-      loaded_files.push 'test/unit/**/*' if loaded_files.include? 'test/unit.rb'
-      loaded_files.push 'test/spec/**/*' if loaded_files.include? 'test/spec.rb'
+    def rubylib
+      'lib/ruby'
+    end
 
-      loaded_files.push 'debug.rb'
-      figure_library_files 'lib/ruby', loaded_files
+    def ruby_version
+      @ruby_version ||= VERSION.split('.').slice(0, 2).join('.')
+    end
+
+    def rubylib_top
+      @rubylib_top ||= begin
+        File.dirname $:.detect { |_path|
+          _path =~ %r{/#{rubylib}/#{ruby_version}$}
+        }
+      end
+    end
+
+    def figure_ruby_library_files
+      figure_library_files rubylib, [
+
+        if package.include_ruby_gems?
+          File.join(rubylib_top, 'gems', ruby_version, '**', '*')
+        end,
+
+        if package.include_ruby_libraries?
+          [
+            File.join(rubylib_top, ruby_version, '**', '*'),
+            File.join(rubylib_top, 'site_ruby', ruby_version, '**', '*')
+          ]
+        else
+          [
+            $",
+            ('irb/**/*' if $".include? 'irb.rb'),
+            ('net/ssh/**/*' if $".include? 'net/ssh.rb'),
+            ('rexml/**/*' if $".include? 'rexml/rexml.rb'),
+            ('test/unit/**/*' if $".include? 'test/unit.rb'),
+            ('test/spec/**/*' if $".include? 'test/spec.rb'),
+            'debug.rb'
+          ]
+        end
+      ].flatten.compact
     end
 
     def figure_tsc_library_files
@@ -188,7 +224,7 @@ module Distribution
         '.meta-inf/tools/bin/tpm-remove' => 'tpm-install',
         '.meta-inf/tools/bin/tpm-revert' => 'tpm-install',
         '.meta-inf/tools/bin/tpm-commit' => 'tpm-install'
-      ).descriptors(@package).map { |_descriptor|
+      ).descriptors(package).map { |_descriptor|
         _descriptor.info
       }
     end
@@ -208,7 +244,7 @@ module Distribution
       descriptor = Descriptor.new FileInfo.new("prodinfo", Defaults.mode.file)
       descriptor.action = "install"
       descriptor.add_destination_component "meta-inf"
-      descriptor.target_directory = ".meta-inf/packages/#{@package.name}"
+      descriptor.target_directory = ".meta-inf/packages/#{package.name}"
 
       descriptor
     end
@@ -225,7 +261,7 @@ module Distribution
     def copy_files_and_collect_info(directory)
       info = []
       TSC::Progress.new 'Copying package contents' do |_progress|
-        @package.descriptors.each do |_descriptor|
+        package.descriptors.each do |_descriptor|
           info << _descriptor.info
           _descriptor.install_to_destination directory
           _progress.print
@@ -236,7 +272,7 @@ module Distribution
 
     def make_package(package_temp_directory, package_path)
       begin
-        TSC::Progress.new "Building #{@package.build_package_name.inspect}" do |_progress|
+        TSC::Progress.new "Building #{package.build_package_name.inspect}" do |_progress|
           installer = File.join(@config.binary_directory, 'tpm-install')
 
           compress = os.stream_compress_command

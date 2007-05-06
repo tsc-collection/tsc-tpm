@@ -96,6 +96,12 @@ module Distribution
         },
         :log => proc {
           @log = true
+        },
+        :include_ruby_libraries => proc {
+          @include_ruby_libraries = true
+        },
+        :include_ruby_gems => proc {
+          @include_ruby_gems = true
         }
       ]
       @product = product
@@ -105,6 +111,14 @@ module Distribution
       @log = false
 
       @parser.process(&block)
+    end
+
+    def include_ruby_libraries?
+      @include_ruby_libraries ? true : false
+    end
+
+    def include_ruby_gems?
+      @include_ruby_gems ? true : false
     end
 
     def full_name
