@@ -61,7 +61,7 @@ require 'ftools'
 module Distribution
   class Package
     attr_reader :name, :description, :product, :tasks, :base, :reserve, :log
-    attr_reader :build_name, :tags, :include_ruby_gems
+    attr_reader :build_name, :tags, :include_ruby_gems, :do_not_build
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
@@ -102,6 +102,9 @@ module Distribution
         },
         :include_ruby_gems => proc { |_block, *_arguments|
           @include_ruby_gems = Array(_arguments).flatten
+        },
+        :do_not_build => proc {
+          @do_not_build = true
         }
       ]
       @product = product

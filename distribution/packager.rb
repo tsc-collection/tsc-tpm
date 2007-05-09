@@ -65,6 +65,8 @@ module Distribution
     end
 
     def create(directory)
+      return if package.do_not_build
+
       directory ||= Dir.getwd
 
       package_path = File.expand_path File.join("#{directory}", package.build_package_name)
