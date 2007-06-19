@@ -72,6 +72,9 @@ module Distribution
         :version => proc { |_block, _argument|
           @version = _argument
         },
+        :build => proc { |_block, _argument|
+          @build = _argument
+        },
         :user => proc { |_block, _argument|
           @user = _argument
         },
