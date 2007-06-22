@@ -43,19 +43,17 @@
 # 
 
 require 'tempfile'
-require 'tsc/launch'
-require 'tsc/undo'
-require 'tsc/perforce/form'
-require 'tsc/perforce/label'
-require 'tsc/perforce/client'
-require 'tsc/perforce/change'
-require 'tsc/perforce/submit'
+require 'tsc/launch.rb'
+require 'tsc/errors.rb'
+require 'tsc/perforce/form.rb'
+require 'tsc/perforce/label.rb'
+require 'tsc/perforce/client.rb'
+require 'tsc/perforce/change.rb'
+require 'tsc/perforce/submit.rb'
 
 module TSC
   module Perforce
     class Commander
-      include TSC::Undo
-
       def sync(*args,&block)
 	launch("p4 sync -f #{args.join(' ')}",&block)
       end
@@ -67,7 +65,7 @@ module TSC
 	raise "No block for edit" unless block
 	launch("p4 open #{args.join(' ')}")
 
-	undo_on_error(Exception) do |_undo|
+	TSC::Error.undo(Exception) do |_undo|
 	  _undo.push proc {
 	    launch("p4 revert #{args.join(' ')}")
 	  }
