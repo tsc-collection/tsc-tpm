@@ -79,7 +79,12 @@ module Distribution
 	    elsif file_on_disk.file?
 	      LeafTreeDescriptor.new file, top
             elsif file_on_disk.symlink?
-              LinkTreeDescriptor.new file, File.readlink(file.path)
+              if follow_symlinks?
+                file.mode = File.stat(file.path).mode
+                LeafTreeDescriptor.new file, top
+              else
+                LinkTreeDescriptor.new file, File.readlink(file.path)
+              end
 	    end
 	  }
 	end
@@ -101,6 +106,10 @@ module Distribution
         end
       }
       entries
+    end
+
+    def follow_symlinks?
+      @follow_symlinks ||= info[:follow]
     end
   end
 end

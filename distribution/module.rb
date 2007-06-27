@@ -54,7 +54,7 @@ require 'descriptor.rb'
 
 module Distribution
   class Module
-    attr_reader :entries
+    attr_reader :entries, :info
 
     @@build = 0
     @@library_extention = 'so'
@@ -135,7 +135,7 @@ module Distribution
             depot.concat _arg.entries
           when Hash 
             _arg.each do |_key, _value|
-              if [ :mode, :owner, :group, :keep ].include? _key
+              if Symbol === _key
                 @info[_key] = _value
               else
                 depot.concat process(*_value).map { |_entry|
