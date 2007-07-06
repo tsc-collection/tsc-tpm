@@ -158,7 +158,7 @@ process_package()
       RUBY='./tools/bin/ruby'
       check_ruby_platform "${RUBY}" || {
         print_error "
-          |${progname}: Platform mismatch
+          |ERROR: ${progname}: Platform mismatch
           |
           |NOTE: The package you are trying to install is not binary compatible 
           |      with the current platform. Please locate the compatible package 
@@ -196,14 +196,14 @@ process_archive()
 
 list()
 {
-  trace_and_run ${STREAM_UNCOMPRESS_COMMAND} | trace_and_run cpio -itdcv "${@}"
+  trace_and_run ${STREAM_UNCOMPRESS_COMMAND} | trace_and_run cpio -itdv "${@}"
 }
 
 extract()
 {
   error_codes=`{
     (trace_and_run ${STREAM_UNCOMPRESS_COMMAND} || _echo ${?} 1>&5) | {
-      (trace_and_run cpio -idcvu ${EXTRACT_ITEMS} 2>&1 || _echo ${?} 1>&5) | {
+      (trace_and_run cpio -idvu ${EXTRACT_ITEMS} 2>&1 || _echo ${?} 1>&5) | {
         # The following is needed because cpio option -v on Linux sends
         # its output to stderr. So in case of error we need the data in 
         # the error log file available for reporting.
@@ -226,7 +226,15 @@ extract()
   } 5>&1 2>"${error_log}"`
 
   [ "${error_codes:+set}" = set ] && {
-    print_error "ERROR: ${progname}: Unpacking failed."
+    print_error "
+      |ERROR: ${progname}: Unpacking failed, please use option -v to get details.
+      |
+      |NOTE: Most likely causes may be one of the following:
+      |      o Wrong platform (no platform specific decompression utility)
+      |      o Insufficient privileges in the current working direcotory
+      |      o Insufficient privileges in ${TEMPDIR}
+
+    "
     [ "${VERBOSE:+set}" = set ] && {
       tail -20 "${error_log}" | sed 's/^/stderr> /' 1>&2
     }
@@ -388,7 +396,8 @@ absolute_location()
 print_location_problem()
 {
   print_error "
-    |${progpath}: Cannot figure out own location.
+    |ERROR: ${progpath}: Cannot figure out own location.
+    |
     |NOTE: Make sure \"${progpath}\" is invoked either directly as a reqular
     |      executable or via a shell with a path specification for
     |      the script.
@@ -398,14 +407,14 @@ print_location_problem()
 print_manager_problem()
 {
   print_error "
-    |${progname}: No package manager found in the script's location
+    |ERROR: ${progname}: No package manager found in the script's location
   "
 }
 
 print_ruby_problem()
 {
   print_error "
-    |${progname}: Cannot setup ruby executable
+    |ERROR: ${progname}: Cannot setup ruby executable
   "
 }
 

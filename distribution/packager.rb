@@ -304,7 +304,7 @@ module Distribution
           File.chmod(0755, package_path)
 
           Dir.cd package_temp_directory do
-            launch 'find . -print', 'cpio -ocv', "#{compress} >> #{package_path}" do
+            launch 'find . -print', 'cpio -ov', "#{compress} >> #{package_path}" do
               _progress.print
             end
           end 
