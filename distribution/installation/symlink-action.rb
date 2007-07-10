@@ -76,7 +76,7 @@ module Installation
             File.unlink(target)
         end
       }
-      File.symlink source, target
+      File.symlink source.gsub(%r{^[.](?=/)}, top), target
     end
 
     def preserve_target
