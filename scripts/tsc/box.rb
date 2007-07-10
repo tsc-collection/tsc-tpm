@@ -111,7 +111,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'stubba'
   
   module TSC
-    class BoxTest < Test::Unit::TestCase
+    class BoxTest < ::Test::Unit::TestCase
       def test_indented
         box = Box.new '
           111

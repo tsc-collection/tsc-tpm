@@ -46,7 +46,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'stubba'
   
   module TSC
-    class BorderBoxTest < Test::Unit::TestCase
+    class BorderBoxTest < ::Test::Unit::TestCase
       def test_simple
         box = BorderBox['  Hello, world    ']
         assert_equal [

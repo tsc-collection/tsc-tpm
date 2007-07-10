@@ -73,10 +73,10 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
   require 'mocha'
   require 'stubba'
-  
+
   module TSC
     module CLI
-      class ResponseTest < Test::Unit::TestCase
+      class ResponseTest < ::Test::Unit::TestCase
         def test_selected
           response = Response.selected('aaaaa')
 
