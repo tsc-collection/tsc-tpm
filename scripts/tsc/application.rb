@@ -251,16 +251,24 @@ module TSC
     end
     
     def adjust_ruby_loadpath(top)
+      local_ruby_top = File.expand_path(top)
+
       ruby_component = File.join 'lib', 'ruby'
-      local_ruby_directory = File.join top, ruby_component
-      return unless check_directory_exists local_ruby_directory
+      local_ruby_library = File.join local_ruby_top, ruby_component
+      return unless check_directory_exists local_ruby_library
 
       pattern = File.join '.*', ruby_component, '(.*)'
       $:.each do |_loadpath|
         components = _loadpath.scan %r{^#{pattern}$}
         unless components.empty?
-          _loadpath.replace File.join(local_ruby_directory, components.first.first)
+          _loadpath.replace File.join(local_ruby_library, components.first.first)
         end
+      end
+
+      require 'rbconfig'
+      ruby_top = Config::CONFIG['prefix'].clone
+      Config::CONFIG.values.each do |_item|
+        _item.gsub!(ruby_top, local_ruby_top)
       end
     end
 

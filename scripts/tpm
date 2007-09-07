@@ -52,7 +52,7 @@
 
 $VERBOSE = nil
 
-$:.push File.dirname(__FILE__)
+$:.push File.expand_path(File.dirname(__FILE__))
 require 'tsc/application.rb'
 
 class Application < TSC::Application
@@ -126,7 +126,7 @@ class Application < TSC::Application
   end
 
   def prepare_environment
-    @top = File.dirname File.dirname(__FILE__)
+    @top = File.expand_path(File.dirname(File.dirname(__FILE__)))
     add_installation_loadpath
   end
 
