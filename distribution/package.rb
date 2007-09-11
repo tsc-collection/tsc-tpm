@@ -61,7 +61,7 @@ require 'ftools'
 module Distribution
   class Package
     attr_reader :name, :description, :product, :tasks, :base, :reserve, :log
-    attr_reader :build_name, :tags, :include_ruby_gems, :do_not_build
+    attr_reader :build_name, :tags, :tag_filters, :include_ruby_gems, :do_not_build
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
@@ -91,8 +91,9 @@ module Distribution
         :params => proc {
           product.params
         },
-        :tags => proc {
-          @tags
+        :tags => proc { |_block, *_args|
+          tag_filters << _block if _block
+          tags.concat _args.flatten.compact
         },
         :log => proc {
           @log = true
@@ -109,6 +110,7 @@ module Distribution
       ]
       @product = product
       @tags = []
+      @tag_filters = []
       @filesets = []
       @tasks = []
       @log = false
@@ -139,10 +141,25 @@ module Distribution
         full_name, 
         product.version,
         ("b#{product.build}" if product.build),
-        product.tags,
-        tags,
+        filter_tags(normalize_tags),
         product.platform
       ].flatten.compact.join('-') + '.tpm'
+    end
+
+    def normalize_tags
+      [ product.tags, tags ].flatten.map { |_item|
+        _item.to_s.split('-').map { |_item|
+          _item.strip
+        }
+      }.flatten.compact.uniq
+    end
+
+    def filter_tags(tags)
+      tags.reject { |_tag|
+        _tag.empty? or (product.tag_filters + tag_filters).any? { |_filter|
+          not _filter.call(_tag)
+        }
+      }
     end
 
     def info

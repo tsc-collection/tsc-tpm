@@ -55,8 +55,8 @@ require 'package.rb'
 
 module Distribution
   class Product
-    attr_reader :description, :user, :group, :top, :packages,
-                :base, :params, :compatibility, :name, :log, :tags
+    attr_reader :description, :user, :group, :top, :packages, :tag_filters,
+                :base, :params, :compatibility, :name, :log, :tags, :notags
 
     attr_accessor :library_prefix, :library_major, :build,
                   :version
@@ -96,8 +96,9 @@ module Distribution
         :params => proc {
           params
         },
-        :tags => proc {
-          @tags
+        :tags => proc { |_block, *_args|
+          tag_filters << _block if _block
+          tags.concat _args.flatten.compact
         },
         :log => proc {
           @log = true
@@ -105,6 +106,7 @@ module Distribution
       ]
       @packages = []
       @tags = []
+      @tag_filters = []
       @params = Hash.new
       @compatibility = Hash.new
       @log = false
