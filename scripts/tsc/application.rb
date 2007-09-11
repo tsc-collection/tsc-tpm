@@ -266,8 +266,8 @@ module TSC
       end
 
       require 'rbconfig'
-      ruby_top = Config::CONFIG['prefix'].clone
-      Config::CONFIG.values.each do |_item|
+      ruby_top = ::Config::CONFIG['prefix'].clone
+      ::Config::CONFIG.values.each do |_item|
         _item.gsub!(ruby_top, local_ruby_top)
       end
     end
