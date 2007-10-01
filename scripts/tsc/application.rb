@@ -248,6 +248,7 @@ module TSC
 
     def localize_ruby_loadpath
       adjust_ruby_loadpath File.dirname(File.dirname(File.dirname(__FILE__)))
+      require 'rbconfig'
     end
     
     def adjust_ruby_loadpath(top)
