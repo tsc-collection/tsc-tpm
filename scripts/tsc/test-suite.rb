@@ -44,6 +44,7 @@
 
 $:.concat ENV['PATH'].split(':')
 
+require 'rubygems'
 require 'test/unit'
 
 require 'application.rb'

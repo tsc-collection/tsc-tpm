@@ -83,7 +83,11 @@ module TSC
     end
 
     def initialize(&child_setup_block)
-      @child_setup_block = child_setup_block
+      @child_setup_blocks = []
+      @parent_setup_blocks = []
+
+      @child_setup_blocks << child_setup_block if child_setup_block
+
       reset_data
     end
 
@@ -99,11 +103,11 @@ module TSC
     end
 
     def call_in_parent(&block)
-      @parent_setup_block = block
+      @parent_setup_blocks << block if block
     end
 
     def call_in_child(&block)
-      @child_setup_block = block
+      @child_setup_blocks << block if block
     end
 
     private
@@ -115,7 +119,9 @@ module TSC
 	@pids.push spawn(_command, @pipes[_index], @pipes[_index.next])
       end
 
-      @parent_setup_block.call if @parent_setup_block
+      @parent_setup_blocks.each do |_block|
+        _block.call
+      end
 
       collect_read_descriptors
       collect_process_info collect_data(&block)
@@ -185,7 +191,9 @@ module TSC
         $stderr.reopen p1[1][1]
 
         close_io @pipes
-        @child_setup_block.call if @child_setup_block
+        @child_setup_blocks.each do |_block|
+          _block.call
+        end
 
         case command
           when Array
