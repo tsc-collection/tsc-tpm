@@ -135,6 +135,9 @@ module TSC
           }
         end
 
+        # Work around to make the message printed instead of a class name.
+        # exception.message
+
         message = [ 'ERROR', options[:originator], Array(options[:strings]) ] + [ exception.message.strip ].map { |_m|
           _m.empty? ? exception.class.to_s : _m
         }
