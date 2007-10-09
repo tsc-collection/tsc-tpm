@@ -80,6 +80,10 @@ module TSC
       def ddl_info(file)
         launch([ 'ldd', file ]).first
       end
+
+      def extract_strings(file)
+        launch([ 'strings', file ]).first
+      end
     end
   end
 end
