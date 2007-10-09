@@ -85,6 +85,12 @@ module TSC
       require 'tsc/launch.rb'
       require 'tsc/option-registry.rb'
 
+      location, name = File.split($0)
+      @script_location = location
+      @script_name = name.sub(%r{[.]rb$}i, '')
+
+      $: << script_location
+
       @conf = Struct.new(:subcommand, :arguments, :options, :description, :verbose).new
       block.call(conf) if block
 
@@ -98,12 +104,7 @@ module TSC
       @registry.add_bulk *args
       @registry.add_bulk *Array(conf.options)
 
-      location, name = File.split($0)
       @options = Hash.new
-
-      @script_location = location
-      @script_name = name.sub(%r{[.]rb$}i, '')
-
       self.verbose = ENV['TRACE'].to_s.split.include?(script_name) || conf.verbose
     end
 
