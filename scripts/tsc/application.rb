@@ -179,7 +179,7 @@ module TSC
       localize_ruby_loadpath
       begin
         require 'rubygems' 
-      rescue LoadError => error
+      rescue Exception
       end
 
       require 'getoptlong'
