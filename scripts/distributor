@@ -164,6 +164,7 @@ class Application < TSC::Application
 
   def prepare_environment
     adjust_loadpath
+    require 'rubygems'
     require 'distributor.rb'
   end
 

@@ -177,11 +177,6 @@ module TSC
       return unless block
 
       localize_ruby_loadpath
-      begin
-        require 'rubygems' 
-      rescue Exception
-      end
-
       require 'getoptlong'
 
       begin
