@@ -68,6 +68,10 @@ module Installation
 
     def make_target(progress, logger)
       begin
+        unless if_types.empty?
+          return unless if_types.include? File.ftype(target)
+        end
+
 	if File.directory? target
 	  Dir.rm_r target
 	else

@@ -58,6 +58,7 @@ require 'transient-action.rb'
 require 'symlink-action.rb'
 require 'directory-action.rb'
 require 'remove-action.rb'
+require 'conditional-remove-action.rb'
 
 module Distribution
   class Fileset
@@ -97,6 +98,9 @@ module Distribution
         },
         :remove => proc { |_block, *_files|
           add_action RemoveAction, *_files
+        },
+        :remove_if => proc { |_block, _hash|
+          add_action ConditionalRemoveAction, _hash
         },
         :directory => proc { |_block, *_dirs|
           add_action DirectoryAction, *_dirs

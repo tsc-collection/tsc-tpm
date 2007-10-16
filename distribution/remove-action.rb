@@ -60,14 +60,25 @@ module Distribution
     
     def descriptors(package)
       @files.map do |_file|
-	file = FileInfo.new _file, Defaults.mode.file
-
-	descriptor = Descriptor.new(file)
-	descriptor.target = _file
-	descriptor.action = 'remove'
-	descriptor.print_destination = false
-	descriptor
+        make_descriptor _file
       end
+    end
+
+    protected
+    #########
+
+    def make_descriptor(file, &block)
+      block ||= proc { |_info|
+        Descriptor.new(_info)
+      }
+      info = FileInfo.new file, Defaults.mode.file
+      descriptor = block.call(info)
+
+      descriptor.target = file
+      descriptor.action = 'remove'
+      descriptor.print_destination = false
+
+      descriptor
     end
   end
 end

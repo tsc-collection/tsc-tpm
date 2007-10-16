@@ -51,7 +51,6 @@
 
 require 'tsc/progress'
 require 'forwardable'
-require 'installation/config.rb'
 require 'config-manager.rb'
 require 'packager.rb'
 require 'installer.rb'
