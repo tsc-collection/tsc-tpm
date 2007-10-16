@@ -85,7 +85,7 @@ module Distribution
           @base = _argument
         },
         :reserve => proc { |_block, _argument|
-          raise 'Space reservation must be numeric' unless Numeric === _argument
+          _argument + 0 rescue raise 'Space reservation must be numeric' 
           @reserve = _argument
         },
         :params => proc {
@@ -114,6 +114,7 @@ module Distribution
       @filesets = []
       @tasks = []
       @log = false
+      @reserve = 0
 
       @parser.process(&block)
     end
@@ -169,7 +170,7 @@ module Distribution
         :tasks => tasks,
         :log => log,
         :build_name => build_name,
-        :reserve => [ 0, reserve.to_i ].max
+        :reserve => [ 0, reserve ].max
       ]
 
       "package #{dataset.inspect.slice(1...-1)}"

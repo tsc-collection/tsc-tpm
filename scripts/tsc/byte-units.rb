@@ -4,39 +4,52 @@
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
 
+require 'tsc/byte-measure.rb'
+
 module TSC
   module ByteUnits
-    def kb
-      self * 1024
+    def bytes
+      ByteMeasure.bytes(self)
     end
 
-    def mb
-      kb * 1024
+    def kilobytes
+      ByteMeasure.kilobytes(self)
     end
 
-    def gb
-      mb * 1024
+    def megabytes
+      ByteMeasure.megabytes(self)
     end
 
-    alias :KB :kb
-    alias :Kb :kb
+    def gigabytes
+      ByteMeasure.gigabytes(self)
+    end
 
-    alias :MB :mb
-    alias :Mb :mb
+    def to_units
+      ByteMeasure.to_units(self)
+    end
 
-    alias :GB :gb
-    alias :Gb :gb
+    alias :kb :kilobytes
+    alias :KB :kilobytes
+    alias :Kb :kilobytes
+
+    alias :mb :megabytes
+    alias :MB :megabytes
+    alias :Mb :megabytes
+
+    alias :gb :gigabytes
+    alias :GB :gigabytes
+    alias :Gb :gigabytes
   end
 end
 
-class Fixnum
+class Numeric
   include TSC::ByteUnits
 end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
   
-  module Tsc
+  module TSC
     class ByteUnitsTest < Test::Unit::TestCase
       def test_units
         assert_equal 1024.kb, 1.MB

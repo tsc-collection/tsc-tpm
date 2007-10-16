@@ -7,6 +7,7 @@
 =end
 
 require 'tsc/platform.rb'
+require 'tsc/byte-units.rb'
 
 module Installation
   module Tasks
@@ -19,11 +20,11 @@ module Installation
         package = self.class.installation_package
         top = self.class.installation_top
 
-        needed = calculate_package_size + package.reserve 
-        free = TSC::Platform.current.driver.free_space(top)
+        needed = package.reserve.to_units.to_same_units(package.reserve + calculate_package_size)
+        free = needed.to_same_units TSC::Platform.current.driver.free_space(top)
 
-        log :available, free
-        log :needed, needed
+        log :available, "#{free} (#{free.to_i})"
+        log :needed, "#{needed} (#{needed.to_i})"
 
         raise "Insufficient room in #{top} (#{needed} needed, #{free} available)" if needed > free
       end

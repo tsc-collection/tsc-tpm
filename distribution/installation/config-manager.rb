@@ -50,6 +50,7 @@
 =end
 
 require 'tsc/dataset.rb'
+require 'tsc/byte-units.rb'
 
 require 'installation/install-action.rb'
 require 'installation/generate-action.rb'
