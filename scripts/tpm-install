@@ -58,6 +58,8 @@ STREAM_UNCOMPRESS_COMMAND="uncompress -c"
 ORIGINAL_WORKING_DIRECTORY=`pwd`
 TRACE=no
 
+unset RUBYOPT
+
 exec 3>&1 4>&2
 
 main()
