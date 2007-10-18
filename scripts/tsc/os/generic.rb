@@ -26,6 +26,10 @@ module TSC
         path.sub %r{[.]exe$}, ''
       end
 
+      def cpio_command
+        'cpio'
+      end
+
       def stream_compress_command
         'compress -fc'
       end

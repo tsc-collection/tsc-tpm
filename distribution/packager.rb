@@ -291,13 +291,23 @@ module Distribution
 
           compress = os.stream_compress_command
           uncompress = os.stream_uncompress_command
+          cpio = os.cpio_command
 
           File.rm_f package_path
 
           File.open(package_path, 'w') do |_io|
             _io.puts IO.readlines(installer).map { |_line|
               r = _line.scan(%r{^(\s*STREAM_UNCOMPRESS_COMMAND=)(.*)$}).first
-              r ? r[0] + uncompress.inspect : _line
+              if r 
+                r[0] + uncompress.inspect 
+              else
+                r = _line.scan(%r{^(\s*CPIO_COMMAND=)(.*)$}).first
+                if r
+                  r[0] + cpio.inspect
+                else
+                  _line
+                end
+              end
             }
           end
 

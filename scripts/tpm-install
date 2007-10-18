@@ -55,6 +55,7 @@ progpath="${0}"
 # specific to a platform.
 #
 STREAM_UNCOMPRESS_COMMAND="uncompress -c"
+CPIO_COMMAND="cpio"
 ORIGINAL_WORKING_DIRECTORY=`pwd`
 TRACE=no
 
@@ -198,14 +199,14 @@ process_archive()
 
 list()
 {
-  trace_and_run ${STREAM_UNCOMPRESS_COMMAND} | trace_and_run cpio -itdv "${@}"
+  trace_and_run ${STREAM_UNCOMPRESS_COMMAND} | trace_and_run "${CPIO_COMMAND}" -itdv "${@}"
 }
 
 extract()
 {
   error_codes=`{
     (trace_and_run ${STREAM_UNCOMPRESS_COMMAND} || _echo ${?} 1>&5) | {
-      (trace_and_run cpio -idvu ${EXTRACT_ITEMS} 2>&1 || _echo ${?} 1>&5) | {
+      (trace_and_run ${CPIO_COMMAND} -idvu ${EXTRACT_ITEMS} 2>&1 || _echo ${?} 1>&5) | {
         # The following is needed because cpio option -v on Linux sends
         # its output to stderr. So in case of error we need the data in 
         # the error log file available for reporting.

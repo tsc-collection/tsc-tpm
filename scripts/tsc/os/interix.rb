@@ -15,6 +15,10 @@ module TSC
         super 'interix'
       end
 
+      def cpio_command
+        'cpio --no-preserve-owner'
+      end
+
       def stream_compress_command
         'gzip -fc'
       end
