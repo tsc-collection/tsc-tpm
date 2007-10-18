@@ -38,6 +38,13 @@ module TSC
         'uncompress -c'
       end
 
+      def processes(*args, &block)
+        format = args.empty? ? '-f' : "-o#{args.join(',')}"
+        TSC::Launcher.launch([ 'ps', '-e', format ]).first.map { |_line|
+          _line.split
+        }
+      end
+
       def add_user(user, group, home)
 	launch "useradd -g #{group} -d #{home} -s /bin/sh #{user}"
       end

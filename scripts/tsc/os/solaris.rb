@@ -7,25 +7,28 @@
 require 'tsc/launch.rb'
 require 'tsc/os/generic.rb'
 
+require 'sys/proctable'
+
 module TSC
   module OS
-    class Linux < Generic
+    class Solaris < Generic
       def initialize
-        super 'linux'
-      end
+        super 'solaris'
 
-      def stream_compress_command
-        'gzip -fc'
-      end
-
-      def stream_uncompress_command
-        'gzip -cd'
+        @proctable_commands = Hash.new { |_hash, _key|
+          _hash[_key] = _key
+        }
+        @proctable_commands.update 'args' => 'cmdline'
       end
 
       def processes(*args, &block)
-        format = args.empty? ? '-f' : "-o#{args.join(',')}"
-        TSC::Launcher.launch([ 'ps', '-eww', format ]).first.map { |_line|
-          _line.split
+        options = args.empty? ? [ 'pid', 'ppid', 'euid', 'cmdline' ] : args.map { |_item|
+          command = @proctable_commands[_item]
+        }
+        Sys::ProcTable.ps.map { |_process|
+          options.map { |_command|
+            _process.send(_command).to_s rescue nil
+          }.compact.join(' ').split
         }
       end
     end
@@ -41,7 +44,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   
   module TSC
     module OS
-      class LinuxTest < Test::Unit::TestCase
+      class SolarisTest < Test::Unit::TestCase
         include TSC::AfterEndReader
 
         attr_reader :os
