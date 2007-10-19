@@ -26,6 +26,13 @@ module TSC
       def stream_uncompress_command
         'gzip -dc'
       end
+
+      def processes(*args, &block)
+        format = args.empty? ? '-f' : "-o#{args.join(',')}"
+        TSC::Launcher.launch([ 'ps', '-eww', format ]).first.map { |_line|
+          _line.split
+        }
+      end
     end
   end
 end
