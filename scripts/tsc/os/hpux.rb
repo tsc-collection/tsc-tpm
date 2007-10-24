@@ -24,6 +24,10 @@ module TSC
       def ddl_info(file)
         launch([ 'chatr', file ]).first
       end
+
+      def extract_strings(file)
+        launch([ 'strings','-a',file ]).first
+      end
     end
   end
 end
