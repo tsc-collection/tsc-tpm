@@ -64,8 +64,8 @@ module Installation
 
       Task.installation_product = config.product
       Task.installation_package = config.package
-      Task.installation_actions = config.actions
 
+      Task.installation_actions.concat config.actions
       Task.installation_parameters.update(config.product.params)
 
       setup_task_user(config.product.user)
@@ -73,6 +73,7 @@ module Installation
       setup_task_top(config.product.top)
 
       adjust_loadpath_for_transient
+
       @task_table = create_task_table
       check_tasks_availability
     end

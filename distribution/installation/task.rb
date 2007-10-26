@@ -51,6 +51,7 @@
 
 require 'tsc/errors.rb'
 require 'tsc/platform.rb'
+require 'installation/properties.rb'
 
 module Installation
   class Task
@@ -61,23 +62,8 @@ module Installation
       end
     end
 
-    @@installation_actions = []
-    @@installation_top = nil
-    @@installation_product = nil
-    @@installation_package = nil
-    @@installation_user_entry = nil
-    @@installation_group_entry = nil
-    @@installation_user = nil
-    @@installation_group = nil
-    @@installation_parameters = Hash.new
-    @@installation_filesets = Hash.new { |_hash, _key|
-      _hash[_key] = TSC::Dataset.new(
-        :top => Installation::Task.installation_top,
-        :user => Installation::Task.installation_user,
-        :group => Installation::Task.installation_group
-      )
-    }
     @subclasses = []
+    @@properties = Properties.new
 
     class << self
       attr_reader :subclasses
@@ -87,100 +73,12 @@ module Installation
 	@subclasses << subclass
       end
 
-      def installation_actions=(actions)
-	@@installation_actions = actions
+      def properties
+        @@properties
       end
 
-      def installation_top=(directory)
-	@@installation_top = directory
-      end
-
-      def installation_product=(name)
-	@@installation_product = name
-      end
-
-      def installation_package=(name)
-	@@installation_package = name
-      end
-
-      def installation_user_entry=(entry)
-	@@installation_user_entry = entry
-      end
-
-      def installation_group_entry=(entry)
-	@@installation_group_entry = entry
-      end
-
-      def installation_user=(user)
-	@@installation_user = user
-      end
-
-      def installation_group=(group)
-	@@installation_group = group
-      end
-
-      def installation_actions
-	@@installation_actions
-      end
-
-      def installation_product
-	@@installation_product
-      end
-
-      def installation_package
-	@@installation_package
-      end
-
-      def installation_user_entry
-	@@installation_user_entry
-      end
-
-      def installation_group_entry
-	@@installation_group_entry
-      end
-
-      def installation_user
-	@@installation_user
-      end
-
-      def installation_group
-	@@installation_group
-      end
-
-      def installation_parameters
-	@@installation_parameters
-      end
-
-      def installation_filesets
-	@@installation_filesets
-      end
-
-      def installation_top
-	@@installation_top
-      end
-
-      def installation_product_metainf
-	installation_top and File.join installation_top, '.meta-inf'
-      end
-
-      def installation_preserve_top
-	installation_product_metainf and File.join installation_product_metainf, 'preserve'
-      end
-
-      def installation_product_prodinfo
-	installation_product_metainf and File.join installation_product_metainf, 'prodinfo'
-      end
-
-      def installation_package_metainf
-	installation_product_metainf and File.join installation_product_metainf, 'packages', installation_package.name
-      end
-
-      def installation_package_prodinfo
-	installation_package_metainf and File.join installation_package_metainf, 'prodinfo'
-      end
-
-      def installation_tools
-	installation_product_metainf and File.join installation_product_metainf, 'tools'
+      def method_missing(*args)
+        @@properties.send *args
       end
     end
 
