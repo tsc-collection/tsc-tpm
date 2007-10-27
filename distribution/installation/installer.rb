@@ -145,10 +145,13 @@ module Installation
     def remove(*args)
       require 'installation/task-manager'
 
-      raise LocationError, :remove unless File.basename(top_directory) == ".meta-inf"
+      top_location, top_folder = File.split(top_directory)
+      
+      raise LocationError, :remove unless top_folder == ".meta-inf"
       raise ArgumentError, :remove unless args.empty?
 
       collect_config_data.each do |_config|
+        _config.product.top = top_location
         @logger = Logger.new('REMOVE', package_name(_config), _config.product.version)
 
         Dir.cd top_directory do
