@@ -136,7 +136,7 @@ module TSC
         end
 
         generator = proc { |_error, *_strings|
-          message = [ 'ERROR', options[:originator], Array(options[:strings]) ] + [ _error.message.strip ].map { |_m|
+          message = [ 'ERROR', options[:originator], _strings, Array(options[:strings]) ] + [ _error.message.strip ].map { |_m|
             _m.empty? ? _error.class.to_s : _m
           }
           [
@@ -386,12 +386,12 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           TSC::Error.persist { |_queue|
             _queue.add { result << 'aaa' }
             _queue.add { raise 'Error 1' }
-            _queue.add { raise 'Error 2' }
+            _queue.add('abc', 'ddd') { raise 'Error 2' }
             _queue.add { result << 'ddd' }
           }
         end
         assert_equal [ 'aaa', 'ddd' ], result
-        assert_equal [ [ 'ERROR: Error 1' ], [ 'ERROR: Error 2' ] ], TSC::Error.textualize(error)
+        assert_equal [ [ 'ERROR: Error 1' ], [ 'ERROR: abc: ddd: Error 2' ] ], TSC::Error.textualize(error)
       end
 
       def test_undo_no_error
