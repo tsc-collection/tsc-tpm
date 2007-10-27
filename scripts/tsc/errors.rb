@@ -135,26 +135,35 @@ module TSC
           }
         end
 
-        # Work around to make the message printed instead of a class name.
-        # exception.message
+        generator = proc { |_error, *_strings|
+          message = [ 'ERROR', options[:originator], Array(options[:strings]) ] + [ _error.message.strip ].map { |_m|
+            _m.empty? ? _error.class.to_s : _m
+          }
+          [
+            message.flatten.compact.join(': '),
 
-        message = [ 'ERROR', options[:originator], Array(options[:strings]) ] + [ exception.message.strip ].map { |_m|
-          _m.empty? ? exception.class.to_s : _m
+            if TSC::Launcher::TerminateError === _error and stderr_processor
+              _error.errors.map(&stderr_processor)
+            end,
+
+            if _error.backtrace and backtrace_processor
+              [
+                '<' + _error.class.name + '>',
+                _error.backtrace.map(&backtrace_processor)
+              ]
+            end
+          ].flatten.compact
         }
-        [
-          message.flatten.compact.join(': '),
 
-          if TSC::Launcher::TerminateError === exception and stderr_processor
-            exception.errors.map(&stderr_processor)
-          end,
-
-          if exception.backtrace and backtrace_processor
-            [
-              '<' + exception.class.name + '>',
-              exception.backtrace.map(&backtrace_processor)
-            ]
+        if self === exception
+          result = []
+          exception.each_error do |_error, *_strings|
+            result << generator.call(_error, *_strings)
           end
-        ].flatten.compact
+          result
+        else
+          generator.call(exception)
+        end
       end
 
       private
@@ -194,7 +203,7 @@ module TSC
     # class (possibly compound too).
     #
     def initialize(*args)
-      @content = args.flatten
+      @content = args.flatten.compact
     end
 
     def each_error(*args, &block)
@@ -382,7 +391,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           }
         end
         assert_equal [ 'aaa', 'ddd' ], result
-        assert_equal [ 'ERROR: Error 1', 'ERROR: Error 2' ], TSC::Error.textualize(error)
+        assert_equal [ [ 'ERROR: Error 1' ], [ 'ERROR: Error 2' ] ], TSC::Error.textualize(error)
       end
 
       def test_undo_no_error
