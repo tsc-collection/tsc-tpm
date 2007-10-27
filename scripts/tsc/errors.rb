@@ -163,8 +163,14 @@ module TSC
       def collector
         collector = []
         class << collector
-          def add(*blocks, &block)
-            self.concat(blocks + Array(block))
+          def add(*strings, &block)
+            self.push strings.empty? ? block : proc {
+              begin 
+                block.call
+              rescue Exception => exception
+                raise TSC::Error, [ strings, exception ]
+              end
+            }
           end
         end
 
@@ -283,6 +289,7 @@ end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
+  require 'tsc/launch.rb'
   
   module TSC
     class ErrorTest < Test::Unit::TestCase
@@ -366,7 +373,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
 
       def test_persist_with_many_errors
         result = []
-        assert_raises(TSC::Error) do
+        error = assert_raises(TSC::Error) do
           TSC::Error.persist { |_queue|
             _queue.add { result << 'aaa' }
             _queue.add { raise 'Error 1' }
@@ -375,6 +382,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           }
         end
         assert_equal [ 'aaa', 'ddd' ], result
+        assert_equal [ 'ERROR: Error 1', 'ERROR: Error 2' ], TSC::Error.textualize(error)
       end
 
       def test_undo_no_error
