@@ -157,13 +157,26 @@ module Installation
         Dir.cd top_directory do
           task_manager = TaskManager.new(communicator, logger, _config)
 
-          task_manager.event_processor.remove_started do
-            communicator.report "Removing #{package_info(_config)}"
-            communicator.report '[ ' + package_description(_config) + ' ]'
-          end
+          begin
+            task_manager.event_processor.remove_started do
+              communicator.report "Removing #{package_info(_config)}"
+              communicator.report '[ ' + package_description(_config) + ' ]'
+            end
 
-          task_manager.revert
-          task_manager.event_processor.remove_finished
+            task_manager.revert
+            task_manager.event_processor.remove_finished
+          rescue => exception
+            logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
+            raise
+          ensure
+            logger.close
+
+            if options['log'] || _config.product.log || _config.package.log
+              task_manager.event_processor.log_closed
+            else
+              logger.remove
+            end
+          end
         end
       end
 
