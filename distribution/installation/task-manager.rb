@@ -97,9 +97,12 @@ module Installation
       rescue Exception => exception
         event_processor.problem_detected
 
-        errors = []
-        errors = revert_tasks task_undo_stack if perform_undo
-        raise TSC::Error.new(*(errors + [exception]))
+        raise TSC::Error, [ 
+          TSC::Error.ignore {
+            revert_tasks task_undo_stack if perform_undo
+          },
+          exception
+        ]
       end
     end
 
@@ -205,24 +208,19 @@ module Installation
     end
 
     def revert_tasks(undo_stack)
-      errors = []
-      unless undo_stack.empty?
+      TSC::Error.persist do |_queue|
         undo_stack.reverse.each do |_task, *_params|
-          begin
+          _queue.add(_task.provides) {
             log :revert, "#{_task.provides} #{_params.join(', ')}"
             _task.revert *_params
-          rescue Exception => exception
-            errors << TSC::Error.new(_task.provides, exception)
-          end
+          }
         end
-        begin
+
+        _queue.add('cleanup') {
           directory = Task.installation_preserve_top
           Dir.rm_r directory unless directory.nil?
-        rescue Exception => exception
-          errors << TSC::Error.new('cleanup', exception)
-        end
+        }
       end
-      errors
     end
 
     def log(label, message)
