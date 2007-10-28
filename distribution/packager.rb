@@ -82,10 +82,10 @@ module Distribution
         info = [
           package.product.info, 
           package.info,
+          prodinfo_info,
           metainf_dirs_info,
           tools_info, 
-          content_info,
-          prodinfo_info
+          content_info
         ]
 
         make_prodinfo info.flatten.compact, package_temp_directory
