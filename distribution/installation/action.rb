@@ -150,7 +150,9 @@ module Installation
     end
 
     def remove_target
-      File.unlink target
+      TSC::Error.ignore Errno::ENOENT do
+        File.unlink target 
+      end
     end
 
     def name
