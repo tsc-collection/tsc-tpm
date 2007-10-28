@@ -52,6 +52,7 @@
 require 'tsc/errors.rb'
 require 'installation/event-processor.rb'
 require 'etc'
+require 'yaml'
 
 module Installation
   class TaskManager
@@ -88,6 +89,21 @@ module Installation
           Installation::EventProcessor.new(communicator, logger, Array(@task_table['welcome']).first)
         end
       end
+    end
+
+    def preserve_properties
+      properties = Task.properties
+      properties.installation_actions.clear
+      File.open(Task.installation_package_properties, 'w') do |_io|
+        _io.write Task.properties.to_yaml
+      end
+    end
+
+    def restore_properties
+      properties = YAML.load(IO::readlines(Task.installation_package_properties).join)
+      actions = Task.installation_actions
+      Task.properties = properties
+      properties.installation_actions.concat actions
     end
 
     def execute(perform_undo = true)

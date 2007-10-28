@@ -48,6 +48,10 @@ module Installation
       installation_product_metainf and File.join installation_product_metainf, 'packages', installation_package.name
     end
 
+    def installation_package_properties
+      installation_package_metainf and File.join installation_package_metainf, 'properties'
+    end
+
     def installation_package_prodinfo
       installation_package_metainf and File.join installation_package_metainf, 'prodinfo'
     end

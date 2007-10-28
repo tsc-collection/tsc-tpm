@@ -156,6 +156,7 @@ module Installation
 
         Dir.cd top_directory do
           task_manager = TaskManager.new(communicator, logger, _config)
+          task_manager.restore_properties
 
           begin
             task_manager.event_processor.remove_started do
@@ -255,6 +256,7 @@ module Installation
           communicator.report '[ ' + package_description(config) + ' ]'
         }
         task_manager.execute !options.key?('nocleanup')
+        task_manager.preserve_properties
 
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)

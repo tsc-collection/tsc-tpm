@@ -73,6 +73,10 @@ module Installation
 	@subclasses << subclass
       end
 
+      def properties=(properties)
+        @@properties = properties
+      end
+
       def properties
         @@properties
       end
