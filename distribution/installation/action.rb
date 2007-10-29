@@ -56,6 +56,8 @@ require 'ftools'
 require 'scanf'
 require 'etc'
 
+require 'fileutils'
+
 module Installation
   class Action < TSC::Dataset
     attr_writer :undoable
@@ -194,7 +196,8 @@ module Installation
       actual_type = File.ftype target
 
       unless expected_types.detect { |_type| _type.to_s == actual_type }
-        raise "#{target} is #{actual_type}, expected #{expected_types.join(', or ')}"
+        FileUtils.rm_rf target
+        # raise "#{target} is #{actual_type}, expected #{expected_types.join(', or ')}"
       end
     end
 
