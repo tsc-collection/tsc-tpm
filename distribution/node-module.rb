@@ -48,13 +48,15 @@ end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
+  require 'mocha'
+  require 'stubba'
   
   module Distribution
     class NodeModuleTest < Test::Unit::TestCase
-      def setup
+      def test_nothing
       end
-      
-      def teardown
+
+      def setup
       end
     end
   end

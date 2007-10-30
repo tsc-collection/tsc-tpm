@@ -170,8 +170,13 @@ end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
+  require 'mocha'
+  require 'stubba'
   
   class TSC::CLI::SelectorTest < Test::Unit::TestCase
+    def test_nothing
+    end
+
     def setup
     end
     

@@ -63,16 +63,13 @@ end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
+  require 'mocha'
+  require 'stubba'
   
   class TSC::CLI::CommunicatorTest < Test::Unit::TestCase
     attr_reader :communicator
 
-    def NO_test_select_output
-      communicator.select Hash[
-        :header => 'Test item',
-        :other => true,
-        :current => 'aaa'
-      ]
+    def test_nothing
     end
 
     def setup
