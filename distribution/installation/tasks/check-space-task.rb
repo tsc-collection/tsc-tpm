@@ -8,6 +8,7 @@
 
 require 'tsc/platform.rb'
 require 'tsc/byte-units.rb'
+require 'installation/task.rb'
 
 module Installation
   module Tasks
@@ -17,7 +18,6 @@ module Installation
       end
 
       def execute
-        package = self.class.installation_package
         top = self.class.installation_top
 
         needed = package.reserve.to_units.to_same_units(package.reserve + calculate_package_size)
@@ -52,9 +52,13 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   module Installation
     module Tasks
       class CheckSpaceTaskTest < Test::Unit::TestCase
-        attr_reader :task
+        attr_reader :task, :communicator, :logger, :package
 
         def test_execute
+          task.expects(:package).with().at_least_once.returns package
+          package.expects(:reserve).with().at_least_once.returns 5.MB
+          logger.expects(:log).times(2)
+
           assert_nothing_raised do
             task.execute
           end
@@ -75,7 +79,11 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         end
 
         def setup
-          @task = CheckSpaceTask.new
+          @communicator = mock('communicator')
+          @logger = mock('logger')
+          @task = CheckSpaceTask.new communicator, logger
+
+          @package = mock('package')
         end
         
         def teardown
