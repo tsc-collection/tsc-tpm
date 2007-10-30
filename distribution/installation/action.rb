@@ -93,6 +93,7 @@ module Installation
         else
           @undo_action = undo_for_non_existing
         end
+        @undo_action.undoable = false
       end
 
       logger.log name, target if logger
@@ -105,8 +106,8 @@ module Installation
       return unless top
       return unless @undo_action
 
-      @undo_action.undoable = false
       @undo_action.create
+
       @undo_action.set_user_and_group if @file_ownership_changed
       @undo_action.set_permissions
       @undo_action = nil
@@ -166,19 +167,7 @@ module Installation
     end
 
     def undo_for_existing
-      raise TSC::NotImplementedError, 'undo_for_existing'
-    end
-
-    def undo_for_non_existing
-      raise TSC::NotImplementedError, 'undo_for_non_existing'
-    end
-
-    def undo_for_existing
-      stat = File.stat(target)
-      user = Etc::getpwuid(stat.uid).name rescue Task.installation_user
-      group = Etc::getgrgid(stat.gid).name rescue Task.installation_group
-
-      InstallAction.new self, :target => target, :source => figure_saved_target_path, :user => user, :group => group, :permission => stat.mode
+      RestoreAction.new self, :target => target, :source => saved_target
     end
 
     def undo_for_non_existing
@@ -186,10 +175,12 @@ module Installation
     end
 
     def preserve_target
-      return unless File.exists? target
-      File.smart_copy target, figure_saved_target_path
-    end
+      return unless File.exists?(target)
+      return if file.exists?(saved_target)
 
+      FileUtils.makedirs File.dirname(saved_target)
+      FileUtils.move target, saved_target
+    end
 
     def change_file_mode(*args)
       File.chmod *args
@@ -202,8 +193,8 @@ module Installation
     private
     #######
 
-    def figure_saved_target_path
-      File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
+    def saved_target
+      @saved_target ||= File.join(top, target).squeeze(File::SEPARATOR)
     end
 
     def user_entry
