@@ -57,6 +57,7 @@ require 'installation/generate-action.rb'
 require 'installation/expand-action.rb'
 require 'installation/symlink-action.rb'
 require 'installation/remove-action.rb'
+require 'installation/restore-action.rb'
 require 'installation/directory-action.rb'
 
 module Installation
