@@ -178,8 +178,10 @@ module Installation
     end
 
     def preserve_target
-      raise TSC::NotImplementedError, 'preserve_target'
+      return unless File.exists? target
+      File.smart_copy target, figure_saved_target_path
     end
+
 
     def change_file_mode(*args)
       File.chmod *args
@@ -191,6 +193,11 @@ module Installation
 
     private
     #######
+
+    def figure_saved_target_path
+      File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
+    end
+
     def ensure_target_type
       expected_types = Array(target_type)
       actual_type = File.ftype target

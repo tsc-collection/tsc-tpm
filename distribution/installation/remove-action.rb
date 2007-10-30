@@ -88,9 +88,6 @@ module Installation
       [ :file, :directory, :link ]
     end
 
-    def preserve_target
-    end
-
     def undo_for_existing
     end
 

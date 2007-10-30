@@ -59,6 +59,7 @@ module Installation
   class DirectoryAction < Action 
     protected
     #########
+
     def name
       :directory
     end
@@ -72,9 +73,6 @@ module Installation
 	Dir.delete target
       rescue
       end
-    end
-
-    def preserve_target
     end
 
     def target_type

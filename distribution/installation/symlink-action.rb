@@ -79,9 +79,6 @@ module Installation
       File.symlink source.gsub(%r{^[.](?=/)}, top), target
     end
 
-    def preserve_target
-    end
-
     def undo_for_existing
       info = File.lstat(target)
       user = Etc::getpwuid(info.uid).name rescue Task.installation_user

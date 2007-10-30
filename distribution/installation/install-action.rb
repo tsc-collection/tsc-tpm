@@ -82,15 +82,5 @@ module Installation
       RemoveAction.new self, :target => target
     end
 
-    def preserve_target
-      return unless File.exists? target
-      File.smart_copy target, figure_saved_target_path
-    end
-
-    private
-    #######
-    def figure_saved_target_path
-      File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
-    end
   end
 end
