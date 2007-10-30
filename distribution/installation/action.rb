@@ -177,6 +177,18 @@ module Installation
       raise TSC::NotImplementedError, 'undo_for_non_existing'
     end
 
+    def undo_for_existing
+      stat = File.stat(target)
+      user = Etc::getpwuid(stat.uid).name rescue Task.installation_user
+      group = Etc::getgrgid(stat.gid).name rescue Task.installation_group
+
+      InstallAction.new self, :target => target, :source => figure_saved_target_path, :user => user, :group => group, :permission => stat.mode
+    end
+
+    def undo_for_non_existing
+      RemoveAction.new self, :target => target
+    end
+
     def preserve_target
       return unless File.exists? target
       File.smart_copy target, figure_saved_target_path

@@ -88,10 +88,5 @@ module Installation
       [ :file, :directory, :link ]
     end
 
-    def undo_for_existing
-    end
-
-    def undo_for_non_existing
-    end
   end
 end

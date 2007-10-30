@@ -87,8 +87,5 @@ module Installation
       DirectoryAction.new self, :target => target, :source =>nil, :user => user, :group => group, :permisison => stat.mode
     end
 
-    def undo_for_non_existing
-      RemoveAction.new self, :target => target
-    end
   end
 end
