@@ -176,7 +176,7 @@ module Installation
 
     def preserve_target
       return unless File.exists?(target)
-      return if file.exists?(saved_target)
+      return if File.exists?(saved_target)
 
       FileUtils.makedirs File.dirname(saved_target)
       FileUtils.move target, saved_target

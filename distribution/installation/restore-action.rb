@@ -7,9 +7,32 @@
 =end
 
 require 'installation/action.rb'
+require 'fileutils'
 
 module Installation
   class RestoreAction < Action
+    def set_permissions
+    end
+
+    def set_user_and_group
+    end
+
+    protected
+    #########
+
+    def name
+      :restore
+    end
+
+    def make_target(progress, logger)
+      FileUtils.remove_entry(target) if File.exists?(target)
+      FileUtils.makedirs File.basename(target)
+      FileUtils.move source, target
+    end
+
+    def remove_target
+    end
+
   end
 end
 

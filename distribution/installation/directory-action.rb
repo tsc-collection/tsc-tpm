@@ -79,6 +79,9 @@ module Installation
       [ :directory ]
     end
 
+    def preserve_target
+    end
+
     def undo_for_existing
       stat = File.stat(target)
       user = Etc::getpwuid(stat.uid).name rescue Task.installation_user
