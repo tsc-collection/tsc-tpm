@@ -67,8 +67,8 @@ module Installation
       File.smart_copy source, target
     end
 
-    def target_type
-      :file
+    def compatible_target_types
+      [ :file ]
     end
 
   end

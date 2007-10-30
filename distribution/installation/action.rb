@@ -84,11 +84,7 @@ module Installation
 
     def create(progress = nil, logger = nil)
       return unless top
-
-      if File.exists?(target)
-        return if keep
-        ensure_target_type
-      end
+      return if keep && File.exists?(target) && compatible_target_types.include?(File.ftype(target))
 
       if @undoable
         if File.exists?(target)
@@ -165,8 +161,8 @@ module Installation
       raise TSC::NotImplementedError, 'make_target'
     end
 
-    def target_type
-      raise TSC::NotImplementedError, 'target_type'
+    def compatible_target_types
+      []
     end
 
     def undo_for_existing
@@ -208,16 +204,6 @@ module Installation
 
     def figure_saved_target_path
       File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
-    end
-
-    def ensure_target_type
-      expected_types = Array(target_type)
-      actual_type = File.ftype target
-
-      unless expected_types.detect { |_type| _type.to_s == actual_type }
-        FileUtils.rm_rf target
-        # raise "#{target} is #{actual_type}, expected #{expected_types.join(', or ')}"
-      end
     end
 
     def user_entry

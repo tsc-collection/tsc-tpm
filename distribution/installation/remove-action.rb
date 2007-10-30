@@ -84,9 +84,5 @@ module Installation
     def remove_target
     end
 
-    def target_type
-      [ :file, :directory, :link ]
-    end
-
   end
 end

@@ -75,8 +75,8 @@ module Installation
       end
     end
 
-    def target_type
-      :directory
+    def compatible_target_types
+      [ :directory ]
     end
 
     def undo_for_existing

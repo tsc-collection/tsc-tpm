@@ -79,10 +79,6 @@ module Installation
       File.symlink source.gsub(%r{^[.](?=/)}, top), target
     end
 
-    def target_type
-      [ :link, :directory, :file ]
-    end
-
     def change_file_mode(*args)
       File.lchmod *args
     end
