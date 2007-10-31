@@ -58,6 +58,8 @@ require 'etc'
 
 require 'fileutils'
 
+require 'installation/task.rb'
+
 module Installation
   class Action < TSC::Dataset
     attr_writer :undoable
@@ -141,9 +143,6 @@ module Installation
       @file_ownership_changed = true
     end
 
-    protected
-    #########
-
     def target_stat
       File.stat(target)
     end
@@ -190,12 +189,12 @@ module Installation
       File.chown *args
     end
 
+    def saved_target
+      @saved_target ||= File.join(Task.installation_preserve_top, target).squeeze(File::SEPARATOR)
+    end
+
     private
     #######
-
-    def saved_target
-      @saved_target ||= File.join(top, target).squeeze(File::SEPARATOR)
-    end
 
     def user_entry
       @user_entry ||= figure_user_entry(user)
@@ -226,6 +225,31 @@ module Installation
     def check_numeric(name)
       result = name.to_s.scanf "%d%s"
       result.first if result.size == 1
+    end
+  end
+end
+
+if $0 == __FILE__ or defined?(Test::Unit::TestCase)
+  require 'test/unit'
+  require 'mocha'
+  require 'stubba'
+  
+  module Installation
+    module Tasks
+      class ActionTaskTest < Test::Unit::TestCase
+        attr_reader :action
+
+        def test_saved_target
+          action = Action.new :target => 'aaa/bbb/zzz.c'
+          Task.properties.expects(:installation_top).at_least_once.returns "/T/u"
+          action.expects(:fileset).with.returns "abc"
+
+          assert_equal '/T/u/.meta-inf/preserve/T/u/aaa/bbb/zzz.c', action.saved_target
+        end
+        
+        def setup
+        end
+      end
     end
   end
 end
