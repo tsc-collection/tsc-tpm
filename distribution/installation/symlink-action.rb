@@ -62,20 +62,13 @@ module Installation
 
     protected
     #########
+
     def name
       :symlink
     end
 
     def make_target(progress, logger)
-      TSC::Error.ignore(SystemCallError) {
-        info = File.lstat(target)
-        case
-          when info.directory?
-            Dir.rm_r(target)
-          else
-            File.unlink(target)
-        end
-      }
+      FileUtils.remove_entry(target) if File.exists?(target)
       File.symlink source.gsub(%r{^[.](?=/)}, top), target
     end
 
