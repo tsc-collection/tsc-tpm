@@ -56,8 +56,6 @@ require 'etc'
 
 module Installation
   class InstallAction < Action 
-    protected
-    #########
 
     def name
       :install
