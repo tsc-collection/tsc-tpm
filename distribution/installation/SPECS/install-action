@@ -72,7 +72,7 @@ context 'Install action' do
     File.expects(:ftype).with('/T/aaa/bbb').never
     action.expects(:preserve_target).never
     action.expects(:undo_for_existing).never
-    action.expects(:undo_for_non_existing).with.returns mock('undo-action', :undoable= => false)
+    action.expects(:undo_for_non_existing).with.returns nil
 
     action.create
   end

@@ -89,13 +89,16 @@ module Installation
       return if keep && File.exists?(target) && compatible_target_types.include?(File.ftype(target))
 
       if @undoable
-        if File.exists?(target)
-          preserve_target
-          @undo_action = undo_for_existing
-        else
-          @undo_action = undo_for_non_existing
+        @undo_action = begin
+          if File.exists?(target)
+            preserve_target
+            undo_for_existing
+          else
+            undo_for_non_existing
+          end
         end
-        @undo_action.undoable = false
+
+        @undo_action.undoable = false if @undo_action
       end
 
       logger.log name, target if logger

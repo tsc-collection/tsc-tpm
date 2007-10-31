@@ -81,5 +81,7 @@ module Installation
     def remove_target
     end
 
+    def undo_for_non_existing
+    end
   end
 end
