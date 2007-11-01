@@ -165,8 +165,6 @@ module Installation
             end
 
             task_manager.revert
-
-            Dir.rm_r Task.installation_product_metainf
             task_manager.event_processor.remove_finished
           rescue => exception
             logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
