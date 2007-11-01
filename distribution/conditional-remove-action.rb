@@ -9,19 +9,6 @@
 require 'remove-action.rb'
 
 module Distribution
-  class ConditionalDescriptor < Descriptor
-    def initialize(info, types)
-      super(info)
-      @types = types
-    end
-
-    def dataset
-      super.update :if_types => [ @types ].flatten.compact.map { |_type|
-        _type.to_s
-      }
-    end
-  end
-
   class ConditionalRemoveAction < RemoveAction 
     def initialize(cache, hash)
       super cache
@@ -30,9 +17,11 @@ module Distribution
     
     def descriptors(package)
       @entries.map do |_file, _types|
-        make_descriptor(_file) { |_info|
-          ConditionalDescriptor.new _info, _types
+        descriptor = make_descriptor(_file)
+        descriptor.options.update :if_types => [ _types ].flatten.compact.map { |_type|
+          _type.to_s
         }
+        descriptor
       end
     end
   end

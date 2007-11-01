@@ -57,8 +57,9 @@ require 'etc'
 
 module Installation
   class DirectoryAction < Action 
-    protected
-    #########
+    def initialize(*args)
+      super :force => false, *args
+    end
 
     def name
       :directory
@@ -69,7 +70,11 @@ module Installation
     end
 
     def remove_target
-      FileUtils.rmdir target rescue true
+      if force 
+        FileUtils.remove_entry target
+      else
+        FileUtils.rmdir target rescue true
+      end
     end
 
     def compatible_target_types

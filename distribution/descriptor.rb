@@ -55,10 +55,10 @@ require 'md5'
 
 module Distribution
   class Descriptor
-    attr_reader :source, :file, :origin
+    attr_reader :source, :file, :origin, :options
     attr_accessor :fileset
 
-    def initialize(file,origin = nil)
+    def initialize(file, origin = nil)
       @file, @origin = file, origin
       @destinations = []
       @exclude_patterns = []
@@ -70,6 +70,7 @@ module Distribution
 
       @print_destination = true
       @print_target = true
+      @options = {}
     end
 
     def add_destination_component(directory)
@@ -126,7 +127,7 @@ module Distribution
     end
 
     def dataset
-      Hash[
+      options.merge Hash[
         :target => (figure_target if @print_target),
         :source => (figure_destination || @source if @print_destination),
         :user => @file.owner,

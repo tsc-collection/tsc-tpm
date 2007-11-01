@@ -100,6 +100,12 @@ module Distribution
       @entries = process args, Array(block && block.call)
     end
 
+    def paths
+      entries.map { |_e|
+        File.join _e
+      }
+    end
+
     def files
       self.entries.map do |_entry|
         _entry = Array(_entry)

@@ -50,21 +50,24 @@
 =end
 
 require 'action.rb'
+require 'module.rb'
 
 module Distribution
   class DirectoryAction < Action
     def initialize(cache, *dirs)
       super cache
-      @dirs = dirs.flatten
+      @module = Module.new *dirs
     end
 
     def descriptors(package)
-      @dirs.map do |_dir|
+      @module.paths.map do |_dir|
 	file = FileInfo.new _dir, Defaults.mode.directory
 	descriptor = Descriptor.new(file)
+        descriptor.options.update @module.info
 	descriptor.target = _dir
 	descriptor.action = :directory
 	descriptor.print_destination = false
+
 	descriptor
       end
     end
