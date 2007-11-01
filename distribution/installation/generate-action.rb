@@ -71,7 +71,7 @@ module Installation
           raise "No gererators defined in #{source.inspect}" if generators.empty?
         }
 	generators.each do |_generator|
-	  _generator.new(target, source).process_create if _generator
+	  _generator.new(target, saved_target).process_create if _generator
 	end
       ensure
 	Generator.clear_recent_subclasses

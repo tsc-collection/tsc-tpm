@@ -65,14 +65,11 @@ module Installation
     end
 
     def make_target(progress, logger)
-      File.makedirs target
+      FileUtils.makedirs target
     end
 
     def remove_target
-      begin
-	Dir.delete target
-      rescue
-      end
+      FileUtils.remove_entry target 
     end
 
     def compatible_target_types

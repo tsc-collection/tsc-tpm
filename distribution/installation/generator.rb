@@ -80,11 +80,11 @@ module Installation
       end
     end
 
-    attr_reader :target, :source
+    attr_reader :target, :saved_target
 
-    def initialize(target, source)
+    def initialize(target, saved_target)
       @target = target
-      @source = source
+      @saved_target = saved_target
     end
 
     def stream_or_nothing(*items, &block)
@@ -96,7 +96,7 @@ module Installation
     end
 
     def process_create
-      result = stream_or_nothing(target, source) do |_input|
+      result = stream_or_nothing(target, saved_target) do |_input|
         create _input
       end
 
