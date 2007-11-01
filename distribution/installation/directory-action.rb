@@ -69,7 +69,7 @@ module Installation
     end
 
     def remove_target
-      FileUtils.remove_entry target 
+      FileUtils.rmdir target rescue true
     end
 
     def compatible_target_types
