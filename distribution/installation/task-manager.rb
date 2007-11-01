@@ -114,9 +114,15 @@ module Installation
         event_processor.problem_detected
 
         raise TSC::Error, [ 
-          TSC::Error.ignore {
-            revert_tasks task_undo_stack if perform_undo
-          },
+          if perform_undo 
+            TSC::Error.ignore {
+              TSC::Error.persist do |_queue|
+                revert_tasks task_undo_stack do |_label, _block|
+                  _queue.add(_label, &_block)
+                end
+              end
+            }
+          end,
           exception
         ]
       end
@@ -217,26 +223,28 @@ module Installation
             log :execute, "#{_task.provides} #{_params.join(', ')}"
             _task.execute *_params
           rescue Exception => exception
-            raise TSC::Error.new(_task.provides, exception)
+            raise TSC::Error, [ _task.provides, exception ]
           end
         end
       end
     end
 
-    def revert_tasks(undo_stack)
-      TSC::Error.persist do |_queue|
-        undo_stack.reverse.each do |_task, *_params|
-          _queue.add(_task.provides) {
-            log :revert, "#{_task.provides} #{_params.join(', ')}"
-            _task.revert *_params
-          }
-        end
+    def revert_tasks(undo_stack, &block)
+      block ||= proc { |_label, _block|
+        _block.call
+      }
 
-        _queue.add('cleanup') {
-          directory = Task.installation_preserve_top
-          Dir.rm_r directory unless directory.nil?
+      undo_stack.reverse.each do |_task, *_params|
+        block.call _task.provides, proc {
+          log :revert, "#{_task.provides} #{_params.join(', ')}"
+          _task.revert *_params
         }
       end
+
+      block.call 'cleanup', proc {
+        directory = Task.installation_preserve_top
+        FileUtils.remove_entry directory, :force => true unless directory.nil?
+      }
     end
 
     def log(label, message)
