@@ -69,8 +69,8 @@ module Installation
     end
 
     def make_target(progress, logger)
-      return unless File.exist?(target)
-      return unless if_types.empty? == false && if_types.include?(File.ftype(target))
+      return unless File.symlink?(target) || File.exist?(target)
+      return unless if_types.empty? || if_types.include?(File.ftype(target))
 
       FileUtils.remove_entry target
     end

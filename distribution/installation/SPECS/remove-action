@@ -35,8 +35,8 @@ context 'Remove action' do
 
   specify 'Target is removed if compatible' do
     action.expects(:if_types).at_least_once.returns [ :file, :link ]
-    File.expects(:exist?).with('/T/aaa/bbb').returns true
-    File.expects(:ftype).with('/T/aaa/bbb').returns :file
+    File.expects(:exist?).with('/T/aaa/bbb').at_least_once.returns true
+    File.expects(:ftype).with('/T/aaa/bbb').at_least_once.returns :file
     FileUtils.expects(:remove_entry).with('/T/aaa/bbb')
 
     action.make_target(progress, logger)
@@ -44,8 +44,8 @@ context 'Remove action' do
 
   specify 'Target is not removed if not compatible' do
     action.expects(:if_types).at_least_once.returns [ :file, :link ]
-    File.expects(:exist?).with('/T/aaa/bbb').returns true
-    File.expects(:ftype).with('/T/aaa/bbb').returns :directory
+    File.expects(:exist?).with('/T/aaa/bbb').at_least_once.returns true
+    File.expects(:ftype).with('/T/aaa/bbb').at_least_once.returns :directory
     FileUtils.expects(:remove_entry).with('/T/aaa/bbb').never
 
     action.make_target(progress, logger)
@@ -53,9 +53,9 @@ context 'Remove action' do
 
   specify 'Target is removed if no types' do
     action.expects(:if_types).at_least_once.returns []
-    File.expects(:exist?).with('/T/aaa/bbb').returns true
+    File.expects(:exist?).with('/T/aaa/bbb').at_least_once.returns true
     File.expects(:ftype).with('/T/aaa/bbb').never
-    FileUtils.expects(:remove_entry).with('/T/aaa/bbb').never
+    FileUtils.expects(:remove_entry).with('/T/aaa/bbb')
 
     action.make_target(progress, logger)
   end

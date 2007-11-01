@@ -55,7 +55,9 @@ module Distribution
   class RemoveAction < Action
     def initialize(cache, *files)
       super cache
-      @files = files.flatten
+      @files = Module.new(*files).entries.map { |_e|
+        File.join _e
+      }
     end
     
     def descriptors(package)

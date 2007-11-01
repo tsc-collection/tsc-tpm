@@ -27,7 +27,7 @@ module Installation
     def make_target(progress, logger)
       return unless File.exists?(source)
 
-      FileUtils.remove_entry(target) if File.exists?(target)
+      FileUtils.remove_entry(target) rescue true
       FileUtils.makedirs File.basename(target)
       FileUtils.move source, target
     end

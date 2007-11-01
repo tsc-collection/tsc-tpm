@@ -111,14 +111,11 @@ module Installation
       return unless top
       return unless @undo_action
 
-      @undo_action.create
+      @undo_action.create(progress, logger)
 
       @undo_action.set_user_and_group if @file_ownership_changed
       @undo_action.set_permissions
       @undo_action = nil
-
-      logger.log :restore, target if logger
-      progress.print if progress
     end
 
     def remove(progress = nil, logger = nil)

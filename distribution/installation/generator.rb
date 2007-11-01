@@ -100,7 +100,7 @@ module Installation
         create _input
       end
 
-      FileUtils.remove_entry target if File.exists?(target)
+      FileUtils.remove_entry rescue true
 
       File.open(target, 'w') do |_io|
 	_io.puts result

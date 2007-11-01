@@ -68,8 +68,8 @@ module Installation
     end
 
     def make_target(progress, logger)
-      FileUtils.remove_entry(target) if File.exists?(target)
-      File.symlink source.gsub(%r{^[.](?=/)}, top), target
+      FileUtils.remove_entry(target) rescue true
+      FileUtils.ln_s source.gsub(%r{^[.](?=/)}, top), target
     end
 
     def change_file_mode(*args)
