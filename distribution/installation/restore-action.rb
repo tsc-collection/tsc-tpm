@@ -32,7 +32,7 @@ module Installation
       FileUtils.move source, target
     end
 
-    def remove_target
+    def remove_target(progress, logger)
     end
 
   end

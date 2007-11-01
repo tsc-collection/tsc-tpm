@@ -119,7 +119,7 @@ module Installation
     end
 
     def remove(progress = nil, logger = nil)
-      remove_target
+      remove_target(progress, logger)
 
       logger.log :remove, target if logger
       progress.print if progress
@@ -147,7 +147,7 @@ module Installation
       File.stat(target)
     end
 
-    def remove_target
+    def remove_target(progress, logger)
       TSC::Error.ignore Errno::ENOENT do
         File.unlink target 
       end

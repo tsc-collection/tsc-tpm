@@ -75,7 +75,7 @@ module Installation
       FileUtils.remove_entry target
     end
 
-    def remove_target
+    def remove_target(progress, logger)
     end
 
     def undo_for_non_existing

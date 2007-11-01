@@ -69,8 +69,9 @@ module Installation
       FileUtils.makedirs target
     end
 
-    def remove_target
+    def remove_target(progress, logger)
       if force 
+        logger.log name, "Removing hierarchy #{target}"
         FileUtils.remove_entry target
       else
         FileUtils.rmdir target rescue true

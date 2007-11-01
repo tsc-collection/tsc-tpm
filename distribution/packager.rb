@@ -82,8 +82,8 @@ module Distribution
         info = [
           package.product.info, 
           package.info,
-          prodinfo_info,
           metainf_dirs_info,
+          prodinfo_info,
           tools_info, 
           content_info
         ]
