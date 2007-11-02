@@ -32,6 +32,10 @@ module Installation
       }
     end
 
+    def dump
+      self.to_yaml
+    end
+
     def installation_product_metainf
       installation_top and File.join installation_top, '.meta-inf'
     end

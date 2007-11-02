@@ -95,7 +95,7 @@ module Installation
       properties = Task.properties
       properties.installation_actions.clear
       File.open(Task.installation_package_properties, 'w') do |_io|
-        _io.write Task.properties.to_yaml
+        _io.write Task.properties.dump
       end
     end
 

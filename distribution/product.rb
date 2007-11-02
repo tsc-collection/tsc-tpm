@@ -129,7 +129,6 @@ module Distribution
         :group => group,
         :top => top,
         :compatible => Array(compatibility[platform.name]),
-        :params => params,
         :library_prefix => library_prefix,
         :library_major => library_major,
         :log => log
