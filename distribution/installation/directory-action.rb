@@ -79,7 +79,7 @@ module Installation
     end
 
     def compatible_target_types
-      [ :directory ]
+      %w[ directory ]
     end
 
     def preserve_target

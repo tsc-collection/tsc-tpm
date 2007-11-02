@@ -66,7 +66,7 @@ module Installation
     end
 
     def compatible_target_types
-      [ :file ]
+      %w[ file ]
     end
 
   end

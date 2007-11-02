@@ -28,7 +28,7 @@ module Installation
       return unless File.exists?(source)
 
       FileUtils.remove_entry(target) rescue true
-      FileUtils.makedirs File.basename(target)
+      FileUtils.makedirs File.dirname(target)
       FileUtils.move source, target
     end
 
