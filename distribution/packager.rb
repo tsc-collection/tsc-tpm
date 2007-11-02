@@ -293,10 +293,7 @@ module Distribution
 
       properties = Installation::Properties.new
       properties.installation_parameters.update params
-
-      File.open(path, 'w') do |_io|
-	_io.puts properties.dump
-      end
+      properties.save(path)
     end
 
     def copy_files_and_collect_info(directory)

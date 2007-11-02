@@ -63,7 +63,6 @@ module Installation
     end
 
     @subclasses = []
-    @@properties = Properties.new
 
     class << self
       attr_reader :subclasses
@@ -73,16 +72,12 @@ module Installation
 	@subclasses << subclass
       end
 
-      def properties=(properties)
-        @@properties = properties
-      end
-
       def properties
-        @@properties
+        Properties.app
       end
 
       def method_missing(*args)
-        @@properties.send *args
+        properties.send *args
       end
     end
 

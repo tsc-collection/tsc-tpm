@@ -67,7 +67,6 @@ module Installation
       Task.installation_package = config.package
 
       Task.installation_actions.concat config.actions
-      Task.installation_parameters.update(config.product.params)
 
       setup_task_user(config.product.user)
       setup_task_group(config.product.group)
@@ -89,21 +88,6 @@ module Installation
           Installation::EventProcessor.new(communicator, logger, Array(@task_table['welcome']).first)
         end
       end
-    end
-
-    def preserve_properties
-      properties = Task.properties
-      properties.installation_actions.clear
-      File.open(Task.installation_package_properties, 'w') do |_io|
-        _io.write Task.properties.dump
-      end
-    end
-
-    def restore_properties
-      properties = YAML.load(IO::readlines(Task.installation_package_properties).join)
-      actions = Task.installation_actions
-      Task.properties = properties
-      properties.installation_actions.concat actions
     end
 
     def execute(perform_undo = true)

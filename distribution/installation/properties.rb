@@ -11,6 +11,30 @@ require 'yaml'
 
 module Installation
   class Properties
+    class << self
+      attr_writer :app
+
+      def app
+        @app or raise 'No application properties'
+      end
+
+      def figure_properties_file(config = nil)
+        Dir[ 'meta-inf/properties' ].first or begin
+          temp = Properties.new
+          temp.installation_top = config.product.top
+          temp.installation_package = config.package
+
+          (Dir[ temp.installation_package_properties ].first rescue nil) or begin
+            raise 'No properties file'
+          end
+        end
+      end
+
+      def load(location)
+        YAML.load(IO::readlines(location).join).fix_filesets
+      end
+    end
+
     attr_accessor :installation_top, :installation_product
     attr_accessor :installation_package, :installation_user_entry
     attr_accessor :installation_group_entry, :installation_user
@@ -22,7 +46,13 @@ module Installation
     def initialize
       @installation_actions = []
       @installation_parameters = {}
+      @installation_filesets = {}
 
+      fix_filesets
+    end
+
+    def fix_filesets
+      hash = installation_filesets
       @installation_filesets = Hash.new { |_hash, _key|
         _hash[_key] = TSC::Dataset.new(
           :top => installation_top,
@@ -30,10 +60,16 @@ module Installation
           :group => installation_group
         )
       }
+      @installation_filesets.update(hash)
+
+      self
     end
 
-    def dump
-      self.to_yaml
+    def save(location)
+      self.installation_actions.clear
+      File.open(location, 'w') do |_io|
+        _io.write self.to_yaml
+      end
     end
 
     def installation_product_metainf
