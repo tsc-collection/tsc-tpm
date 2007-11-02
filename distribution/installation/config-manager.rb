@@ -59,6 +59,7 @@ require 'installation/symlink-action.rb'
 require 'installation/remove-action.rb'
 require 'installation/restore-action.rb'
 require 'installation/directory-action.rb'
+require 'installation/touch-action.rb'
 
 module Installation
   class ConfigManager
@@ -154,6 +155,10 @@ module Installation
 
       def directory(*data)
 	@actions[:action].call DirectoryAction.new(*data)
+      end
+
+      def touch(*data)
+	@actions[:action].call TouchAction.new(*data)
       end
     end
   end

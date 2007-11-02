@@ -50,6 +50,7 @@
 =end
 
 require 'action.rb'
+require 'module.rb'
 
 module Distribution
   class RemoveAction < Action

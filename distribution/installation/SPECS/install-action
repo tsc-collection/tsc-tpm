@@ -29,6 +29,8 @@ context 'Install action' do
   end
 
   specify 'Basics' do
+    action.get_dataset_item(:remove).should.equal true
+
     action.name.should.equal :install
     action.compatible_target_types.should.include :file
     action.target.should.equal '/T/aaa/bbb'

@@ -15,7 +15,7 @@ module Installation
       attr_writer :app
 
       def app
-        @app or raise 'No application properties'
+        @app ||= new
       end
 
       def figure_properties_file(config = nil)

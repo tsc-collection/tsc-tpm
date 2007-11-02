@@ -40,6 +40,14 @@ module TSC
       super
     end
 
+    def get_dataset_item(item)
+      catch :missing do
+        return get(item.to_s)
+      end
+
+      raise "Data item #{item.inspect} missing"
+    end
+
     private
     #######
 

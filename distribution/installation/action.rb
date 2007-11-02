@@ -77,7 +77,7 @@ module Installation
     end
 
     def initialize(*args)
-      super :base => nil, *args
+      super :base => nil, :remove => true, *args
 
       @undo_action = nil
       @undoable = true
@@ -119,6 +119,7 @@ module Installation
     end
 
     def remove(progress = nil, logger = nil)
+      return unless get_dataset_item(:remove)
       remove_target(progress, logger)
 
       logger.log :remove, target if logger
