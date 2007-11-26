@@ -71,6 +71,7 @@ module TSC
           when 'aix' then name, arch = fine_tune_aix
           when 'hpux' then name, arch = fine_tune_hpux
           when 'osf' then name, os, arch = fine_tune_osf
+          when 'darwin' then name, os, arch = fine_tune_darwin
         end
 
         new name, os, arch
@@ -164,6 +165,28 @@ module TSC
         [ "#{os}-#{release}#{version}-#{arch}", os, arch ]
       end
 
+      def fine_tune_darwin
+        require 'rubygems'
+        require 'sys/uname'
+        info = Sys::Uname.uname
+
+        arch = case info.machine
+          when 'i386' then 'x86'
+          else 'ppc'
+        end
+        os = 'darwin'
+
+        kernel = info.release.split('.')
+        release = case
+          when kernel.first.to_i >= 9
+            "10.5"
+          else 
+            "X"
+        end
+
+        [ "mac-#{release}-#{arch}", os, arch ]
+      end
+
       def fine_tune_windows
         require 'sys/uname'
         info = Sys::Uname.uname
@@ -241,8 +264,9 @@ module TSC
       [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu },
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 },
-      [ 'tiger-ppc', :darwin, :ppc ] => %w{ powerpc-darwin8.1.0 powerpc-darwin8.8.0 universal-darwin9.0 powerpc-darwin8.9.0 },
-      [ 'tiger-x86', :darwin, :x86 ] => %w{ i686-darwin8.6.1 universal-darwin8.0 i686-darwin8.9.1 },
+      [ 'mac-universal', :darwin, :universal ] => %w{ universal-darwin9.0 universal-darwin8.0 },
+      [ 'mac-ppc', :darwin, :ppc ] => %w{ powerpc-darwin8.1.0 powerpc-darwin8.8.0 powerpc-darwin8.9.0 },
+      [ 'mac-x86', :darwin, :x86 ] => %w{ i686-darwin8.6.1 i686-darwin8.9.1 },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
       [ 'hpux', :hpux, :parisc ] => %w{ hppa2.0w-hpux11.00 ia64-hpux11.23 },
@@ -265,7 +289,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
       def test_known_platforms
         assert_equal 'lin-x86', Platform['i386-linux-gnu'].name
         assert_equal 'sol-sparc', "#{Platform['sparc-solaris2.6']}"
-        assert_equal true, Platform['powerpc-darwin8.1.0'] == 'tiger-ppc'
+        assert_equal true, Platform['powerpc-darwin8.1.0'] == 'mac-ppc'
         assert_equal false, Platform['sol-sparc'] == Platform['sol-x86']
         assert_equal Platform['lin-x86'].arch, Platform['sol-x86'].arch
         assert_equal Platform['sol-sparc'].os, Platform['sol-x86'].os
