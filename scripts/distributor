@@ -77,7 +77,7 @@ class Application < TSC::Application
         [ '--tag',       'Product tag',              'string',    '-T' ],
         [ '--build',     'Broduct build',            'number',    '-b', '-B' ],
         [ '--prefix',    'Library prefix',           'string',    '-p' ],
-        [ '--extention', 'Shared library extention', 'string',    '-E' ],
+        [ '--extension', 'Shared library extension', 'string',    '-E' ],
         [ '--major',     'Library major number',     'number',    '-l' ],
         [ '--mode',      'Operational mode',         'number',    '-m' ],
         [ '--output',    'Output directory',         'directory', '-o' ],
@@ -125,7 +125,7 @@ class Application < TSC::Application
           when 'version' then distributor.product_version = _value
           when 'tag' then distributor.product_tag = _value
           when 'prefix' then distributor.product_library_prefix = _value
-          when 'extention' then distributor.product_library_extention = _value
+          when 'extension' then distributor.product_library_extension = _value
           when 'major' then distributor.product_library_major = convert_to_integer(_value)
           when 'force' then distributor.force = true
         end

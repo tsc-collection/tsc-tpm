@@ -49,14 +49,17 @@
   
 =end
 
-require 'binary-exec-module'
+require 'binary-exec-module.rb'
+require 'node-module.rb'
 
 module Distribution
   class LibraryModule < BinaryExecModule
+    include NodeMixin
+
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0..-2] + [ "lib#{prefix}#{_entry.last}.#{extention}.*.#{major}" ]
+	_entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{prefix}#{_entry.last}.#{extension}" ]
       }
     end
 
@@ -68,13 +71,13 @@ module Distribution
       self.class.library_major
     end
 
-    def extention
-      self.class.library_extention
+    def extension
+      self.class.library_extension
     end
 
     def process_file_entry(file)
       super
-      file.path_for_checksum = file.path.sub(%r{[.]#{extention}[.][^.]*[.][^.]*$}, ".#{extention}.reloc.o")
+      file.path_for_checksum = file.path.sub(%r{[.]#{extension}$},'.a.reloc.o')
     end
   end
 end

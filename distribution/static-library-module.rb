@@ -13,7 +13,7 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0..-2] + [ "lib#{self.class.library_prefix}#{_entry.last}.a" ]
+	_entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.a" ]
       }
     end
 

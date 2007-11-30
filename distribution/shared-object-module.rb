@@ -56,12 +56,12 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0..-2] + [ _entry.last.sub(%r{[.]#{extention}$}, '') + ".#{extention}" ]
+	_entry[0..-2] + [ _entry.last.sub(%r{[.]#{extension}$}, '') + ".#{extension}" ]
       }
     end
 
-    def extention
-      self.class.library_extention
+    def extension
+      self.class.library_exsention
     end
   end
 end

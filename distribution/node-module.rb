@@ -10,7 +10,7 @@ require 'module.rb'
 require 'tree-descriptor.rb'
 
 module Distribution
-  class NodeModule < Distribution::Module
+  module NodeMixin
     def descriptors(origin)
       files.map { |_file|
 	dirname, basename = File.split _file.path
@@ -43,6 +43,10 @@ module Distribution
           raise "Unsupported file type for #{path.inspect}"
       end
     end
+  end
+
+  class NodeModule < Distribution::Module
+    include NodeMixin
   end
 end
 

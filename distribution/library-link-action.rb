@@ -77,8 +77,8 @@ module Distribution
       LibraryModule.library_prefix
     end
 
-    def extention
-      LibraryModule.library_extention
+    def extension
+      LibraryModule.library_extension
     end
 
     def major
@@ -86,7 +86,7 @@ module Distribution
     end 
 
     def make_library_name(dir,name)
-      File.join dir, "lib#{prefix}#{name}.#{extention}.#{major}"
+      File.join dir, "lib#{prefix}#{name}.#{extension}.#{major}"
     end
 
     def make_descriptor(original,target)

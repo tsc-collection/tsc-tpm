@@ -57,7 +57,7 @@ module Distribution
     attr_reader :entries, :info
 
     @@build = 0
-    @@library_extention = 'so'
+    @@library_extension = 'so'
     @@library_prefix = nil
     @@library_major = nil
 
@@ -78,12 +78,12 @@ module Distribution
         @@library_prefix = prefix
       end
 
-      def library_extention
-        @@library_extention
+      def library_extension
+        @@library_extension
       end
 
-      def library_extention=(extention)
-        @@library_extention = extention
+      def library_extension=(extension)
+        @@library_extension = extension
       end
 
       def library_major

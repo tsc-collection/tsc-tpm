@@ -113,8 +113,8 @@ module Distribution
       @product.library_prefix = prefix
     end
 
-    def product_library_extention=(extention)
-      Module.library_extention = extention
+    def product_library_extension=(extension)
+      Module.library_extension = extension
     end
 
     def product_library_major=(major)

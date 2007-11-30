@@ -56,13 +56,13 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0..-2] + [ "lib#{self.class.library_prefix}#{_entry.last}.#{self.class.library_extention}.#{self.class.library_major}" ]
+	_entry[0..-2] + [ "lib#{self.class.library_prefix}#{_entry.last}.#{self.class.library_extension}.#{self.class.library_major}" ]
       }
     end
 
     def process_file_entry(file)
       super
-      file.path_for_checksum = file.path.sub(%r{[.]#{self.class.library_extention}[.][^.]*$}, ".#{self.class.library_extention}.reloc.o")
+      file.path_for_checksum = file.path.sub(%r{[.]#{self.class.library_extension}[.][^.]*$}, ".#{self.class.library_extension}.reloc.o")
     end
   end
 end
