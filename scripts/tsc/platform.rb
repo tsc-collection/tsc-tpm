@@ -261,7 +261,7 @@ module TSC
       [ 'sol9-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.9 },
       [ 'sol10-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.10 },
       [ 'sol8-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.8 },
-      [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu },
+      [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu x86_64-linux},
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 },
       [ 'mac-universal', :darwin, :universal ] => %w{ universal-darwin9.0 universal-darwin8.0 },
