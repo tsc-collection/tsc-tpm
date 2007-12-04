@@ -82,6 +82,8 @@ module Distribution
         @@library_extension
       end
 
+      alias_method :library_extention, :library_extension
+
       def library_extension=(extension)
         @@library_extension = extension
       end
