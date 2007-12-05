@@ -97,7 +97,7 @@ module TSC
           else info.machine
         end
 
-        kernel, version = info.release.scan(%r{^(\d+[.]\d+)[.](\d+)-}).first
+        kernel, version = info.release.scan(%r{^(\d+[.]\d+)[.](\d+)[.-]}).first
         distro = case kernel
           when '2.4'
             case version.to_i
