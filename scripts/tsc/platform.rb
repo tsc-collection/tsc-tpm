@@ -180,6 +180,8 @@ module TSC
         release = case
           when kernel.first.to_i >= 9
             "10.5"
+          when kernel.first.to_i >= 8
+            "10.4"
           else 
             "X"
         end
@@ -265,7 +267,14 @@ module TSC
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 },
       [ 'mac-universal', :darwin, :universal ] => %w{ universal-darwin9.0 universal-darwin8.0 },
-      [ 'mac-ppc', :darwin, :ppc ] => %w{ powerpc-darwin8.1.0 powerpc-darwin8.8.0 powerpc-darwin8.9.0 },
+      [ 'mac-ppc', :darwin, :ppc ] => %w{ 
+        powerpc-darwin8.1.0 
+        powerpc-darwin8.0 
+        powerpc-darwin8.8.0 
+        powerpc-darwin8.9.0 
+        powerpc-darwin8.10.0 
+        powerpc-darwin8.11.0 
+      },
       [ 'mac-x86', :darwin, :x86 ] => %w{ i686-darwin8.6.1 i686-darwin8.9.1 },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
