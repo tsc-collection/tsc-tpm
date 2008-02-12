@@ -247,6 +247,20 @@ module Installation
         end
       end
 
+      if options.key? 'archive'
+        package_name = ENV['TPM_PACKAGE_NAME']
+        if package_name
+          Task.archive = true
+          archive_content_location = File.expand_path 'archive'
+          archive_file_name = package_name.gsub(%r{[.][^.]*$}, '') + '.tar'
+          archive_file_path = File.expand_path(archive_file_name, Array(options['directory']).first)
+
+          actions.each do |_action|
+            _action.base = archive_content_location
+          end
+        end
+      end
+
       @logger = Logger.new('INSTALL', package_name(config), config.product.version)
       task_manager = TaskManager.new(communicator, logger, config)
 
@@ -256,8 +270,17 @@ module Installation
           communicator.report '[ ' + package_description(config) + ' ]'
         }
         task_manager.execute !options.key?('nocleanup')
-        Properties.app.save(Properties.app.installation_package_properties)
-
+        if Task.archive?
+          Dir.cd archive_content_location do
+            TSC::Progress.new "Building #{archive_file_name.inspect}" do |_progress|
+              launch([ 'tar', 'cvf', archive_file_path, '.']) do
+                _progress.print
+              end
+            end
+          end
+        else 
+          Properties.app.save(Properties.app.installation_package_properties)
+        end
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
         raise

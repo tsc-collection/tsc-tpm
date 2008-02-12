@@ -85,6 +85,7 @@ main()
 
   case "${progname}" in
     *.tpm)
+      TPM_PACKAGE_NAME="${progname}" export TPM_PACKAGE_NAME
       process_package ${options}
     ;;
     *)

@@ -109,7 +109,7 @@ module Installation
 
     def figure_ruby_path
       @ruby ||= ruby_path_list.detect { |_path|
-        File.file?(_path) && File.executable?(_path)
+        Task.archive? or File.file?(_path) && File.executable?(_path)
       }
     end
 

@@ -76,6 +76,14 @@ module Installation
         Properties.app
       end
 
+      def archive=(state)
+        @archive = state
+      end
+
+      def archive?
+        @archive
+      end
+
       def method_missing(*args)
         properties.send *args
       end

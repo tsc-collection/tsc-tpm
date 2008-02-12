@@ -80,6 +80,7 @@ class Application < TSC::Application
         [ '--extract', 'Extract the archive into the current directory', nil ],
         [ '--responses', 'Use the responses from a specified file', 'yaml file', '-r' ],
         [ '--defaults', 'Accept default answeres', nil, '-D' ],
+        [ '--archive', 'Repackage as an archived installation tree', nil ],
         [ '--log', 'Leave the installation log file', nil, '-l'  ]
       ]
       _conf.description = [
