@@ -151,6 +151,51 @@ module TSC
     end
 
     class << self
+      def solitary_option(*args)
+        predicate_option *args
+
+        args.flatten.compact.each do |_option|
+          define_method _option.to_s do ||
+            Array(options[_option.to_s]).first
+          end
+        end
+      end
+      
+      def multiple_option(*args)
+        begin
+          require 'linguistics' and Linguistics.use(:en)
+        rescue
+          raise 'Multiple options not supported. Please install Linguistics gem and try it again.'
+        end
+        
+        solitary_option *args
+
+        solitary_options = args.flatten.compact.map { |_item| 
+          _item.to_s
+        }
+        pluralized_options = solitary_options.map { |_option|
+          _option.en.plural
+        }
+
+        [ solitary_options, pluralized_options ].transpose.each do |_solitary, _plural |
+          define_method _plural do ||
+            Array(options[_solitary])
+          end
+
+          define_method "#{_plural}?" do ||
+            options.has_key? _solitary
+          end
+        end
+      end
+
+      def predicate_option(*args)
+        args.flatten.compact.each do |_option|
+          define_method "#{_option}?" do ||
+            options.has_key? _option.to_s
+          end
+        end
+      end
+
       def in_generator_context(&block)
         return unless defined? Installation::Generator
 
@@ -353,6 +398,8 @@ end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
+  require 'mocha'
+  require 'stubba'
   require 'set'
 
   module TSC
@@ -425,6 +472,58 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         rescue SystemExit => exception
           assert_equal true, exception.success?
         end
+      end
+
+      def test_predicate_options
+        app = TSC::Application.new 
+        app.expects(:options).at_least_once.returns Hash[
+           'bbb' => ''
+        ]
+
+        app.class.predicate_option :aaa, :bbb
+        assert_equal false, app.aaa?
+        assert_equal true, app.bbb?
+      end
+
+      def test_solitary_options
+        app = TSC::Application.new 
+        app.expects(:options).at_least_once.returns Hash[
+           'bbb' => 'hello'
+        ]
+
+        app.class.solitary_option :aaa, :bbb
+
+        assert_equal false, app.aaa?
+        assert_equal true, app.bbb?
+
+        assert_equal 'hello', app.bbb
+        assert_nil app.aaa
+      end
+
+      def test_multiple_options
+        app = TSC::Application.new 
+        app.expects(:options).at_least_once.returns Hash[
+           'car' => 'he-he',
+           'goose' => [ 'hello', 'good-bye' ]
+        ]
+
+        app.class.multiple_option :car, :goose, :man
+
+        assert_equal true, app.car?
+        assert_equal true, app.goose?
+        assert_equal false, app.man?
+
+        assert_equal true, app.cars?
+        assert_equal true, app.geese?
+        assert_equal false, app.men?
+
+        assert_equal 'he-he', app.car
+        assert_equal 'hello', app.goose
+        assert_equal nil, app.man
+
+        assert_equal [ 'he-he' ], app.cars
+        assert_equal [ 'hello', 'good-bye' ], app.geese
+        assert_equal [], app.men
       end
     end
   end
