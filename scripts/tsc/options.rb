@@ -49,6 +49,22 @@ module TSC
       @hash[name]
     end
 
+    def []=(name, value)
+      @hash[name] = value
+    end
+
+    def key?(name)
+      @hash.has_key?(name)
+    end
+
+    def has_key?(name)
+      @hash.has_key?(name)
+    end
+
+    def each(&block)
+      @hash.each(&block)
+    end
+
     def set(name, value)
       @hash[name] = @hash.has_key?(name) ? Array(@hash[name]).push(value) : value
     end
