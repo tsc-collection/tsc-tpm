@@ -58,7 +58,7 @@ module TSC
   # information.
   #
   class Application
-    attr_reader :script_name, :script_location, :options, :conf
+    attr_reader :script_name, :script_location, :options
 
     # Creates and application, passing it optional command line descriptor 
     # (if the first argument is aString) and an array of option descriptors  
@@ -84,6 +84,7 @@ module TSC
       require 'tsc/errors.rb'
       require 'tsc/launch.rb'
       require 'tsc/option-registry.rb'
+      require 'tsc/options.rb'
 
       location, name = File.split($0)
       @script_location = location
@@ -91,10 +92,10 @@ module TSC
 
       $: << script_location
 
-      @conf = Struct.new(:subcommand, :arguments, :options, :description, :verbose).new
-      block.call(conf) if block
+      @appconf = Struct.new(:subcommand, :arguments, :options, :description, :verbose).new
+      block.call(@appconf) if block
 
-      conf.arguments ||= args.shift if String === args.first
+      @appconf.arguments ||= args.shift if String === args.first
       @registry = OptionRegistry.new
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
@@ -102,10 +103,10 @@ module TSC
       @registry.add 'debug', 'Starts the interactive debugger', nil
 
       @registry.add_bulk *args
-      @registry.add_bulk *Array(conf.options)
+      @registry.add_bulk *Array(@appconf.options)
 
-      @options = Hash.new
-      self.verbose = ENV['TRACE'].to_s.split.include?(script_name) || conf.verbose
+      @options = Options.new @registry.entries
+      options.verbose = ENV['TRACE'].to_s.split.include?(script_name) || @appconf.verbose
     end
 
     # Default start method that processes the command line arguments and
@@ -117,14 +118,6 @@ module TSC
       handle_errors do
         process_command_line
         block.call(self) if block
-      end
-    end
-
-    def verbose=(state)
-      if state 
-        @options['verbose'] = true
-      else
-        @options.delete('verbose')
       end
     end
 
@@ -151,51 +144,6 @@ module TSC
     end
 
     class << self
-      def solitary_option(*args)
-        predicate_option *args
-
-        args.flatten.compact.each do |_option|
-          define_method _option.to_s do ||
-            Array(options[_option.to_s]).first
-          end
-        end
-      end
-      
-      def multiple_option(*args)
-        begin
-          require 'linguistics' and Linguistics.use(:en)
-        rescue
-          raise 'Multiple options not supported. Please install Linguistics gem and try it again.'
-        end
-        
-        solitary_option *args
-
-        solitary_options = args.flatten.compact.map { |_item| 
-          _item.to_s
-        }
-        pluralized_options = solitary_options.map { |_option|
-          _option.en.plural
-        }
-
-        [ solitary_options, pluralized_options ].transpose.each do |_solitary, _plural |
-          define_method _plural do ||
-            Array(options[_solitary])
-          end
-
-          define_method "#{_plural}?" do ||
-            options.has_key? _solitary
-          end
-        end
-      end
-
-      def predicate_option(*args)
-        args.flatten.compact.each do |_option|
-          define_method "#{_option}?" do ||
-            options.has_key? _option.to_s
-          end
-        end
-      end
-
       def in_generator_context(&block)
         return unless defined? Installation::Generator
 
@@ -254,18 +202,12 @@ module TSC
       processor.ordering = GetoptLong::REQUIRE_ORDER if order
 
       processor.each do |_option, _argument|
-        key = _option.slice(2..-1)
-
-        if @options.key?(key)
-          @options[key] = [ @options[key], _argument ].flatten
-        else
-          @options[key] = _argument
-        end
+        options.set(_option.slice(2..-1), _argument)
       end
 
-      require 'debug' if @options.has_key? 'debug'
+      require 'debug' if options.debug?
+      return options unless options.help?
 
-      return @options unless @options.has_key? 'help'
       print_usage
       exit 0
     end
@@ -283,7 +225,11 @@ module TSC
     # was specified.
     #
     def verbose?
-      @options.has_key?('verbose')
+      options.verbose?
+    end
+
+    def verbose=(state)
+      options.verbose = state
     end
 
     def find_in_path(command) 
@@ -334,7 +280,7 @@ module TSC
     end
 
     def usage_description
-      conf.description
+      @appconf.description
     end
 
     def print_usage(*args)
@@ -343,18 +289,18 @@ module TSC
         '  ' + [
           script_name, 
           '[<options>]', 
-          if conf.subcommand
+          if @appconf.subcommand
             [
-              conf.subcommand,
+              @appconf.subcommand,
               '[<sub-options>]'
             ]
           end,
-          conf.arguments
+          @appconf.arguments
         ].flatten.compact.join(' '),
         unless @registry.entries.empty?
           [
             '',
-            (conf.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
+            (@appconf.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
             @registry.format_entries.map { |_aliases, _option, _description|
               "  #{_aliases}#{_option}   #{_description}"
             },
