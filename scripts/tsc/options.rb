@@ -61,6 +61,10 @@ module TSC
       @hash.has_key?(name)
     end
 
+    def clear
+      @hash.clear
+    end
+
     def each(&block)
       @hash.each(&block)
     end
