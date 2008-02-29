@@ -45,6 +45,10 @@ module TSC
       end
     end
 
+    def keys
+      @hash.keys
+    end
+
     def [](name)
       @hash[name]
     end
