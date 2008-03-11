@@ -166,6 +166,18 @@ module TSC
         end
       end
 
+      def on_error(block, arguments, default_list, *error_list, &handler)
+        begin
+          block.call(*arguments) if block
+        rescue Exception => exception
+          case exception
+            when *(error_list + Array((default_list if error_list.empty?)))
+              return handler.call(exception) if handler
+          end
+          raise
+        end
+      end
+
       private
       #######
 
@@ -186,17 +198,6 @@ module TSC
         collector
       end
 
-      def on_error(block, arguments, default_list, *error_list, &handler)
-        begin
-          block.call(*arguments) if block
-        rescue Exception => exception
-          case exception
-            when *(error_list + Array((default_list if error_list.empty?)))
-              return handler.call(exception) if handler
-          end
-          raise
-        end
-      end
     end
 
     # Accepts a list of strings and/or other exeptions, including of its own
