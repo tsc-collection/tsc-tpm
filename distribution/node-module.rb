@@ -15,18 +15,24 @@ module Distribution
       files.map { |_file|
 	dirname, basename = File.split _file.path
         detect_file_type(basename, File.smart_join(origin, dirname))
-      }.flatten
+      }.flatten.compact
     end
 
     private
     #######
 
     def detect_file_type(name, location)
+      path = File.join(location, name)
+      begin
+        file_stat = File.lstat(path)
+      rescue Errno::ENOENT
+        return if info[:optional]
+        raise 
+      end
+
       file = FileInfo.new name
       process_file_entry(file)
 
-      path = File.join(location, name)
-      file_stat = File.lstat(path)
       file.mode ||= file_stat.mode
 
       case
