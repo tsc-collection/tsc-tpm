@@ -50,6 +50,7 @@
 =end
 
 require 'module.rb'
+require 'defaults.rb'
 
 module Distribution
   class BinaryExecModule < Module

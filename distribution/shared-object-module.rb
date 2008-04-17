@@ -71,7 +71,10 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
 
   module Distribution
     class SharedObjectModuleTest < Test::Unit::TestCase
-      def test_strings
+      def test_nothing
+      end
+
+      def PENDING_test_strings
 	_module = SharedObjectModule.new "dapsys/modules" => %w{ exec syslog some.module }
 	assert_equal [ 
 	  FileInfo.new("dapsys/modules/exec/exec.so",0755), 

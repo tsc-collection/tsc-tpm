@@ -66,11 +66,11 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         end
 
         def test_name
-          assert_equal 'linux', @os.name
+          assert_equal 'solaris', @os.name
         end
 
         def setup
-          @os = Linux.new
+          @os = Solaris.new
         end
         
         def teardown

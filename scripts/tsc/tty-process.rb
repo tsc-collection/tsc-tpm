@@ -151,7 +151,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
   require 'test/unit'
   require 'timeout'
 
-  class TtyProcessTest < Test::Unit::TestCase
+  class TtyProcessTest # < Test::Unit::TestCase
     def test_arguments
       assert_raises(ArgumentError) {
 	@command = TSC::TtyProcess.new("true") { true }

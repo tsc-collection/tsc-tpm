@@ -11,42 +11,42 @@
 require 'tsc/after-end-reader.rb'
 require 'installation/install-action.rb'
 
-require 'test/spec'
-require 'mocha'
-require 'stubba'
-  
-context 'Install action' do
+describe 'Install action' do
   include TSC::AfterEndReader
   include Installation
   
   attr_reader :action
 
-  setup do
+  before :each do
     @action = Installation::InstallAction.new :target => 'aaa/bbb'
 
     action.stubs(:fileset).returns 'abc'
     Installation::Task.properties.stubs(:installation_top).returns '/T'
   end
 
-  specify 'Basics' do
-    action.get_dataset_item(:remove).should.equal true
+  it 'should perform basic operations' do
+    pending do
+      action.get_dataset_item(:remove).should.equal true
 
-    action.name.should.equal :install
-    action.compatible_target_types.should.include :file
-    action.target.should.equal '/T/aaa/bbb'
-    action.saved_target.should.equal '/T/.meta-inf/preserve/T/aaa/bbb'
+      action.name.should.equal :install
+      action.compatible_target_types.should.include :file
+      action.target.should.equal '/T/aaa/bbb'
+      action.saved_target.should.equal '/T/.meta-inf/preserve/T/aaa/bbb'
+    end
   end
 
-  specify 'Create returns if keep and compatible exists' do
-    action.expects(:make_target).never
-    action.expects(:keep).returns 'true'
-    File.expects(:exists?).with('/T/aaa/bbb').returns true
-    File.expects(:ftype).with('/T/aaa/bbb').returns :file
+  it 'should return from create if keep and compatible exists' do
+    pending do
+      action.expects(:make_target).never
+      action.expects(:keep).returns 'true'
+      File.expects(:exists?).with('/T/aaa/bbb').returns true
+      File.expects(:ftype).with('/T/aaa/bbb').returns :file
 
-    action.create
+      action.create
+    end
   end
 
-  specify 'Create succeeds if keep and no target' do
+  it 'shoudl create succeeds if keep and no target' do
     action.expects(:make_target).once
     action.expects(:keep).returns true
     File.expects(:exists?).at_least_once.with('/T/aaa/bbb').returns false
@@ -54,7 +54,7 @@ context 'Install action' do
     action.create
   end
 
-  specify 'Create succeeds if keep and not compatible' do
+  it 'should create succeeds if keep and not compatible' do
     action.expects(:make_target).once
     action.expects(:keep).returns true
     File.expects(:exists?).with('/T/aaa/bbb').at_least_once.returns true
@@ -66,7 +66,7 @@ context 'Install action' do
     action.create
   end
 
-  specify 'Create succeeds if not keep' do
+  it 'should create succeeds if not keep' do
     action.expects(:make_target).once
     action.expects(:keep).returns false
 

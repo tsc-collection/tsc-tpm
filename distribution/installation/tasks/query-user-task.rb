@@ -53,6 +53,7 @@ require 'etc'
 require 'tsc/errors.rb'
 require 'tsc/platform.rb'
 
+require 'installation/task.rb'
 require 'installation/util/user-management.rb'
 require 'installation/util/group-management.rb'
 

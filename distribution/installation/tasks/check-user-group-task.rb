@@ -50,6 +50,7 @@
 =end
 
 require 'etc'
+require 'installation/task.rb'
 
 module Installation
   module Tasks

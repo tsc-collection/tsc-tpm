@@ -365,13 +365,8 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           _app.options
         }
         assert_equal 3, result.size
-        assert_equal [ '', '' ], result.fetch('verbose')
-        assert_equal '', result.fetch('install')
-
-        test = result.fetch('test')
-
-        assert_equal 3, test.size
-        assert_equal Set.new(['a', 'b', 'c']), Set.new(test)
+        assert_equal [ 'a', 'b', 'c' ], result.test_list
+        assert_equal true, result.install?
       end
 
       def test_error
@@ -418,58 +413,6 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         rescue SystemExit => exception
           assert_equal true, exception.success?
         end
-      end
-
-      def test_predicate_options
-        app = TSC::Application.new 
-        app.expects(:options).at_least_once.returns Hash[
-           'bbb' => ''
-        ]
-
-        app.class.predicate_option :aaa, :bbb
-        assert_equal false, app.aaa?
-        assert_equal true, app.bbb?
-      end
-
-      def test_solitary_options
-        app = TSC::Application.new 
-        app.expects(:options).at_least_once.returns Hash[
-           'bbb' => 'hello'
-        ]
-
-        app.class.solitary_option :aaa, :bbb
-
-        assert_equal false, app.aaa?
-        assert_equal true, app.bbb?
-
-        assert_equal 'hello', app.bbb
-        assert_nil app.aaa
-      end
-
-      def test_multiple_options
-        app = TSC::Application.new 
-        app.expects(:options).at_least_once.returns Hash[
-           'car' => 'he-he',
-           'goose' => [ 'hello', 'good-bye' ]
-        ]
-
-        app.class.multiple_option :car, :goose, :man
-
-        assert_equal true, app.car?
-        assert_equal true, app.goose?
-        assert_equal false, app.man?
-
-        assert_equal true, app.cars?
-        assert_equal true, app.geese?
-        assert_equal false, app.men?
-
-        assert_equal 'he-he', app.car
-        assert_equal 'hello', app.goose
-        assert_equal nil, app.man
-
-        assert_equal [ 'he-he' ], app.cars
-        assert_equal [ 'hello', 'good-bye' ], app.geese
-        assert_equal [], app.men
       end
     end
   end

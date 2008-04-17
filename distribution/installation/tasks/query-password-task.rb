@@ -8,6 +8,7 @@
 
 require 'tsc/errors.rb'
 require 'installation/util/user-management.rb'
+require 'installation/task.rb'
 
 module Installation
   module Tasks

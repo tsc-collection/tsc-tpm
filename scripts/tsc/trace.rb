@@ -92,22 +92,3 @@ module TSC
   end
 end
 
-if $0 == __FILE__
-  class TraceTest
-    include TSC::Trace
-
-    def aaa 
-      trace "Hello", 28, "world"
-    end
-    def bbb 
-      trace "Hello"
-    end
-  end
-
-  test = TraceTest.new
-  test.debug_preserve = true
-  test.aaa
-  test.bbb
-
-  p "ERRORS:", *TSC::Trace::Logger.errors
-end

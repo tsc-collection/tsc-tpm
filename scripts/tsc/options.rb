@@ -53,6 +53,10 @@ module TSC
       @hash[name]
     end
 
+    def size
+      @hash.size
+    end
+
     def []=(name, value)
       @hash[name] = value
     end
@@ -98,6 +102,11 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
 
   module TSC
     class OptionsTest < Test::Unit::TestCase
+      def test_nothing
+      end
+
+      def setup
+      end
     end
   end
 end

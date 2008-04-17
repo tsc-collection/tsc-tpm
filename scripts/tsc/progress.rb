@@ -111,19 +111,3 @@ module TSC
   end
 end
 
-if __FILE__ == $0
-  progress = TSC::Progress.new 'ls -l /dev', 10, 2, 70
-  IO.popen 'ls -l /dev' do |io|
-    io.each do 
-      progress.print
-    end
-  end
-  progress.done
-  TSC::Progress.new "Counting" do |_progress|
-    100.times {
-      _progress.print
-    }
-  end
-  puts "Done."
-end
-

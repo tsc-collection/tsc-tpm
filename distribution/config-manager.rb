@@ -153,8 +153,6 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
         config = ConfigManager.new
         config.process "prodinfo"
 
-        show config if $0 == __FILE__
-
         assert_equal 2, config.product.packages.size
         assert_equal 3, config.filesets.size
 
@@ -175,14 +173,6 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
         assert_equal 8, fileset_common.actions.size
         assert_equal 3, fileset_dap.actions.size
         assert_equal 3, fileset_sys.actions.size
-      end
-
-      def show(config)
-        p config.product
-        p config.filesets
-
-        puts "PACKAGES:"
-        p @product.packages
       end
     end
   end
