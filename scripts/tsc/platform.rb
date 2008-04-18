@@ -287,6 +287,7 @@ end
 
 if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   require 'test/unit'
+  TSC::Platform.current.driver
 
   module TSC
     class PlatformTest < Test::Unit::TestCase

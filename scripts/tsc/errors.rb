@@ -71,7 +71,7 @@ module TSC
       # Returns the relayed exception or nil.
       #
       def relay(thread, *errors, &block)
-        on_error(block, [], Exception, *errors) do |_error|
+        on_error(block, [ thread ], Exception, *errors) do |_error|
           Thread.current == thread ? raise : thread.raise(self.new(_error))
           return _error
         end
