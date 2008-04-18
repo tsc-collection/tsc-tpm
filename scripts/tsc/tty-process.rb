@@ -42,8 +42,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 
-
-require 'tpty'
 require 'delegate'
 
 require 'tsc/launch'
@@ -53,6 +51,7 @@ module TSC
   class TtyProcess < DelegateClass(IO)
     def initialize(*args,&block)
       raise ArgumentError unless args.empty? or block.nil?
+      require 'tpty'
 
       @status = 0
       @pty = TPty.new
