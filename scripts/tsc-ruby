@@ -23,13 +23,14 @@ class Application < TSC::Application
       [ '--test', 'Run internal tests', nil ],
       [ '--eval', 'Evaluate Ruby code', 'program', '-e' ],
       [ '--interactive', 'Start irb', nil, '-i' ],
+      [ '--path', 'Look up program using PATH', nil, '-S' ],
       [ '--require', 'Require a file', 'file', '-r' ]
     )
   end
 
   def start
     handle_errors {
-      process_command_line
+      process_command_line true
 
       Array(options['require']).each do |_file|
         require _file
@@ -57,6 +58,13 @@ class Application < TSC::Application
         program = ARGV.first.strip
         unless program.slice(0) == ?-
           ARGV.shift
+          if program.slice(0) != ?/ and options.path?
+            choices = ENV['PATH'].split(File::PATH_SEPARATOR).map { |_folder|
+              path = File.join(_folder, program)
+              path if File.file?(path) and File.executable?(path)
+            }.compact
+            program = choices.first unless choices.empty?
+          end
           File.open(program) do |_io|
             workspace.process _io, program
           end
