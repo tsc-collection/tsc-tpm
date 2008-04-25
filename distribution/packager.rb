@@ -202,7 +202,11 @@ module Distribution
     def require_installation_code(directory)
       Dir.cd directory do
         Dir["installation/**/*.rb"].each do |_file|
-          require _file unless File.basename(_file).index('test-') == 0
+          next if _file =~ %r{-spec.rb$}
+          next if _file =~ %r{-test.rb$}
+          next if File.basename(_file).index('test-') == 0
+
+          require _file 
         end
       end
     end
