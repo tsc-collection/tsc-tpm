@@ -180,6 +180,9 @@ module TSC
       localize_ruby_loadpath
       require 'tsc/errors.rb'
       require 'tsc/launch.rb'
+      require 'tsc/box.rb'
+      require 'tsc/string-utils.rb'
+      require 'tsc/line-builder.rb'
 
       begin
         block.call(options)
@@ -293,10 +296,6 @@ module TSC
     end
 
     def print_usage(*args)
-      require 'tsc/box.rb'
-      require 'tsc/string-utils.rb'
-      require 'tsc/line-builder.rb'
-
       extend TSC::StringUtils
       extend TSC::LineBuilder
 
