@@ -81,10 +81,9 @@ module TSC
     # the specified block.
     #
     def initialize(*args, &block)
-      require 'tsc/errors.rb'
-      require 'tsc/launch.rb'
       require 'tsc/option-registry.rb'
       require 'tsc/options.rb'
+      require 'tsc/dataset.rb'
 
       location, name = File.split($0)
       @script_location = location
@@ -92,14 +91,23 @@ module TSC
 
       $: << script_location
 
-      @appconf = Struct.new(:subcommand, :arguments, :options, :description, :verbose).new
+      @appconf = TSC::Dataset[
+        :subcommand => nil, 
+        :arguments => TSC::Dataset[ :usage => nil, :description => nil ], 
+        :options => [], 
+        :description => nil, 
+        :examples => nil, 
+        :verbose => nil
+      ]
       block.call(@appconf) if block
 
-      @appconf.arguments ||= args.shift if String === args.first
+      if String === args.first && TSC::Dataset === @appconf.arguments && @appconf.arguments.usage.nil?
+        @appconf.arguments.usage = args.shift 
+      end
       @registry = OptionRegistry.new
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
-      @registry.add 'help', 'Prints out this message', nil, 'h', '?'
+      @registry.add 'help', 'Prints out this help message', nil, 'h', '?'
       @registry.add 'debug', 'Starts the interactive debugger', nil
 
       @registry.add_bulk *args
@@ -170,7 +178,8 @@ module TSC
       return unless block
 
       localize_ruby_loadpath
-      require 'getoptlong'
+      require 'tsc/errors.rb'
+      require 'tsc/launch.rb'
 
       begin
         block.call(options)
@@ -284,35 +293,60 @@ module TSC
     end
 
     def print_usage(*args)
+      require 'tsc/box.rb'
+      require 'tsc/string-utils.rb'
+      require 'tsc/line-builder.rb'
+
+      extend TSC::StringUtils
+      extend TSC::LineBuilder
+
       print_diagnostics args + [
         'USAGE',
-        '  ' + [
-          script_name, 
-          '[<options>]', 
-          if @appconf.subcommand
-            [
-              @appconf.subcommand,
-              '[<sub-options>]'
-            ]
-          end,
-          @appconf.arguments
-        ].flatten.compact.join(' '),
-        unless @registry.entries.empty?
+        indent(
+          [
+            script_name, 
+            '[<options>]', 
+            if @appconf.subcommand
+              [
+                @appconf.subcommand,
+                '[<sub-options>]'
+              ]
+            end,
+            (TSC::Dataset === @appconf.arguments ? @appconf.arguments.usage : @appconf.arguments.to_s)
+          ].flatten.compact.join(' ')
+        ),
+        [
+          '',
+          (@appconf.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
+          indent(
+            @registry.format_entries.map { |_aliases, _option, _description|
+              "#{_aliases}#{_option}   #{_description}"
+            }
+          )
+        ],
+        if TSC::Dataset === @appconf.arguments and @appconf.arguments.description
           [
             '',
-            (@appconf.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
-            @registry.format_entries.map { |_aliases, _option, _description|
-              "  #{_aliases}#{_option}   #{_description}"
-            },
-            if usage_description 
-              [
-                '',
-                'DESCRIPTION',
-                [ usage_description ].flatten.join("\n").map { |_line|
-                  '  ' + _line
-                }
-              ]
-            end
+            'ARGUMENTS',
+            indent(
+              make_definition_list(@appconf.arguments.description) { |_definition, _description|
+                [ enclose_words(_definition), _description ]
+              }
+            )
+          ]
+        end,
+        if @appconf.description 
+          [
+            '',
+            'DESCRIPTION',
+            indent(TSC::Box[ @appconf.description ].map)
+          ]
+        end,
+        if @appconf.examples
+          [
+            '',
+            'EXAMPLES',
+            indent(make_definition_list(@appconf.examples))
           ]
         end
       ]

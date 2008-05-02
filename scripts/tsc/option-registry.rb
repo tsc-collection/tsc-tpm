@@ -78,11 +78,14 @@ module TSC
     end
 
     def format_entries
+      require 'tsc/string-utils.rb'
+      extend TSC::StringUtils
+
       [
         @entries.map { |_entry|
           [ _entry.to_a ].map { |_option, _description, _argument, _aliases|
             aliases = (_aliases + ['']).join(', ')
-            option = [ _option, (_argument && "<#{_argument.strip}>") ].compact.join(' ')
+            option = [ _option, _argument && enclose_words(_argument) ].compact.join(' ')
 
             [ aliases, aliases.size, option, option.size, _description ]
           }.first
