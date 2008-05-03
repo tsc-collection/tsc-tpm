@@ -178,6 +178,7 @@ module TSC
       return unless block
 
       localize_ruby_loadpath
+      require 'getoptlong'
       require 'tsc/errors.rb'
       require 'tsc/launch.rb'
       require 'tsc/box.rb'
