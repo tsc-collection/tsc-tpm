@@ -87,7 +87,7 @@ module TSC
 
       location, name = File.split($0)
       @script_location = location
-      @script_name = name.sub(%r{[.]rb$}i, '')
+      @script_name = name.sub(%r{[.]rb.*$}i, '')
 
       $: << script_location
 
