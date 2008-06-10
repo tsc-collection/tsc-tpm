@@ -235,7 +235,7 @@ extract()
       |
       |NOTE: Most likely causes may be one of the following:
       |      o Wrong platform (no platform specific decompression utility)
-      |      o Insufficient privileges in the current working direcotory
+      |      o Insufficient privileges in the current working directory
       |      o Insufficient privileges in ${TEMPDIR}
 
     "
