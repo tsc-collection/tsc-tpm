@@ -275,7 +275,11 @@ module TSC
         powerpc-darwin8.10.0 
         powerpc-darwin8.11.0 
       },
-      [ 'mac-x86', :darwin, :x86 ] => %w{ i686-darwin8.6.1 i686-darwin8.9.1 },
+      [ 'mac-x86', :darwin, :x86 ] => %w{ 
+        i686-darwin8.6.1 
+        i686-darwin8.9.1 
+        i686-darwin9.3.0
+      },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
       [ 'hpux', :hpux, :parisc ] => %w{ hppa2.0w-hpux11.00 ia64-hpux11.23 },
