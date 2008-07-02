@@ -116,7 +116,7 @@ module TSC
       @pipeline = pipeline
       @pipes.concat @pipeline.map { [ IO.pipe, IO.pipe ] }
       @pipeline.each_with_index do |_command, _index|
-	@pids.push spawn(_command, @pipes[_index], @pipes[_index.next])
+        @pids.push spawn(_command, @pipes[_index], @pipes[_index.next])
       end
 
       @parent_setup_blocks.each do |_block|
@@ -186,6 +186,8 @@ module TSC
 
     def spawn(command, p0, p1)
       fork do
+        $VERBOSE = nil
+
         $stdin.reopen  p0[0][0]
         $stdout.reopen p1[0][1]
         $stderr.reopen p1[1][1]

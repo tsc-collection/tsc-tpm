@@ -85,7 +85,7 @@ module TSC
       require 'tsc/options.rb'
       require 'tsc/dataset.rb'
 
-      location, name = File.split($0)
+      location, name = File.split File.expand_path($0)
       @script_location = location
       @script_name = name.sub(%r{[.]rb.*$}i, '')
 
