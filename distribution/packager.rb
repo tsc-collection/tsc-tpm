@@ -1,3 +1,4 @@
+# vim: set sw=2:
 =begin
              Tone Software Corporation BSD License ("License")
   
@@ -113,24 +114,24 @@ module Distribution
           File.join(_path, what)
         }
       end.map { |_item|
-	Dir[_item].select { |_file| 
-	  File.file? _file 
-	}
+        Dir[_item].select { |_file| 
+          File.file? _file 
+        }
       }.flatten
     end
 
     def figure_library_files(library, loaded_files = $")
       result = Hash.new
       loaded_files.each do |_file|
-	find_in_path(_file, $:).each do |_path|
-	  _path.scan(%r{^(.*)/(#{library})/(.*)$}).each do |_target|
+        find_in_path(_file, $:).each do |_path|
+          _path.scan(%r{^(.*)/(#{library})/(.*)$}).each do |_target|
             permissions = case _target[2].split('.').last
               when 'so', 'sl' then Defaults.mode.program
               else Defaults.mode.file
             end
-	    result[ File.join(_target[1], _target[2]) ] ||= [ _target[0], permissions ]
-	  end
-	end
+            result[ File.join(_target[1], _target[2]) ] ||= [ _target[0], permissions ]
+          end
+        end
       end
       result.map { |*_entry| 
         _entry.flatten 
@@ -232,11 +233,11 @@ module Distribution
           _entry.each { |_to, _from, _permissions|
             fileinfo = FileInfo.new(_to, _permissions || permissions || Defaults.mode.file)
             fileinfo.path_for_checksum = _to
-	    descriptor = Descriptor.new fileinfo, _from
-	    descriptor.add_destination_component File.join(destination, File.dirname(_to))
+            descriptor = Descriptor.new fileinfo, _from
+            descriptor.add_destination_component File.join(destination, File.dirname(_to))
             file_target_directory = File.join('.meta-inf', destination, File.dirname(_to))
-	    descriptor.target_directory = file_target_directory
-	    descriptor.action = :install
+            descriptor.target_directory = file_target_directory
+            descriptor.action = :install
             info << descriptor.info
             descriptor.install_to_destination directory
             _progress.print
@@ -287,7 +288,7 @@ module Distribution
       File.makedirs File.dirname(prodinfo_path)
 
       File.open(prodinfo_path, "w") do |_io|
-	_io.puts *info.compact
+        _io.puts *info.compact
       end
     end
 
