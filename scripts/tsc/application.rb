@@ -1,3 +1,4 @@
+# vim: set sw=2:
 =begin
              Tone Software Corporation BSD License ("License")
   
@@ -85,13 +86,8 @@ module TSC
       require 'tsc/options.rb'
       require 'tsc/dataset.rb'
 
-      location, name = File.split File.expand_path($0)
-      @script_location = location
-      @script_name = name.sub(%r{[.]rb.*$}i, '')
-
-      $: << script_location
-
       @appconf = TSC::Dataset[
+        :script => $0,
         :subcommand => nil, 
         :arguments => TSC::Dataset[ :usage => nil, :description => nil ], 
         :options => [], 
@@ -100,6 +96,12 @@ module TSC
         :verbose => nil
       ]
       block.call(@appconf) if block
+
+      location, name = File.split File.expand_path(@appconf.script)
+      @script_location = location
+      @script_name = name.sub(%r{[.]rb.*$}i, '')
+
+      $: << script_location
 
       if String === args.first && TSC::Dataset === @appconf.arguments && @appconf.arguments.usage.nil?
         @appconf.arguments.usage = args.shift 

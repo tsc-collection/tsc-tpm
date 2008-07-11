@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# vim: set sw=2:
 =begin
  
              Tone Software Corporation BSD License ("License")
@@ -50,7 +51,7 @@
   
 =end
 
-$:.concat ENV.to_hash['PATH'].to_s.split(':')
+$:.concat ENV.to_hash['PATH'].to_s.split(File::PATH_SEPARATOR)
 
 require 'tsc/application.rb'
 require 'tsc/path.rb'
@@ -67,6 +68,7 @@ class Application < TSC::Application
 
   def initialize
     super { |_conf|
+      _conf.script = __FILE__
       _conf.arguments = '<product description> [<package> ...]'
       _conf.options = [
         [ '--install',   'Install',                  nil,         '-i' ],
