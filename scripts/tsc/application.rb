@@ -177,6 +177,7 @@ module TSC
     # correct exit code.
     #
     def handle_errors(*errors, &block) # :yields: options
+      $VERBOSE = nil unless verbose?
       return unless block
 
       localize_ruby_loadpath
@@ -248,8 +249,8 @@ module TSC
     end
 
     def find_in_path(command) 
-      ENV['PATH'].to_s.split(File::PATH_SEPARATOR).map { |_location|
-	Dir[File.join(os.path(_location), command)].first
+      ENV.to_hash['PATH'].to_s.split(File::PATH_SEPARATOR).map { |_location|
+        Dir[File.join(os.path(_location), command)].first
       }.compact
     end
 

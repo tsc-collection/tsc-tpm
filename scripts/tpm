@@ -50,8 +50,6 @@
   
 =end
 
-$VERBOSE = nil
-
 $:.push File.expand_path(File.dirname(__FILE__))
 require 'tsc/application.rb'
 
