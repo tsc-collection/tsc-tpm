@@ -1,3 +1,4 @@
+# vim: set sw=2:
 =begin
              Tone Software Corporation BSD License ("License")
   
@@ -72,6 +73,7 @@ module TSC
           when 'hpux' then name, arch = fine_tune_hpux
           when 'osf' then name, os, arch = fine_tune_osf
           when 'darwin' then name, os, arch = fine_tune_darwin
+          when 'jvm' then name, os, arch = fine_tune_java
         end
 
         new name, os, arch
@@ -163,6 +165,17 @@ module TSC
         release, version = info.release.scan(%r{V(\d+)[.](\d+)$}).first
 
         [ "#{os}-#{release}#{version}-#{arch}", os, arch ]
+      end
+
+      def fine_tune_java
+        require 'rbconfig'
+        conf = ::Config::CONFIG
+
+        platform = conf['target_os']
+        arch = conf['target_cpu']
+        os = 'jvm'
+
+        [ "#{platform}-#{os}-#{arch}", os, arch ]
       end
 
       def fine_tune_darwin
@@ -284,7 +297,8 @@ module TSC
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
       [ 'hpux', :hpux, :parisc ] => %w{ hppa2.0w-hpux11.00 ia64-hpux11.23 },
       [ 'windows-x86', :mswin, :x86 ] => %w{ i386-mswin32 },
-      [ 'win32-sfu-x86', :interix, :x86 ] => %w{ i586-interix3 }
+      [ 'win32-sfu-x86', :interix, :x86 ] => %w{ i586-interix3 },
+      [ 'java', :jvm, :any ] => %w{ java }
     ]
   end
 end
