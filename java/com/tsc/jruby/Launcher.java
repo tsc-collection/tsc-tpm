@@ -10,8 +10,8 @@ public class Launcher {
         System.setProperty("jruby.lib", top + '/' + "lib");
 
         java.util.ArrayList<String> arguments = new java.util.ArrayList<String>();
-        arguments.add("-r");
-        arguments.add("ruby/init");
+        arguments.add("-e");
+        arguments.add("require 'ruby/init'");
         arguments.addAll(java.util.Arrays.asList(args));
 
         org.jruby.Main.main(arguments.toArray(new String[0]));

@@ -30,8 +30,6 @@ public class Locator {
     }
     
     public String figureOrigin() {
-        System.out.println("R: " + figureResource());
-
         java.net.URL url = getClass().getClassLoader().getResource(figureResource());
         return url.toString();
     }
