@@ -12,8 +12,9 @@ public class Launcher {
         java.util.ArrayList<String> arguments = new java.util.ArrayList<String>();
         arguments.add("-e");
         arguments.add("require 'ruby/init'");
-        arguments.addAll(java.util.Arrays.asList(args));
+        arguments.add("--");
 
+        arguments.addAll(java.util.Arrays.asList(args));
         org.jruby.Main.main(arguments.toArray(new String[0]));
     }
 }
