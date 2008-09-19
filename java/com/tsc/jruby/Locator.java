@@ -31,6 +31,15 @@ public class Locator {
     
     public String figureOrigin() {
         java.net.URL url = getClass().getClassLoader().getResource(figureResource());
-        return url.toString();
+        return unescape(url.toString());
+    }
+
+    private String unescape(final String path) {
+        try {
+            return java.net.URLDecoder.decode(path.toString(), System.getProperty("file.encoding"));
+        }
+        catch(java.io.UnsupportedEncodingException exception) {
+            return path;
+        }
     }
 }
