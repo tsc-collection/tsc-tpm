@@ -59,7 +59,8 @@ module TSC
     def add(option, description, argument = nil, *aliases)
       option = '--' + ensure_not_empty(remove_leading_dashes(option))
       aliases = aliases.map { |_alias|
-        '-' + ensure_not_empty(remove_leading_dashes(_alias))
+        name = ensure_not_empty(remove_leading_dashes(_alias))
+        (name.size > 1 ? '--' : '-') + name
       }
       @entries.each do |_entry|
         common = [ _entry.option, *_entry.aliases ] & [ option, *aliases ]
