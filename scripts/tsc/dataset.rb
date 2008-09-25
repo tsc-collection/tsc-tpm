@@ -1,3 +1,4 @@
+# vim: set sw=2:
 # Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
 # 
 # Distributed under the MIT Licence.
@@ -29,6 +30,13 @@ module TSC
 
     def each(&block)
       @hash.each(&block)
+    end
+
+    def update(other)
+      other.each_pair do |_key, _value|
+        get_dataset_item(_key)
+        set _key.to_s, _value
+      end
     end
 
     def method_missing(name, *args)
