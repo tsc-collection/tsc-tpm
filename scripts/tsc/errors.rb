@@ -65,6 +65,12 @@ module TSC
         nil
       end
 
+      def wrap_as(wrapper, *args, &block)
+        on_error(block, [], StandardError) do |_error|
+          raise wrapper, [ _error, *args ]
+        end
+      end
+
       # Relays an exception raised during the block execution to a 
       # specified thread if the exception is of one of the types in
       # in a specified list or any exception if none specified. 
