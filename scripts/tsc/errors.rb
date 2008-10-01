@@ -67,7 +67,13 @@ module TSC
 
       def wrap_as(wrapper, *args, &block)
         on_error(block, [], StandardError) do |_error|
-          raise wrapper, [ _error, *args ]
+          raise wrapper.new(_error, *args)
+        end
+      end
+
+      def wrap_with(*args, &block)
+        on_error(block, [], StandardError) do |_error|
+          raise self.new(args, _error)
         end
       end
 
@@ -261,7 +267,7 @@ module TSC
 
   class NotImplementedError < Error
     def initialize(*args)
-      super 'Not implemented yet', *args
+      super args, 'Not implemented yet'
     end
   end
 
