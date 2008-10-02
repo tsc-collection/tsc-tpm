@@ -147,6 +147,7 @@ module TSC
           }
         end
 
+        require 'tsc/launch.rb'
         generator = proc { |_error, *_strings|
           message = [ 'ERROR', options[:originator], _strings, Array(options[:strings]) ] + [ _error.message.strip ].map { |_m|
             _m.empty? ? _error.class.to_s : _m
