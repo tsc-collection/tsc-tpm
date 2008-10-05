@@ -1,3 +1,4 @@
+# vim: set sw=2:
 =begin
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
    
@@ -29,7 +30,6 @@ module TSC
 
         if _entry.argument
           self.class.make_method name do
-            # raise MissingError, name unless @hash.has_key? name
             Array(@hash[name]).first
           end
 
@@ -38,8 +38,11 @@ module TSC
           end
 
           self.class.make_method "#{name}_list" do
-            # raise MissingError, name unless @hash.has_key? name
             Array(@hash[name])
+          end
+        else
+          self.class.make_method name do
+            Array(@hash[name]).size if @hash.has_key?(name)
           end
         end
       end
@@ -78,7 +81,7 @@ module TSC
     end
 
     def set(name, value)
-      @hash[name] = @hash.has_key?(name) ? Array(@hash[name]).push(value) : value
+      (@hash[name] ||= []) << value
     end
 
     def verbose?
