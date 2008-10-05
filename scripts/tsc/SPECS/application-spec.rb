@@ -12,7 +12,7 @@
 require 'tsc/application.rb'
 
 describe TSC::Application do
-  attr_reader :app
+  attr_reader :app, :options
 
   before do
     @app = TSC::Application.new { |_config|
@@ -42,8 +42,6 @@ describe TSC::Application do
   end
 
   describe "option processing" do
-    attr_reader :options
-
     before do
       ARGV.replace [ '-v', '-a', 'zzz', '-a', 'bbb', '-m', '', '-fff' ]
       @options = app.start { |_app|
@@ -82,6 +80,67 @@ describe TSC::Application do
       options.verbose?.should == true
       options.verbose.should == 1
       options.force.should == 3
+    end
+  end
+
+  describe "verbose option processing" do
+    before do
+      ARGV.replace [ '-v', '-v' ]
+      @options = app.start { |_app|
+        _app.options
+      }
+    end
+
+    after do
+      ARGV.replace []
+    end
+
+    it "should have proper option count" do
+      options.verbose?.should == true
+      options.verbose.should == 2
+    end
+
+    it "should be possible to reset it to false" do
+      options.verbose = false
+      options.verbose?.should == false
+      options.verbose.should == nil
+    end
+
+    it "should be possible to reset it to true" do
+      options.verbose = true
+      options.verbose?.should == true
+      options.verbose.should == 2
+
+      options.verbose = false
+      options.verbose?.should == false
+      options.verbose.should == nil
+
+      options.verbose = true
+      options.verbose?.should == true
+      options.verbose.should == 1
+    end
+
+    it "should be possible to reset it to a positive count" do
+      options.verbose = 5
+      options.verbose?.should == true
+      options.verbose.should == 5
+    end
+
+    it "should be possible to reset it to zero" do
+      options.verbose = 0
+      options.verbose?.should == false
+      options.verbose.should == nil
+    end
+
+    it "should treat gabberish as false" do
+      options.verbose = "abc"
+      options.verbose?.should == false
+      options.verbose.should == nil
+    end
+
+    it "should be available via application" do
+      app.verbose?.should == true
+      app.verbose.should == 2
     end
   end
 end

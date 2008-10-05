@@ -84,12 +84,21 @@ module TSC
       (@hash[name] ||= []) << value
     end
 
-    def verbose?
-      @hash['verbose']
-    end
-
-    def verbose=(state)
-      state ? @hash['verbose'] = state : @hash.delete('verbose')
+    def verbose=(value)
+      while true
+        if value == true
+          return if verbose?
+          value = 1
+        else 
+          count = value.to_s.to_i
+          if count > 0
+            @hash['verbose'] = [ '' ] * count
+          else
+            @hash.delete('verbose')
+          end
+          return
+        end
+      end
     end
 
     class << self

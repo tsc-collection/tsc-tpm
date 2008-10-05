@@ -131,6 +131,21 @@ module TSC
       end
     end
 
+    # Returns true if no option processing yet or option 'verbose' 
+    # was specified.
+    #
+    def verbose?
+      options.verbose?
+    end
+
+    def verbose
+      options.verbose
+    end
+
+    def verbose=(state)
+      options.verbose = state
+    end
+
     def platform 
       @platform ||= begin
         require 'tsc/platform.rb'
@@ -235,17 +250,6 @@ module TSC
     def do_and_exit(code = 0, &block) # :yields: exit_code
       block.call(code) if block
       exit code
-    end
-
-    # Returns true if no option processing yet or option 'verbose' 
-    # was specified.
-    #
-    def verbose?
-      options.verbose?
-    end
-
-    def verbose=(state)
-      options.verbose = state
     end
 
     def find_in_path(command) 
