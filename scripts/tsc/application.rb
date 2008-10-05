@@ -59,7 +59,7 @@ module TSC
   # information.
   #
   class Application
-    attr_reader :script_name, :script_location, :options
+    attr_reader :script_name, :script_location, :options, :registry
 
     # Creates and application, passing it optional command line descriptor 
     # (if the first argument is aString) and an array of option descriptors  
