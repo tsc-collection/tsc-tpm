@@ -24,7 +24,7 @@ module TSC
 
       entries.each do |_entry|
         name = _entry.option[2..-1]
-        self.class.make_method "#{name}?" do
+        self.class.make_method "#{normalize(name)}?" do
           @hash.has_key? name
         end
 
@@ -33,11 +33,11 @@ module TSC
             Array(@hash[name]).first
           end
 
-          self.class.make_method "#{name}_list?" do
+          self.class.make_method "#{normalize(name)}_list?" do
             Array(@hash[name]).size > 1
           end
 
-          self.class.make_method "#{name}_list" do
+          self.class.make_method "#{normalize(name)}_list" do
             Array(@hash[name])
           end
         else
@@ -99,6 +99,13 @@ module TSC
           return
         end
       end
+    end
+
+    private
+    #######
+
+    def normalize(name)
+      name.strip.tr('-', '_')
     end
 
     class << self

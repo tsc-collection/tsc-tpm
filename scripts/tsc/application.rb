@@ -342,11 +342,11 @@ module TSC
             )
           ]
         end,
-        if @appconf.description 
+        if usage_description
           [
             '',
             'DESCRIPTION',
-            indent(TSC::Box[ @appconf.description ].map)
+            indent(usage_description)
           ]
         end,
         if @appconf.examples
@@ -408,6 +408,26 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         assert_equal 3, result.size
         assert_equal [ 'a', 'b', 'c' ], result.test_list
         assert_equal true, result.install?
+      end
+
+      def test_with_dashed_options
+        app = TSC::Application.new( 
+          [ 'no-system', 'Exclude system', 'name' ],
+          [ 'no-host', 'Exclude host', 'name' ]
+        )
+        ARGV.replace %w{ --no-system aaa --no-system bbb }
+        result = app.start { |_app|
+          _app.options
+        }
+        assert_equal 1, result.size
+
+        assert_equal false, result.no_host?
+        assert_equal nil, result.no_host
+        assert_equal [], result.no_host_list
+
+        assert_equal true, result.no_system?
+        assert_equal 'aaa', result.no_system
+        assert_equal [ 'aaa', 'bbb' ], result.no_system_list
       end
 
       def test_error
