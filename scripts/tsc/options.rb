@@ -29,7 +29,7 @@ module TSC
         end
 
         if _entry.argument
-          self.class.make_method name do
+          self.class.make_method normalize(name) do
             Array(@hash[name]).first
           end
 
@@ -81,7 +81,7 @@ module TSC
     end
 
     def set(name, value)
-      (@hash[name] ||= []) << value
+      (@hash[name] ||= []).concat value.split(',')
     end
 
     def verbose=(value)

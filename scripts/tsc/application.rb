@@ -410,6 +410,23 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         assert_equal true, result.install?
       end
 
+      def test_comma_separated_arguments
+        app = TSC::Application.new( 
+          [ 'host', 'Host', 'name', '-m' ], 
+          [ 'system', 'System', 'name' ]
+        )
+        ARGV.replace %w{ -ma -mb,c -md --system s1,s2 }
+        result = app.start { |_app|
+          _app.options
+        }
+        assert_equal 2, result.size
+        assert_equal true, result.system?
+        assert_equal true, result.host?
+
+        assert_equal [ 'a', 'b', 'c', 'd' ], result.host_list
+        assert_equal [ 's1', 's2' ], result.system_list
+      end
+
       def test_with_dashed_options
         app = TSC::Application.new( 
           [ 'no-system', 'Exclude system', 'name' ],
