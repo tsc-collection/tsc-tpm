@@ -37,6 +37,8 @@ module TSC
         get_dataset_item(_key)
         set _key.to_s, _value
       end
+
+      self
     end
 
     def method_missing(name, *args)

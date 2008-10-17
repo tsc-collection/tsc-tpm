@@ -243,6 +243,12 @@ module TSC
       exit 0
     end
 
+    def populate_command_line_from_environment
+      ENV[script_name.tr('-', '_').upcase].to_s.split.reverse.each do |_item|
+        ARGV.unshift _item
+      end
+    end
+
     # Invokes a block, passing it the specified exit code, and then exits
     # with the same code. Provided only as a convenient way to write 
     # one-liner verifications.
