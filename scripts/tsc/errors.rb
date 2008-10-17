@@ -272,6 +272,12 @@ module TSC
     end
   end
 
+  class MissingResourceError < Error
+    def initialize(*args)
+      super args, 'Resource missing'
+    end
+  end
+
   class UsageError < Error
     def initialize(*args)
       super 'Wrong usage', *args
