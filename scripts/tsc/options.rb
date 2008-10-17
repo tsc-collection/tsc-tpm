@@ -81,7 +81,7 @@ module TSC
     end
 
     def set(name, value)
-      (@hash[name] ||= []).concat value.split(',')
+      (@hash[name] ||= []).concat value.include?(',') ? value.split(',') : [ value ]
     end
 
     def verbose=(value)
