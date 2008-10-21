@@ -19,6 +19,8 @@ module TSC
       end
     end
 
+    include Enumerable
+
     def initialize(entries)
       @hash = {}
 
@@ -53,7 +55,17 @@ module TSC
     end
 
     def [](name)
-      @hash[name]
+      result = Array(@hash[name])
+      case result.size
+        when 0
+          nil
+
+        when 1
+          result.first
+
+        else
+          result
+      end
     end
 
     def size
@@ -61,7 +73,7 @@ module TSC
     end
 
     def []=(name, value)
-      @hash[name] = value
+      set name, value
     end
 
     def key?(name)
@@ -76,8 +88,10 @@ module TSC
       @hash.clear
     end
 
-    def each(&block)
-      @hash.each(&block)
+    def each
+      keys.sort.each do |_key|
+        yield _key, self[_key]
+      end
     end
 
     def set(name, value)

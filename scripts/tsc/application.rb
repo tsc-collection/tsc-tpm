@@ -416,6 +416,20 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         assert_equal true, result.install?
       end
 
+      def test_options_compatibility
+        app = TSC::Application.new( 
+          [ 'host', 'Host', 'name', '-m' ], 
+          [ 'system', 'System', 'name' ]
+        )
+        ARGV.replace %w{ -ma -mb --system s1 }
+        result = app.start { |_app|
+          _app.options
+        }
+        assert_equal [ 'a', 'b' ], result['host']
+        assert_equal 's1', result['system']
+        assert_equal [["host", ["a", "b"]], ["system", "s1"]], result.map
+      end
+
       def test_comma_separated_arguments
         app = TSC::Application.new( 
           [ 'host', 'Host', 'name', '-m' ], 
