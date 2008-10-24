@@ -42,8 +42,8 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
-require 'tsc/monitor.rb'
 require 'tsc/errors.rb'
+require 'monitor.rb'
 
 module TSC
   class SynchroQueue
@@ -60,8 +60,8 @@ module TSC
     def initialize(blocking_put = false)
       @queue = []
       @blocking_put = blocking_put
-      @monitor = TSC::Monitor.new
-      @data_available = TSC::Monitor::ConditionVariable.new @monitor
+      @monitor = ::Monitor.new
+      @data_available = @monitor.new_cond
       @high_water_mark = 0
     end
 
