@@ -144,6 +144,8 @@ module TSC
       protected
       #########
       def mon_initialize
+        raise "JRuby not supported" if PLATFORM == 'java'
+
         @mon_owner = nil
         @mon_count = 0
         @mon_waiters = ThreadQueue.new
@@ -359,7 +361,7 @@ module TSC
   end
 end
 
-if $0 != "-e" and $0 == __FILE__ or defined? Test::Unit::TestCase
+if $0 != "-e" and $0 == __FILE__ or defined? Test::Unit::TestCase and PLATFORM != 'java'
   require 'test/unit'
   require 'timeout'
 

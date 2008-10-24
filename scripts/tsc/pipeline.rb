@@ -9,6 +9,7 @@ require 'tsc/errors.rb'
 module TSC
   class Pipeline
     def initialize(*commands)
+      raise "JRuby not supported" if PLATFORM == 'java'
       @commands = commands
     end
 
@@ -74,7 +75,7 @@ module TSC
   end
 end
 
-if $0 == __FILE__ or defined?(Test::Unit::TestCase)
+if $0 == __FILE__ or defined?(Test::Unit::TestCase) and PLATFORM != 'java'
   require 'test/unit'
   
   module TSC

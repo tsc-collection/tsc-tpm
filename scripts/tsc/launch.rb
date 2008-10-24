@@ -83,6 +83,8 @@ module TSC
     end
 
     def initialize(&child_setup_block)
+      raise "JRuby not supported" if PLATFORM == 'java'
+
       @child_setup_blocks = []
       @parent_setup_blocks = []
 
@@ -224,7 +226,7 @@ module Kernel
   end
 end
 
-if $0 == __FILE__ or defined? Test::Unit::TestCase
+if $0 == __FILE__ or defined? Test::Unit::TestCase and PLATFORM != 'java'
   require 'test/unit'
 
   module TSC
