@@ -93,36 +93,36 @@ module TSC
   module MonitorMixin
     class ThreadQueue
       def initialize
-	@queue = []
+        @queue = []
       end
       def size
-	@queue.size
+        @queue.size
       end
       def add(thread)
-	@queue.push thread unless @queue.include? thread
+        @queue.push thread unless @queue.include? thread
       end
       def remove(thread)
-	@queue.delete thread
+        @queue.delete thread
       end
       def wakeup_one
-	until @queue.empty?
-	  thread = @queue.shift
-	  if thread.alive?
-	    thread.wakeup
-	    return thread
-	  end
-	end
+        until @queue.empty?
+          thread = @queue.shift
+          if thread.alive?
+            thread.wakeup
+            return thread
+          end
+        end
       end
       def wakeup_all
-	while wakeup_one
-	end
+        while wakeup_one
+        end
       end
     end
     class MonitorError < RuntimeError
       attr_reader :original
       def initialize(exception)
-	@original = exception
-	super "Exception while in monitor: #{exception.inspect}"
+        @original = exception
+        super "Exception while in monitor: #{exception.inspect}"
       end
     end
 
@@ -130,13 +130,13 @@ module TSC
       protected
       #########
       def mon_check_owner(*args)
-	p_mon_check_owner *args
+        p_mon_check_owner *args
       end
       def mon_wait_and_capture(*args)
-	p_mon_wait_and_capture *args
+        p_mon_wait_and_capture *args
       end
       def mon_release(*args)
-	p_mon_release *args
+        p_mon_release *args
       end
     end
     module Initializable
@@ -144,9 +144,9 @@ module TSC
       protected
       #########
       def mon_initialize
-	@mon_owner = nil
-	@mon_count = 0
-	@mon_waiters = ThreadQueue.new
+        @mon_owner = nil
+        @mon_count = 0
+        @mon_waiters = ThreadQueue.new
       end
     end
 
@@ -157,88 +157,88 @@ module TSC
       include InternalMonitorOperations
 
       def initialize(monitor)
-	@monitor = monitor
-	@waiters = ThreadQueue.new
+        @monitor = monitor
+        @waiters = ThreadQueue.new
       end
       def count_waiters
-	@waiters.size
+        @waiters.size
       end
 
       def wait(timeout = nil)
-	@monitor.mon_check_owner
-	timer = create_timer timeout
+        @monitor.mon_check_owner
+        timer = create_timer timeout
 
-	Thread.critical = true
-	count = @monitor.mon_release
-	@waiters.add Thread.current
+        Thread.critical = true
+        count = @monitor.mon_release
+        @waiters.add Thread.current
 
-	result = wait_event_or_timer timer
-	
-	@waiters.remove Thread.current
-	@monitor.mon_wait_and_capture count
-	Thread.critical = false
-	result
+        result = wait_event_or_timer timer
+        
+        @waiters.remove Thread.current
+        @monitor.mon_wait_and_capture count
+        Thread.critical = false
+        result
       end
       def wait_while
-	while yield
-	  wait
-	end
+        while yield
+          wait
+        end
       end
       def wait_until
-	until yield
-	  wait
-	end
+        until yield
+          wait
+        end
       end
       def signal
-	@monitor.mon_check_owner
+        @monitor.mon_check_owner
 
-	Thread.critical = true
-	@waiters.wakeup_one
-	Thread.critical = false
+        Thread.critical = true
+        @waiters.wakeup_one
+        Thread.critical = false
       end
       def broadcast
-	@monitor.mon_check_owner
+        @monitor.mon_check_owner
 
-	Thread.critical = true
-	@waiters.wakeup_all
-	Thread.critical = false
+        Thread.critical = true
+        @waiters.wakeup_all
+        Thread.critical = false
       end
 
       private
       #######
       def create_timer(timeout)
-	if timeout
-	  waiter = Thread.current
-	  Thread.new {
-	    Thread.pass
-	    sleep timeout
-	    #
-	    # Here we enter the critical section so that it will be in effect when 
-	    # the waiter's thread enters its rescue block. It will be released
-	    # there.
-	    #
-	    Thread.critical = true
-	    waiter.raise Timeout
-	  }
-	end
+        if timeout
+          waiter = Thread.current
+          Thread.new {
+            Thread.pass
+            sleep timeout
+            #
+            # Here we enter the critical section so that it will be in effect when 
+            # the waiter's thread enters its rescue block. It will be released
+            # there.
+            #
+            Thread.critical = true
+            waiter.raise Timeout
+          }
+        end
       end
       def wait_event_or_timer(timer)
-	is_event = true
-	begin
-	  Thread.stop
-	  Thread.critical = true
-	rescue Timeout
-	  #
-	  # When we get here, Thread.critical is set to true in the timer
-	  # thread, if any. All other exceptions are passed "as is" to be
-	  # enveloped into MonitorMixin::MonitorError by mon_synchronize 
-	  # and re-raised.
-	  #
-	  is_event = false
-	ensure
-	  timer.kill if timer
-	end
-	is_event
+        is_event = true
+        begin
+          Thread.stop
+          Thread.critical = true
+        rescue Timeout
+          #
+          # When we get here, Thread.critical is set to true in the timer
+          # thread, if any. All other exceptions are passed "as is" to be
+          # enveloped into MonitorMixin::MonitorError by mon_synchronize 
+          # and re-raised.
+          #
+          is_event = false
+        ensure
+          timer.kill if timer
+        end
+        is_event
       end
     end
     
@@ -248,8 +248,8 @@ module TSC
     class << self
       include Initializable
       def extend_object(obj)
-	super(obj)
-	obj.mon_initialize
+        super(obj)
+        obj.mon_initialize
       end
     end
 
@@ -267,8 +267,8 @@ module TSC
       @mon_owner = Thread.current unless @mon_owner
 
       if @mon_owner == Thread.current
-	@mon_count += 1
-	result = true
+        @mon_count += 1
+        result = true
       end
       Thread.critical = false
       return result
@@ -285,34 +285,34 @@ module TSC
       Thread.critical = true
       @mon_count -= 1
       if @mon_count == 0
-	mon_release
+        mon_release
       end
       Thread.critical = false
       Thread.pass
     end
     def mon_synchronize
       begin
-	mon_enter
-	yield
+        mon_enter
+        yield
       rescue Exception => exception
-	raise 
+        raise 
       ensure
-	begin
-	  Thread.critical = true
-	  if @mon_owner == Thread.current
-	    mon_exit
-	  else 
-	    case exception
-	      when nil 
-		# raise MonitorError, RuntimeError.new "releasing wrong monitor"
-	      when MonitorError
-	      else 
-		raise MonitorError, exception
-	    end
-	  end
-	ensure
-	  Thread.critical = false
-	end
+        begin
+          Thread.critical = true
+          if @mon_owner == Thread.current
+            mon_exit
+          else 
+            case exception
+              when nil 
+                # raise MonitorError, RuntimeError.new "releasing wrong monitor"
+              when MonitorError
+              else 
+                raise MonitorError, exception
+            end
+          end
+        ensure
+          Thread.critical = false
+        end
       end
     end
 
@@ -322,15 +322,15 @@ module TSC
     #######
     def p_mon_check_owner
       if @mon_owner != Thread.current
-	raise ThreadError, "current thread not owner"
+        raise ThreadError, "current thread not owner"
       end
     end
     def p_mon_wait_and_capture(count = nil)
       Thread.critical = true
       until @mon_owner.nil? or @mon_owner == Thread.current
-	@mon_waiters.add Thread.current
-	Thread.stop
-	Thread.critical = true
+        @mon_waiters.add Thread.current
+        Thread.stop
+        Thread.critical = true
       end
       @mon_owner = Thread.current
       @mon_count = count if count
@@ -368,39 +368,39 @@ if $0 != "-e" and $0 == __FILE__ or defined? Test::Unit::TestCase
   class MonitorTest < Test::Unit::TestCase
     def test_timing
       Thread.new {
-	sleep 1
-	@monitor.synchronize {
-	  @condition.broadcast
-	  sleep 2
-	}
+        sleep 1
+        @monitor.synchronize {
+          @condition.broadcast
+          sleep 2
+        }
       }
       @monitor.synchronize {
-	@result = @condition.wait 2
+        @result = @condition.wait 2
       }
       assert_equal true, @result
     end
     def test_event
       Thread.new {
-	sleep 1
-	@monitor.synchronize {
-	  @condition.signal
-	}
+        sleep 1
+        @monitor.synchronize {
+          @condition.signal
+        }
       }
       @monitor.synchronize {
-	@result = @condition.wait 2
+        @result = @condition.wait 2
       }
       assert_equal true, @result
     end
     def test_timeout
       Thread.new {
-	sleep 1
-	@monitor.synchronize {
-	  sleep 1
-	  @condition.broadcast
-	}
+        sleep 1
+        @monitor.synchronize {
+          sleep 1
+          @condition.broadcast
+        }
       }
       @monitor.synchronize {
-	@result = @condition.wait 1
+        @result = @condition.wait 1
       }
       assert_equal false, @result
     end
