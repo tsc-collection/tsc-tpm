@@ -10,7 +10,6 @@
 
 require 'tsc/after-end-reader.rb'
 
-require 'test/spec'
 require 'mocha'
 require 'stubba'
   
@@ -18,19 +17,19 @@ context 'Two end markers' do
   include TSC::AfterEndReader
 
   specify 'default item available' do
-    read_after_end_marker(__FILE__).should.equal "abcd\n"
+    read_after_end_marker(__FILE__).should == "abcd\n"
   end
 
   specify 'default item same as first item' do
-    read_after_end_marker(__FILE__).should.equal read_after_end_marker(__FILE__, 0)
+    read_after_end_marker(__FILE__).should == read_after_end_marker(__FILE__, 0)
   end
 
   specify 'second item available' do
-    read_after_end_marker(__FILE__, 1).should.equal "zzzz\nZZZZ\n"
+    read_after_end_marker(__FILE__, 1).should == "zzzz\nZZZZ\n"
   end
 
   specify 'third item not available' do
-    read_after_end_marker(__FILE__, 2).should.be nil
+    read_after_end_marker(__FILE__, 2).should be(nil)
   end
 end
 

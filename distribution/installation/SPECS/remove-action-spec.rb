@@ -11,7 +11,6 @@
 require 'tsc/after-end-reader.rb'
 require 'installation/install-action.rb'
 
-require 'test/spec'
 require 'mocha'
 require 'stubba'
   
@@ -30,7 +29,7 @@ context 'Remove action' do
   end
 
   specify 'Basics' do
-    action.name.should.equal :remove
+    action.name.should == :remove
   end
 
   specify 'Target is removed if compatible' do

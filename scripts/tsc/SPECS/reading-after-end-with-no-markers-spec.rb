@@ -10,7 +10,6 @@
 
 require 'tsc/after-end-reader.rb'
 
-require 'test/spec'
 require 'mocha'
 require 'stubba'
   
@@ -18,10 +17,10 @@ context 'No end markers' do
   include TSC::AfterEndReader
 
   specify 'default item not available' do
-    read_after_end_marker(__FILE__).should.be nil
+    read_after_end_marker(__FILE__).should be(nil)
   end
 
   specify 'first item not available' do
-    read_after_end_marker(__FILE__, 0).should.be nil
+    read_after_end_marker(__FILE__, 0).should be(nil)
   end
 end
