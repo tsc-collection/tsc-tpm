@@ -1,3 +1,4 @@
+# vim: set sw=2:
 =begin
  
              Tone Software Corporation BSD License ("License")
@@ -79,13 +80,13 @@ module Installation
       end
     end
 
-    attr_reader :options
     attr_accessor :top_directory
+    attr_reader :app
 
-    def initialize(options, binary_directory)
+    def initialize(app, binary_directory)
+      @app = app
       @binary_directory = binary_directory
-      @options = options
-      @tmp_directory = options['tmp'] || "/tmp"
+      @tmp_directory = app.options.tmp || "/tmp"
     end
 
     def install(*args)
@@ -173,7 +174,7 @@ module Installation
           ensure
             logger.close
 
-            if options['log'] || _config.product.log || _config.package.log
+            if app.options.log? || _config.product.log || _config.package.log
               task_manager.event_processor.log_closed
             else
               logger.remove
@@ -206,7 +207,7 @@ module Installation
     end
 
     def communicator
-      @communicator ||= Communicator.new(logger, options['responses'], options['defaults'])
+      @communicator ||= Communicator.new(logger, app.responses, app.options.defaults)
     end
 
     private
@@ -241,19 +242,19 @@ module Installation
       raise 'No product name' unless product.name
       raise 'No package name' unless package.name
 
-      if options.key? 'force'
+      if app.options.force?
         actions.each do |_action|
           _action.keep = false
         end
       end
 
-      if options.key? 'archive'
+      if app.options.archive?
         package_name = ENV['TPM_PACKAGE_NAME']
         if package_name
           Task.archive = true
           archive_content_location = File.expand_path 'archive'
           archive_file_name = package_name.gsub(%r{[.][^.]*$}, '') + '.tar'
-          archive_file_path = File.expand_path(archive_file_name, Array(options['directory']).first)
+          archive_file_path = File.expand_path(archive_file_name, app.options.directory)
 
           actions.each do |_action|
             _action.base = archive_content_location
@@ -269,7 +270,7 @@ module Installation
           communicator.report "Installing #{package_info(config)}"
           communicator.report '[ ' + package_description(config) + ' ]'
         }
-        task_manager.execute !options.key?('nocleanup')
+        task_manager.execute app.should_cleanup?
         if Task.archive?
           Dir.cd archive_content_location do
             TSC::Progress.new "Building #{archive_file_name.inspect}" do |_progress|
@@ -290,7 +291,7 @@ module Installation
         }
         logger.close
 
-        if options['log'] || product.log || package.log
+        if app.options.log? || product.log || package.log
           task_manager.event_processor.log_closed
         else
           logger.remove
@@ -345,7 +346,7 @@ module Installation
     end
 
     def build_options
-      options.map { |_key, _value|
+      app.options.map { |_key, _value|
         [ "--#{_key}", _value ]
       }.flatten.reject { |_value| 
         _value.nil? or _value.strip.empty? 

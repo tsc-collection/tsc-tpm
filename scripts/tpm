@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# vim: set sw=2:
 =begin
  
              Tone Software Corporation BSD License ("License")
@@ -103,25 +104,28 @@ class Application < TSC::Application
       require 'installation/installer.rb'
       require 'tsc/config.rb'
 
-      options['nocleanup'] = true if options.key? 'no-cleanup'
-      options['no-cleanup'] = true if options.key? 'nocleanup'
-
-      if options.key? 'responses'
-        options['responses'] = TSC::Config.parse(response_file_path).hash
-      end
-
-      installer = Installation::Installer.new(options, script_location)
+      installer = Installation::Installer.new(self, script_location)
       installer.top_directory = File.dirname @top
 
       installer.send actions.first.intern, *ARGV
     }
   end
 
+  def should_cleanup?
+    options.no_cleanup? || options.nocleanup? ? false : true
+  end
+
+  def responses
+    if options.responses?
+      TSC::Config.parse(response_file_path).hash
+    end
+  end
+
   private
   #######
 
   def response_file_path
-    File.expand_path options['responses'], Array(options['directory']).first
+    File.expand_path options.responses, options.directory
   end
 
   def prepare_environment
