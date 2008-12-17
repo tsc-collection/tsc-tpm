@@ -1,3 +1,4 @@
+# vim: set sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # 
 # Distributed under the MIT Licence.
@@ -17,10 +18,10 @@ module TSC
 
         @decorators = Hash[
           :selector => proc { |_message|
-            "#{_message.capitalize} (select a number)"
+            "#{make_label(_message)} (select a number)"
           },
           :question => proc { |_message|
-            _message.capitalize
+            make_label(_message)
           }
         ].update(decorators)
 
@@ -35,6 +36,12 @@ module TSC
         else
           (pool.empty? or other) ? question(pool.first) : menu
         end
+      end
+
+      def make_label(message)
+        message.strip.sub(%r{^.}) { |_first|
+          _first.upcase
+        }
       end
 
       def menu
