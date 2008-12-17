@@ -45,13 +45,13 @@ module TSC
 
       def ask_hash_key(hash, key, preferred = nil, other = true, &block)
         key = key.to_s
-        hash[key] = select Hash[
+        hash[key] = select(
           :header => key,
           :current => hash[key],
           :other => other,
           :preferred => preferred,
           :choices => (block.call hash, key if block)
-        ]
+        ).message
       end
 
       def method_missing(*args)

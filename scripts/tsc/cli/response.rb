@@ -40,6 +40,10 @@ module TSC
         @categories = categories
       end
 
+      def to_yaml(*args)
+        message.to_yaml(*args)
+      end
+
       def to_str
         to_s
       end
