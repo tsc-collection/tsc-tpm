@@ -1,3 +1,4 @@
+# vim: set sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # 
 # Distributed under the MIT Licence.
@@ -51,7 +52,7 @@ module TSC
           :other => other,
           :preferred => preferred,
           :choices => (block.call hash, key if block)
-        ).message
+        ).data
       end
 
       def method_missing(*args)

@@ -1,3 +1,4 @@
+# vim: set sw=2:
 =begin
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
   
@@ -10,20 +11,20 @@ module TSC
   module CLI
     class Response
       class << self
-        def selected(message)
-          new message, :selected
+        def selected(data)
+          new data, :selected
         end
 
-        def accepted(message)
-          new message, :accepted
+        def accepted(data)
+          new data, :accepted
         end
 
-        def entered(message)
-          new message, :entered
+        def entered(data)
+          new data, :entered
         end
 
-        def preset(message)
-          new message, :preset
+        def preset(data)
+          new data, :preset
         end
 
         def none
@@ -33,15 +34,19 @@ module TSC
         private :new
       end
 
-      attr_reader :message
+      attr_reader :data
 
-      def initialize(message, *categories)
-        @message = message
+      def initialize(data, *categories)
+        @data = data
         @categories = categories
       end
 
+      def message
+        data
+      end
+
       def to_yaml(*args)
-        message.to_yaml(*args)
+        data.to_yaml(*args)
       end
 
       def to_str
@@ -49,11 +54,11 @@ module TSC
       end
 
       def to_s
-        message.to_s
+        data.to_s
       end
 
       def inspect
-        message.inspect
+        data.inspect
       end
 
       def category
@@ -66,7 +71,7 @@ module TSC
         if predicate && args.empty?
           @categories.include? predicate.intern
         else
-          @message.send method, *args
+          @data.send method, *args
         end
       end
     end
