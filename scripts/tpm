@@ -101,6 +101,7 @@ class Application < TSC::Application
       actions = %w{ install remove commit revert info } & options.keys
       raise ActionArgumentError unless actions.size == 1
 
+      require 'rubygems'
       require 'installation/installer.rb'
       require 'tsc/config.rb'
 

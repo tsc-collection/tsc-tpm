@@ -1,3 +1,4 @@
+# vim: set sw=2:
 =begin
  
              Tone Software Corporation BSD License ("License")
@@ -65,6 +66,7 @@ module Distribution
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
+      @include_ruby_gems = [ 'highline' ]
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument|
           @name = _argument
@@ -102,7 +104,7 @@ module Distribution
           @include_ruby_libraries = true
         },
         :include_ruby_gems => proc { |_block, *_arguments|
-          @include_ruby_gems = Array(_arguments).flatten
+          @include_ruby_gems.concat Array(_arguments).flatten
         },
         :do_not_build => proc {
           @do_not_build = true
@@ -124,7 +126,7 @@ module Distribution
     end
 
     def include_ruby_gems?
-      @include_ruby_gems ? true : false
+      @include_ruby_gems.empty? ? false : true
     end
 
     def full_name
