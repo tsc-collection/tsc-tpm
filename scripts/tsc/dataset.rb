@@ -44,7 +44,16 @@ module TSC
     def method_missing(name, *args)
       key = name.to_s
       catch :missing do
-        return key.slice(-1) == ?= ? set(key.slice(0...-1), *args) : get(key, *args)
+        return case key.slice(-1) 
+          when ?= 
+            set(key.slice(0...-1), *args) 
+
+          when ??
+            get(key.slice(0...-1), *args) ? true : false
+
+          else
+            get(key, *args)
+        end
       end
 
       super
@@ -100,6 +109,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
       def test_delegate
         other = TSC::Dataset.new(dataset)
 
+        assert_equal true, dataset.aaa?
         assert_equal 17, dataset.aaa
         assert_equal 'zzz', dataset.bbb
       end
