@@ -278,7 +278,7 @@ module TSC
       [ 'sol8-sparc', :solaris, :sparc ] => %w{ sparc-solaris2.8 },
       [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu x86_64-linux},
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
-      [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 },
+      [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 powerpc-aix5.3.0.0 },
       [ 'mac-universal', :darwin, :universal ] => %w{ universal-darwin9.0 universal-darwin8.0 },
       [ 'mac-ppc', :darwin, :ppc ] => %w{ 
         powerpc-darwin8.1.0 
@@ -295,7 +295,12 @@ module TSC
       },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
-      [ 'hpux', :hpux, :parisc ] => %w{ hppa2.0w-hpux11.00 ia64-hpux11.23 },
+      [ 'hpux', :hpux, :parisc ] => %w{ 
+        hppa2.0w-hpux11.00 
+        hppa2.0w-hpux11.11 
+        hppa2.0w-hpux11.23
+        ia64-hpux11.23 
+      },
       [ 'windows-x86', :mswin, :x86 ] => %w{ i386-mswin32 },
       [ 'win32-sfu-x86', :interix, :x86 ] => %w{ i586-interix3 },
       [ 'java', :jvm, :any ] => %w{ java }
