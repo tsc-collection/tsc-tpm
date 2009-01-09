@@ -66,7 +66,7 @@ module Distribution
     attr_accessor :filesets
 
     def initialize(product, cache, &block)
-      @include_ruby_gems = [ 'highline' ]
+      @include_ruby_gems = [ 'highline', 'sys-uname' ]
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument|
           @name = _argument
