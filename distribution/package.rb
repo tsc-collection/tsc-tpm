@@ -65,7 +65,10 @@ module Distribution
     attr_reader :build_name, :tags, :tag_filters, :include_ruby_gems, :do_not_build
     attr_accessor :filesets
 
-    def initialize(product, cache, &block)
+    def initialize(product, cache, *args, &block)
+      @name = args.shift
+      @description = args.shift
+
       @include_ruby_gems = [ 'highline', 'sys-uname' ]
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument|

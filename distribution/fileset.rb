@@ -65,7 +65,10 @@ module Distribution
   class Fileset
     attr_reader :name, :description, :actions, :base, :product
 
-    def initialize(product, cache, &block)
+    def initialize(product, cache, *args, &block)
+      @name = args.shift
+      @description = args.shift
+
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument|
           @name = _argument

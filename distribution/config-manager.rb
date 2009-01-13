@@ -70,12 +70,12 @@ module Distribution
       @cache = TSC::OpenDataset.new
 
       @parser = ConfigParser.new @cache, Hash[
-        :product => proc { |_block| 
+        :product => proc { |_block, *args| 
           raise 'Multiple products defined' if @product
-          @product = Product.new(@cache, &_block)
+          @product = Product.new(@cache, *args, &_block)
         },
-        :fileset => proc { |_block| 
-          @filesets << Fileset.new(product, @cache, &_block)
+        :fileset => proc { |_block, *args| 
+          @filesets << Fileset.new(product, @cache, *args, &_block)
         },
         :defaults => proc {
           Distribution::Defaults

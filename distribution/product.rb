@@ -1,4 +1,5 @@
 =begin
+  vim: set sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -61,7 +62,10 @@ module Distribution
     attr_accessor :library_prefix, :library_major, :build,
                   :version
 
-    def initialize(cache, &block)
+    def initialize(cache, *args, &block)
+      self.name = args.shift
+      @description = args.shift
+
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument| 
           self.name = _argument
@@ -84,8 +88,8 @@ module Distribution
         :top => proc { |_block, _argument|
           @top = _argument
         },
-        :package => proc { |_block|
-          @packages.push Package.new(self, cache, &_block)
+        :package => proc { |_block, *args|
+          @packages.push Package.new(self, cache, *args, &_block)
         },
         :compatible => proc { |_block, _argument|
           compatibility.update _argument
@@ -138,7 +142,7 @@ module Distribution
     end
 
     def name=(name)
-      @name = name.upcase
+      @name = name.to_s.upcase if name
     end
   end
 end
