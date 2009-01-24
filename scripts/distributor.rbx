@@ -85,6 +85,7 @@ class Application < TSC::Application
         [ '--output',    'Output directory',         'directory', '-o' ],
         [ '--force',     'Force installation',       nil,         '-f' ],
         [ '--require',   'File to require',          'file',      '-r' ],
+        [ '--oneoff',    'Create oneoff package',    'descriptor'      ],
         [ '--test',      'Setup unit tests',         nil,         '-t' ]
       ]
       _conf.description = [
@@ -99,13 +100,13 @@ class Application < TSC::Application
       process_command_line
       prepare_environment
 
-      require 'test/unit' if options.key?('test')
+      require 'test/unit' if options.test?
 
-      Array(options['require']).each do |_file|
+      Array(options.require).each do |_file|
         require _file
       end
 
-      if options.key?('test')
+      if options.test?
         exit Test::Unit::AutoRunner.run
       end
 
@@ -133,14 +134,18 @@ class Application < TSC::Application
         end
       end
       
-      if options.key? 'install'
-        @args.clear unless ([ options['source'], options['binary'] ] & @args).empty?
+      if options.install?
+        @args.clear unless ([ options.source, options.binary ] & @args).empty?
 
         distributor.install_content *@args.map { |_arg|
           File.expand_path(_arg)
         }
       else
-        distributor.create_packages options['output'], *@args
+        if options.oneoff?
+          distributor.create_oneoff options.output, options.oneoff
+        else
+          distributor.create_packages options.output, *@args
+        end
       end
 
       exit 0
@@ -178,7 +183,7 @@ class Application < TSC::Application
     }.flatten.compact.first
 
     if distribution_directory
-      mode = options['mode']
+      mode = options.mode
       unless mode.nil? or mode == '0'
         mode_directory = File.join distribution_directory, 'mode', mode
         raise "Mode #{mode.inspect} not supported" unless File.directory? mode_directory
