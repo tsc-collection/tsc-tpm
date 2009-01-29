@@ -117,23 +117,30 @@ class Application < TSC::Application
 
       guess_source_and_binary
 
-      distributor = Distribution::Distributor.new(@prodinfo, binary_directory)
+      distributor = Distribution::Distributor.new(binary_directory)
 
       options.each do |_key, _value|
         case _key
           when 'source' then distributor.product_source_path = File.expand_path(_value)
           when 'binary' then distributor.product_binary_path = File.expand_path(_value)
+          when 'extension' then distributor.product_library_extension = _value
+        end
+      end
+
+      distributor.parse_prodinfo @prodinfo
+      
+      options.each do |_key, _value|
+        case _key
           when 'build' then distributor.product_build = convert_to_integer(_value)
           when 'product' then distributor.product_name = _value
           when 'version' then distributor.product_version = _value
           when 'tag' then distributor.product_tag = _value
           when 'prefix' then distributor.product_library_prefix = _value
-          when 'extension' then distributor.product_library_extension = _value
           when 'major' then distributor.product_library_major = convert_to_integer(_value)
           when 'force' then distributor.force = true
         end
       end
-      
+
       if options.install?
         @args.clear unless ([ options.source, options.binary ] & @args).empty?
 
@@ -142,7 +149,7 @@ class Application < TSC::Application
         }
       else
         if options.oneoff?
-          distributor.create_oneoff options.output, options.oneoff
+          distributor.create_oneoffs options.output, options.oneoff
         else
           distributor.create_packages options.output, *@args
         end

@@ -1,4 +1,5 @@
 =begin
+vim: set sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -73,11 +74,13 @@ module Distribution
     def_delegators :@config, "product_source_path="
     def_delegators :@config, "product_binary_path="
 
-    def initialize(prodinfo, binary_directory)
+    def initialize(binary_directory)
       @force = false
       @binary_directory = binary_directory
-
       @config = ConfigManager.new
+    end
+
+    def parse_prodinfo(prodinfo)
       @config.process(prodinfo)
     end
 
@@ -92,6 +95,10 @@ module Distribution
           Packager.new(_package, self).create directory
         end
       end
+    end
+
+    def create_oneoffs(location, descriptor)
+      raise TSC::NotImplementedError, :create_oneoffs
     end
 
     def file_located_in(file, *dirs)
