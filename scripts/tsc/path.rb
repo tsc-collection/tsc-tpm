@@ -1,3 +1,4 @@
+# vim: set sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # 
 # Distributed under the MIT Licence.
@@ -19,13 +20,23 @@ module TSC
     end
 
     def initialize(*entries)
+      @entries = normalize(entries)
+
       @front = []
-      @entries = entries.flatten.compact
       @back = []
     end
 
+    def normalize(*entries)
+      entries.flatten.compact.map { |_entry|
+        _entry.to_s.split(':').map { |_component|
+          value = _component.strip
+          value unless value.empty?
+        }
+      }.flatten.compact
+    end
+
     def load
-      @entries = ENV.to_hash[name].to_s.split(':')
+      @entries = normalize(ENV.to_hash[name])
       @front.clear
       @back.clear
 
@@ -38,17 +49,27 @@ module TSC
     end
 
     def front(*entries)
-      @front.concat entries.flatten.compact
+      @front.concat normalize(entries)
       self
     end
 
     def back(*entries)
-      @back.concat entries.flatten.compact
+      @back.concat normalize(entries)
       self
     end
 
     def entries
       @front.reverse + @entries + @back
+    end
+
+    def find_all(name)
+      require 'pathname'
+
+      entries.map { |_entry|
+        [ Pathname.new(_entry).join(name) ].map { |_path|
+          _path if _path.exist?
+        }
+      }.flatten.compact.uniq
     end
 
     def to_s
@@ -75,6 +96,15 @@ module TSC
 
     def to_csh_eval
       "setenv #{name} #{self.inspect}"
+    end
+  end
+
+  class NamedPath < Path
+    attr_reader :name
+
+    def initialize(name, *entries)
+      @name = name
+      super *entries
     end
   end
 
