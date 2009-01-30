@@ -1,4 +1,5 @@
 =begin
+  vim: set sw=2:
              Tone Software Corporation BSD License ("License")
   
                          Ruby Application Framework
@@ -149,7 +150,7 @@ module TSC
 
         require 'tsc/launch.rb'
         generator = proc { |_error, *_strings|
-          message = [ 'ERROR', options[:originator], _strings, Array(options[:strings]) ] + [ _error.message.strip ].map { |_m|
+          message = [ (options[:level] || 'ERROR').to_s.upcase, options[:originator], _strings, Array(options[:strings]) ] + [ _error.message.strip ].map { |_m|
             _m.empty? ? _error.class.to_s : _m
           }
           [
@@ -189,6 +190,14 @@ module TSC
           end
           raise
         end
+      end
+
+      def report_deprecated(name, opts = {})
+        params = Hash[:backtrace => true].update(opts)
+        error = TSC::Error.ignore {
+          raise TSC::DeprecatedMethodError, name
+        }
+        $stderr.puts TSC::Error.textualize(error, params)
       end
 
       private
@@ -266,6 +275,12 @@ module TSC
     end
   end
 
+  class DeprecatedMethodError < Error
+    def initialize(*args)
+      super args, 'Deprecated'
+    end
+  end
+  
   class NotImplementedError < Error
     def initialize(*args)
       super args, 'Not implemented yet'
