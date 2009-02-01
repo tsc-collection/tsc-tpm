@@ -1,4 +1,5 @@
 =begin
+  vim: set sw=2:
              Tone Software Corporation BSD License ("License")
   
                        Software Distribution Facility
@@ -57,8 +58,17 @@ module Distribution
       b = nil
       super *args, &b
 
-      @filter = block || proc { |_location, _item|
-        true
+      @filter = block || proc { |_localtion, _item|
+        case _item
+          when '.svn'
+            nil
+
+          when %r{^test-}, %r{.+-spec.rb}
+            false
+
+          else
+            true
+        end
       }
     end
 
