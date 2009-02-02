@@ -1,4 +1,5 @@
 =begin
+  vim: set sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -60,9 +61,9 @@ module Distribution
 
     def copy_source_to(destination)
       File.open(destination, 'w') do |_io|
-	@block.call(@source).each do |_line, |
-	  _io.puts _line unless _line.nil?
-	end
+        @block.call(@source).each do |_line|
+          _io.puts *Array(_line).flatten.compact
+        end
       end
     end
   end

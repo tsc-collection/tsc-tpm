@@ -1,4 +1,5 @@
 =begin
+  vim: set sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -56,14 +57,15 @@ require 'generator-descriptor.rb'
 module Distribution
   class GeneratorModule < Module
     def initialize(*args, &block)
-      super *args
+      noblock = nil
+      super *args, &noblock
       @block = block
       raise 'Block not given' unless @block
     end
 
     def descriptors(directory)
       self.files.map { |_file|
-	GeneratorDescriptor.new @block, _file, directory
+        GeneratorDescriptor.new @block, _file, directory
       }
     end
   end
