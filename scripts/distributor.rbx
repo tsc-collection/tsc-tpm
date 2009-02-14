@@ -99,6 +99,7 @@ class Application < TSC::Application
     handle_errors {
       process_command_line
       prepare_environment
+      require 'pathname'
 
       require 'test/unit' if options.test?
 
