@@ -1,4 +1,5 @@
 =begin
+  vim: sw=2:
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -7,13 +8,16 @@
 =end
 
 require 'binary-exec-module'
+require 'node-module.rb'
 
 module Distribution
   class StaticLibraryModule < BinaryExecModule
+    include NodeMixin
+
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.a" ]
+        _entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.a" ]
       }
     end
 
