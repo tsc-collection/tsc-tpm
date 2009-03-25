@@ -1,4 +1,5 @@
 =begin
+  vim: sw=2:
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -11,11 +12,12 @@ require 'tsc/ftools.rb'
 module Installation
   class Logger
     def initialize(*args)
+      @ready = false
       @location = '/tmp'
       @name = [ args, timestamp ].flatten.join('-')
 
-      @io = File.open(path, 'w+')
-      @io.puts "[Started on #{Time.now}]"
+      open_with_mode 'w+'
+      log "[Started on #{Time.now}]"
     end
 
     def relocate(location)
@@ -24,24 +26,42 @@ module Installation
       @io.flush
       @io.close
 
-      return unless File.file?(oldpath)
+      mode = 'w+'
+      if File.file?(oldpath)
+        File.smart_copy oldpath, path
+        File.unlink oldpath
 
-      File.smart_copy oldpath, path
-      File.unlink oldpath
+        mode = 'a'
+      end
 
-      @io = File.open(path, 'a')
+      open_with_mode mode
     end
 
     def log(*args)
-      @io.puts *args rescue nil
+      return unless @ready
+
+      begin
+        @io.puts *args 
+      rescue Exception
+        @ready = false
+        raise
+      end
     end
 
     def close
       TSC::Error.ignore do
-        @io.puts "[Finished on #{Time.now}]"
-        @io.flush
-        @io.close
+        TSC::Error.persist do |_queue|
+          _queue.add {
+            log "[Finished on #{Time.now}]"
+            @io.flush
+          }
+          _queue.add {
+            @io.close
+          }
+        end
       end
+
+      @ready = false
     end
 
     def path
@@ -55,6 +75,12 @@ module Installation
 
     protected
     #########
+
+    def open_with_mode(mode)
+      @io = File.open(path, mode)
+      @io.sync = true
+      @ready = true
+    end
 
     def timestamp
       Time.now.strftime "%y%m%d%H%M"
