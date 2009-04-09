@@ -71,7 +71,7 @@ module Distribution
 
     def process_file_entry(file)
       super
-      file.path_for_checksum = "#{file.path}.reloc.o"
+      file.path_for_checksum = "#{file.path}.reloc"
     end
   end
 end

@@ -62,7 +62,7 @@ module Distribution
 
     def process_file_entry(file)
       super
-      file.path_for_checksum = file.path.sub(%r{[.]#{self.class.library_extension}[.][^.]*$},'.a.reloc.o')
+      file.path_for_checksum = file.path.sub(%r{[.]#{self.class.library_extension}[.][^.]*$},'.a.reloc')
     end
   end
 end
@@ -83,7 +83,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
 	  FileInfo.new("lib/util/libtscutil.so.*.15",0755) 
 	], _module.files
 
-	assert_equal "lib/ffc/libtscffc.so.reloc.o", _module.files.first.path_for_checksum
+	assert_equal "lib/ffc/libtscffc.so.reloc", _module.files.first.path_for_checksum
       end
     end
   end
