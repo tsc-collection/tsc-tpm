@@ -290,6 +290,7 @@ module TSC
       },
       [ 'mac-x86', :darwin, :x86 ] => %w{ 
         i686-darwin8.6.1 
+        i686-darwin8.7.1
         i686-darwin8.9.1 
         i686-darwin9.3.0
       },
