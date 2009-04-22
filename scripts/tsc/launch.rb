@@ -1,4 +1,5 @@
 #!/bin/env ruby
+# vi: sw=2:
 =begin
              Tone Software Corporation BSD License ("License")
   
@@ -100,6 +101,8 @@ module TSC
       ensure
         close_io @pipes
         close_io @fds
+
+        cleanup_pids
         reset_data
       end
     end
@@ -110,6 +113,23 @@ module TSC
 
     def call_in_child(&block)
       @child_setup_blocks << block if block
+    end
+
+    class << self
+      def stop(pid, tolerance = 3)
+        require 'timeout'
+        Process.kill 'INT', pid rescue return
+        begin 
+          timeout tolerance do
+            loop do
+              Process.kill 0, pid rescue break
+              sleep 1
+            end
+          end
+        rescue Timeout::Error
+          Process.kill 'KILL', pid
+        end
+      end
     end
 
     private
@@ -211,6 +231,12 @@ module TSC
     def close_io(*args)
       args.flatten.compact.each do |_io| 
         _io.close rescue IOError 
+      end
+    end
+
+    def cleanup_pids
+      @pids.each do |_pid|
+        TSC::Launcher.stop(_pid, 1)
       end
     end
 
