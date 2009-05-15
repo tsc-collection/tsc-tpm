@@ -46,6 +46,16 @@
 
 require 'tsc/errors.rb'
 
+TSC::Error.ignore LoadError do
+  # Try to require it here and ignore the failure. There will be another 
+  # attempt where it is really needed (see bellow). Need this to make sure
+  # "timeout.rb" gets into packages when this file is loaded from the packager
+  # and yet does not cause load problems until Ruby's load path is adjusted
+  # properly.
+  #
+  require 'timeout'
+end
+
 module TSC
   class Launcher
     class TerminateError < TSC::Error
