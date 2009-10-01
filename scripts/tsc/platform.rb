@@ -293,6 +293,7 @@ module TSC
         i686-darwin8.7.1
         i686-darwin8.9.1 
         i686-darwin9.3.0
+        i686-darwin9.7.0
       },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
