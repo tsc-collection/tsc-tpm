@@ -279,7 +279,11 @@ module TSC
       [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu x86_64-linux},
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 powerpc-aix5.3.0.0 },
-      [ 'mac-universal', :darwin, :universal ] => %w{ universal-darwin9.0 universal-darwin8.0 },
+      [ 'mac-universal', :darwin, :universal ] => %w{ 
+        universal-darwin10.0
+        universal-darwin9.0 
+        universal-darwin8.0 
+      },
       [ 'mac-ppc', :darwin, :ppc ] => %w{ 
         powerpc-darwin8.1.0 
         powerpc-darwin8.0 
