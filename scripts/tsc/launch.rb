@@ -139,6 +139,7 @@ module TSC
         rescue Timeout::Error
           Process.kill 'KILL', pid
         end
+        Process.waitpid pid
       end
     end
 
