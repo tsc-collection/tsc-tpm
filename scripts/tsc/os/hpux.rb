@@ -22,7 +22,7 @@ module TSC
         launch([ 'df', '-k', location ]).join("\n").scan(%r{(\d+)\s+free allocated Kb\s*$}).flatten.first.to_i.KB
       end
 
-      def ddl_info(file)
+      def dll_info(file)
         [ '/usr/ccs/bin/ldd', 'ldd', 'chatr' ].each do |_program|
           begin
             return launch([ _program, file ]).first 

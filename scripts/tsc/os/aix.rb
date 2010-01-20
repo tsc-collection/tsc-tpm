@@ -21,7 +21,7 @@ module TSC
         launch( [ 'df', '-k', location] ).first.slice(1).split.slice(2).to_i.KB
       end
 
-      def ddl_info(file)
+      def dll_info(file)
         launch([ 'dump', '-H', file ]).first
       end
 

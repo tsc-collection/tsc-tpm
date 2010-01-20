@@ -46,7 +46,7 @@ module TSC
       end
 
       def add_user(user, group, home)
-	launch "useradd -g #{group} -d #{home} -s /bin/sh #{user}"
+        launch "useradd -g #{group} -d #{home} -s /bin/sh #{user}"
       end
 
       def remove_user(user)
@@ -54,7 +54,7 @@ module TSC
       end
 
       def add_group(group)
-	launch "groupadd #{group}"
+        launch "groupadd #{group}"
       end
 
       def remove_group(group)
@@ -88,8 +88,14 @@ module TSC
         groups
       end
 
-      def ddl_info(file)
+      def dll_info(file)
         launch([ 'ldd', file ]).first
+      end
+
+      # Left this mistyped method name for compatibility with the older code.
+      #
+      def ddl_info(*args)
+        dll_info *args
       end
 
       def extract_strings(file)
