@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -22,7 +23,12 @@ module TSC
       end
 
       def ddl_info(file)
-        launch([ 'chatr', file ]).first
+        [ '/usr/ccs/bin/ldd', 'ldd', 'chatr' ].each do |_program|
+          begin
+            return launch([ _program, file ]).first 
+          rescue TSC::Launcher::TerminateError
+          end
+        end
       end
 
       def extract_strings(file)
