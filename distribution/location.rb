@@ -55,9 +55,9 @@ module Distribution
   class Location < Originator
     attr_reader :target
 
-    def initialize(cache, target)
+    def initialize(cache, *target)
       super cache
-      @target = target
+      @target = File.join target.flatten
     end
 
     def update_descriptor(descriptor, package)

@@ -50,34 +50,44 @@
   
 =end
 
-require 'tsc/platform'
+require 'forwardable'
+
+require 'tsc/platform.rb'
 require 'config-parser.rb'
 require 'package.rb'
 
 module Distribution
   class Product
+    extend Forwardable
+
     attr_reader :description, :user, :group, :top, :packages, :tag_filters,
-                :base, :params, :compatibility, :name, :log, :tags, :notags
+                :base, :params, :compatibility, :log, :notags
 
-    attr_accessor :library_prefix, :library_major, :build,
-                  :version
+    def_delegators :@settings, :name, :tags, :build, :version, :library_major, :library_prefix
 
-    def initialize(cache, *args, &block)
-      self.name = args.shift
+    def_delegators :@settings, :library_prefix=
+    def_delegators :@settings, :library_major=
+    def_delegators :@settings, :build=
+    def_delegators :@settings, :version=
+
+    def initialize(cache, settings, *args, &block)
       @description = args.shift
+      @settings = settings
+
+      @settins.name = args.shift unless @settings.name
 
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument| 
-          self.name = _argument
+          @settings.name = _argument
         },
         :description => proc { |_block, _argument|
           @description = _argument
         },
         :version => proc { |_block, _argument|
-          @version = _argument
+          @settings.version = _argument unless @settings.version
         },
         :build => proc { |_block, _argument|
-          @build = _argument
+          @settings.build = _argument unless @settings.build
         },
         :user => proc { |_block, _argument|
           @user = _argument
@@ -102,14 +112,13 @@ module Distribution
         },
         :tags => proc { |_block, *_args|
           tag_filters << _block if _block
-          tags.concat _args.flatten.compact
+          @settings.tags.concat _args.flatten.compact
         },
         :log => proc {
           @log = true
         }
       ]
       @packages = []
-      @tags = []
       @tag_filters = []
       @params = Hash.new
       @compatibility = Hash.new
@@ -139,10 +148,6 @@ module Distribution
       ]
 
       "product #{dataset.inspect.slice(1...-1)}"
-    end
-
-    def name=(name)
-      @name = name.to_s.upcase if name
     end
   end
 end

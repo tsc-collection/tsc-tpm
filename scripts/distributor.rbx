@@ -128,8 +128,6 @@ class Application < TSC::Application
         end
       end
 
-      distributor.parse_prodinfo @prodinfo
-      
       options.each do |_key, _value|
         case _key
           when 'build' then distributor.product_build = convert_to_integer(_value)
@@ -141,6 +139,8 @@ class Application < TSC::Application
           when 'force' then distributor.force = true
         end
       end
+
+      distributor.parse_prodinfo @prodinfo
 
       if options.install?
         @args.clear unless ([ options.source, options.binary ] & @args).empty?

@@ -61,10 +61,10 @@ module Distribution
       super cache
 
       @parser = ConfigParser.new cache, Hash[
-        :as => proc { |_block, _destination|
+        :as => proc { |_block, *_destination|
           add_location FileLocation, _destination, &_block
         },
-        :into => proc { |_block, _destination|
+        :into => proc { |_block, *_destination|
           add_location DirectoryLocation, _destination, &_block
         }
       ]

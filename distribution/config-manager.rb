@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -58,6 +59,7 @@ require 'product.rb'
 require 'fileset.rb'
 
 require 'config-parser.rb'
+require 'product-settings.rb'
 require 'defaults.rb'
 
 module Distribution
@@ -66,13 +68,14 @@ module Distribution
 
     def initialize
       @product = nil
+      @product_settings = ProductSettings.new
       @filesets = []
       @cache = TSC::OpenDataset.new
 
       @parser = ConfigParser.new @cache, Hash[
         :product => proc { |_block, *args| 
           raise 'Multiple products defined' if @product
-          @product = Product.new(@cache, *args, &_block)
+          @product = Product.new(@cache, @product_settings, *args, &_block)
         },
         :fileset => proc { |_block, *args| 
           @filesets << Fileset.new(product, @cache, *args, &_block)
@@ -93,24 +96,24 @@ module Distribution
 
     def product_build=(build)
       Module.build = build
-      @product.build = build
+      @product_settings.build = build
     end
 
     def product_name=(name)
-      @product.name = name if name
+      @product_settings.name = name
     end
 
     def product_version=(version)
-      @product.version = version if version
+      @product_settings.version = version
     end
 
     def product_tag=(tags)
-      @product.tags.unshift Array(tags)
+      @product_settings.tags = tags
     end
 
     def product_library_prefix=(prefix)
       Module.library_prefix = prefix
-      @product.library_prefix = prefix
+      @product_settings.library_prefix = prefix
     end
 
     def product_library_extension=(extension)
@@ -119,7 +122,7 @@ module Distribution
 
     def product_library_major=(major)
       Module.library_major = major
-      @product.library_major = major
+      @product_settings.library_major = major
     end
 
     def product_source_path=(path)

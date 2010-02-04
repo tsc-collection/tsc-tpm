@@ -115,6 +115,9 @@ module Distribution
         :base => proc { |_block, _directory|
           @base = _directory
         }, 
+        :library => proc { |_block, *_parameters|
+          LibraryModule.new *_parameters, &_block
+        },
         :params => proc {
           product.params
         }

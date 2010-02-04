@@ -1,5 +1,5 @@
 =begin
- 
+  vi: sw=2:
              Tone Software Corporation BSD License ("License")
   
                        Software Distribution Facility
@@ -62,6 +62,10 @@ module Distribution
     @@library_major = nil
 
     class << self
+      def [](*args)
+        self.new *args
+      end
+
       def build=(build)
         @@build = build.to_i
       end
@@ -105,6 +109,12 @@ module Distribution
     def paths
       entries.map { |_e|
         File.join _e
+      }
+    end
+
+    def names
+      entries.map { |_e|
+        _e.last
       }
     end
 
