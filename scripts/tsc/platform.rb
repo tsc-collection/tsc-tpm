@@ -189,11 +189,16 @@ module TSC
         end
         os = 'darwin'
 
-        kernel = info.release.split('.')
+        kernel = info.release.split('.').reverse.inject([0, 0]) { |_memo, _item|
+          [ _memo.first + _item.to_i * (100 ** _memo.last), _memo.last.next ]
+        }.first
+
         release = case
-          when kernel.first.to_i >= 9
+          when kernel >= 100200
+            "10.6"
+          when kernel >= 90000
             "10.5"
-          when kernel.first.to_i >= 8
+          when kernel >= 80000
             "10.4"
           else 
             "X"
@@ -298,6 +303,7 @@ module TSC
         i686-darwin8.9.1 
         i686-darwin9.3.0
         i686-darwin9.7.0
+        i686-darwin10.2.0
       },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
