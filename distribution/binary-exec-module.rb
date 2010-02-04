@@ -61,11 +61,11 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	last = _entry.last.split(File::SEPARATOR)
-	if last.size == 1 and _entry.size < 3
-	  last << last.last
-	end
-	_entry[0...-1] + last
+        last = _entry.last.split(File::SEPARATOR)
+        if last.size == 1 and _entry.size < 3
+          last << last.last
+        end
+        _entry[0...-1] + last
       }
     end
 
@@ -82,21 +82,21 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
   module Distribution
     class BinaryExecModuleTest < Test::Unit::TestCase
       def test_files
-	_module = BinaryExecModule.new "aaa", "bbb"
-	assert_equal [ 
-	  FileInfo.new("aaa/aaa",0755), 
-	  FileInfo.new("bbb/bbb",0755) 
-	], _module.files
+        _module = BinaryExecModule.new "aaa", "bbb"
+        assert_equal [ 
+          FileInfo.new("aaa/aaa",0755), 
+          FileInfo.new("bbb/bbb",0755) 
+        ], _module.files
       end
 
       def test_components
-	_module = BinaryExecModule.new "dapsys/modules" => %w{ 
-	  exec modem/imodem 
-	}
-	assert_equal [
-	  FileInfo.new("dapsys/modules/exec/exec",0755),
-	  FileInfo.new("dapsys/modules/modem/imodem",0755)
-	], _module.files
+        _module = BinaryExecModule.new "dapsys/modules" => %w{ 
+          exec modem/imodem 
+        }
+        assert_equal [
+          FileInfo.new("dapsys/modules/exec/exec",0755),
+          FileInfo.new("dapsys/modules/modem/imodem",0755)
+        ], _module.files
       end
     end
   end
