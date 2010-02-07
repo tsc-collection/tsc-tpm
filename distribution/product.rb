@@ -71,10 +71,11 @@ module Distribution
     def_delegators :@settings, :version=
 
     def initialize(cache, settings, *args, &block)
+      name = args.shift
       @description = args.shift
       @settings = settings
 
-      @settins.name = args.shift unless @settings.name
+      @settings.name = name unless @settings.name
 
       @parser = ConfigParser.new cache, Hash[
         :name => proc { |_block, _argument| 
