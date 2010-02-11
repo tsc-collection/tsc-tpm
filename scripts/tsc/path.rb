@@ -10,8 +10,25 @@ require 'tsc/errors.rb'
 module TSC
   class Path
     class << self
-      def current
-        self.new.load
+      def current(name = nil)
+        path = self.new
+
+        generate_name_method_unless_nil name, class << path
+          public_class_method :define_method
+          self
+        end
+
+        path.load
+      end
+
+      private
+      #######
+
+      def generate_name_method_unless_nil(name, meta_class)
+        return unless name
+        meta_class.define_method(:name) {
+          name.to_s
+        }
       end
     end
 
@@ -35,16 +52,16 @@ module TSC
       }.flatten.compact
     end
 
-    def load
-      @entries = normalize(ENV.to_hash[name])
+    def load(name = nil)
+      @entries = normalize(ENV.to_hash[name || self.name])
       @front.clear
       @back.clear
 
       self
     end
 
-    def install
-      ENV[name] = to_s
+    def install(name = nil)
+      ENV[name || self.name] = self.to_s
       self
     end
 
@@ -128,6 +145,17 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
     class PATHTest < Test::Unit::TestCase
       def test_to_s
         assert_equal '/bin/aaa:/bin/bbb', @path.to_s
+      end
+
+      def test_current
+        ENV.delete('ZZZ')
+        assert TSC::Path.current(:ZZZ).entries.empty?
+
+        ENV['ZZZ'] = "aaa:bbb:ccc"
+        assert_equal [ "aaa", "bbb", "ccc" ], TSC::Path.current(:ZZZ).entries
+
+        TSC::Path.current(:ZZZ).front('uuu').back('ooo').install
+        assert_equal "uuu:aaa:bbb:ccc:ooo", ENV['ZZZ']
       end
 
       def test_modify
