@@ -26,7 +26,7 @@ module TSC
       end
 
       def add_user(user, group, home)
-	launch [
+        launch [
           'mkuser',
           "pgrp=#{group}",
           "home=#{home}",
@@ -43,7 +43,7 @@ module TSC
       end
 
       def add_group(group)
-	launch [ 'mkgroup', group ]
+        launch [ 'mkgroup', group ]
       end
 
       def remove_group(group)
