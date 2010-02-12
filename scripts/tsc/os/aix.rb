@@ -16,8 +16,15 @@ module TSC
   module OS
     class Aix < Generic
       class DLLFormatter
-        def process(data)
-          data.first.map { |_line|
+        attr_reader :master
+
+        def initialize(master)
+          @master = master
+          @modes = %w[ 32 64 ]
+        end
+
+        def process(file)
+          produce_object_dump(file).map { |_line|
             next unless _line =~ %r{^\d+\s+\S+}
             index, item, *members  = _line.split 
 
@@ -33,6 +40,19 @@ module TSC
         private
         #######
 
+        def produce_object_dump(file)
+          @modes.each do |_mode|
+            begin
+              return dump_loader_info(file, _mode) {
+                @mode = _mode
+              }
+            rescue TSC::Launcher::TerminateError
+            end
+          end
+
+          raise TSC::Error, "Cannot figure ABI for #{file.inspect}"
+        end
+
         def libpath
           @libpath ||= TSC::Path.new ENV['SHLIB_PATH']
         end
@@ -42,7 +62,26 @@ module TSC
         end
 
         def locate(item)
-          libpath.find_all(item).first or "not found"
+          libpath.find_all(item).each do |_path|
+            return _path if check_dependent_module(_path)
+          end
+
+          "not found"
+        end
+
+        def dump_loader_info(file, mode)
+          output = master.launch [ 'dump', '-X', mode, '-Hp', file ]
+          yield mode if block_given?
+
+          return Array(output.first)
+        end
+
+        def check_dependent_module(path)
+          begin
+            return dump_loader_info(path, @mode).empty? == false
+          rescue TSC::Launcher::TerminateError
+            false
+          end
         end
       end
 
@@ -55,7 +94,7 @@ module TSC
       end
 
       def dll_info(file)
-        DLLFormatter.new.process launch([ 'dump', '-Hp', file ])
+        DLLFormatter.new(self).process(file)
       end
 
       def add_user(user, group, home)
@@ -125,7 +164,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         end
 
         def test_dll_info
-          os.expects(:launch).with(['dump', '-Hp', './sp_ocap']).returns [
+          os.expects(:launch).with(['dump', '-X', '32', '-Hp', './sp_ocap']).returns [
             read_after_end_marker(__FILE__, 1).map
           ]
 
@@ -146,6 +185,12 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           File.expects(:exist?).with('/usr/lib/libpthread.a').times(2).returns true
           File.expects(:exist?).with('/lib/libc.a').returns true
           File.expects(:exist?).with('/oracle/10.2/lib/libclntsh.a').returns true
+
+          os.expects(:launch).with(['dump', '-X', '32', '-Hp', '/usr/local/lib/libgcc_s.a']).returns [ 'abc' ]
+          os.expects(:launch).with(['dump', '-X', '32', '-Hp', '/lib/libdl.a']).returns [ 'abc' ]
+          os.expects(:launch).with(['dump', '-X', '32', '-Hp', '/usr/lib/libpthread.a']).times(2).returns [ 'abc' ]
+          os.expects(:launch).with(['dump', '-X', '32', '-Hp', '/lib/libc.a']).returns [ 'abc' ]
+          os.expects(:launch).with(['dump', '-X', '32', '-Hp', '/oracle/10.2/lib/libclntsh.a']).returns [ 'abc' ]
 
           ENV['SHLIB_PATH'] = "/uuu/zzz:/oracle/10.2/lib"
           assert_equal result, os.dll_info('./sp_ocap');
