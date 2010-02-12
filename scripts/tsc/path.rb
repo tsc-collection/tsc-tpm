@@ -83,8 +83,8 @@ module TSC
       require 'pathname'
 
       entries.map { |_entry|
-        [ Pathname.new(_entry).join(name) ].map { |_path|
-          _path if _path.exist?
+        [ Pathname.new(_entry).join(name).to_s ].map { |_path|
+          _path if File.exist?(_path)
         }
       }.flatten.compact.uniq
     end
