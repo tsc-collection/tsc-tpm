@@ -23,16 +23,32 @@ module TSC
       end
 
       def dll_info(file)
-        [ '/usr/ccs/bin/ldd', 'ldd', 'chatr' ].each do |_program|
-          begin
-            return launch([ _program, file ]).first 
-          rescue TSC::Launcher::TerminateError
-          end
-        end
+        dump_loader_info(file).map { |_item|
+          entry = _item.scan(%r{\s*(\S+)\s*=>\s*(\S+)\s*.*$}).first
+          File.basename(entry.first) + " => " + entry.last if entry
+        }.compact
       end
 
       def extract_strings(file)
-        launch([ 'strings','-a',file ]).first
+        launch([ file ]).first
+      end
+
+      protected
+      #########
+
+      def dump_loader_info(file)
+        launcher = TSC::Launcher.new {
+          ENV['_HP_DLDOPTS'] = '-ldd'
+        }
+        output = []
+        begin
+          launcher.launch [ file ] do |*_args|
+            output.concat _args.flatten.compact
+          end
+        rescue TSC::Launcher::TerminateError
+        end
+
+        output
       end
     end
   end
@@ -60,6 +76,20 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
           assert_equal 630600.KB, os.free_space('/tmp')
         end
 
+        def test_dll_info
+          os.expects(:dump_loader_info).with('/bin/date').returns read_after_end_marker(__FILE__, 1).map
+
+          expected = [
+            "libc.2 => /usr/lib/libc.2",
+            "libgcc_s.sl => /u1/lib/libgcc_s.sl",
+            "libsk-1.0-db.sl.1 => /u1/lib/libsk-1.0-db.sl.1",
+            "libm.2 => /usr/lib/libm.2",
+            "libsk-1.0-oralog.sl.1 => /u1/lib/libsk-1.0-oralog.sl.1"
+          ]
+
+          assert_equal expected, os.dll_info("/bin/date")
+        end
+
         def test_name
           assert_equal 'hpux', os.name
         end
@@ -81,3 +111,11 @@ __END__
                                                     630600 free allocated Kb
                                                    1413584 used allocated Kb
                                                         69 % allocation used
+__END__
+        /usr/lib/libc.2 =>      /usr/lib/libc.2
+        /opt/sk/platform/hp11-23-pa/gcc-3.4/lib/libgcc_s.sl =>       /u1/lib/libgcc_s.sl
+        ../bin/lib/db/libsk-1.0-db.sl.1 =>    /u1/lib/libsk-1.0-db.sl.1
+        /usr/lib/libm.2 =>      /usr/lib/libm.2
+        ../bin/lib/oralog/libsk-1.0-oralog.sl.1 =>    /u1/lib/libsk-1.0-oralog.sl.1
+/usr/lib/dld.sl: Bad magic number for shared library: /oracle/products/110/lib/libclntsh.sl.11.1
+/usr/lib/dld.sl: Exec format error
