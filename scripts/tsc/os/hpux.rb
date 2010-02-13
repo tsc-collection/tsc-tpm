@@ -23,18 +23,34 @@ module TSC
       end
 
       def dll_info(file)
-        dump_loader_info(file).map { |_item|
+        libraries = collect_library_info(file)
+
+        dump_loader_info(file).each do |_item|
           entry = _item.scan(%r{\s*(\S+)\s*=>\s*(\S+)\s*.*$}).first
-          File.basename(entry.first) + " => " + entry.last if entry
-        }.compact
+          next unless entry
+
+          info = libraries.assoc(File.basename(entry.first))
+          info[1] = entry.last if info
+        end
+
+        libraries.map { |_name, _location|
+          _name + " => " + (_location || "not found")
+        }
       end
 
       def extract_strings(file)
-        launch([ file ]).first
+        launch([ 'strings', '-a', file ]).first
       end
 
       protected
       #########
+
+      def collect_library_info(file)
+        launch([ 'chatr', file ]).first.map { |_line|
+          item = _line.scan(%r{^\s*dynamic\s+(\S+)\s*$}).flatten.first
+          [ File.basename(item), nil ] if item
+        }.compact
+      end
 
       def dump_loader_info(file)
         launcher = TSC::Launcher.new {
@@ -78,13 +94,19 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
 
         def test_dll_info
           os.expects(:dump_loader_info).with('/bin/date').returns read_after_end_marker(__FILE__, 1).map
+          os.expects(:launch).with([ 'chatr', '/bin/date' ]).returns [
+            read_after_end_marker(__FILE__, 2).map
+          ]
 
           expected = [
-            "libc.2 => /usr/lib/libc.2",
-            "libgcc_s.sl => /u1/lib/libgcc_s.sl",
+            "libclntsh.sl.11.1 => not found",
+            "libsk-1.0-oracle.sl.1 => not found",
+            "libsk-1.0-oralog.sl.1 => /u1/lib/libsk-1.0-oralog.sl.1",
             "libsk-1.0-db.sl.1 => /u1/lib/libsk-1.0-db.sl.1",
+            "libstdc++.sl.6 => not found",
             "libm.2 => /usr/lib/libm.2",
-            "libsk-1.0-oralog.sl.1 => /u1/lib/libsk-1.0-oralog.sl.1"
+            "libgcc_s.sl => /u1/lib/libgcc_s.sl",
+            "libc.2 => /usr/lib/libc.2"
           ]
 
           assert_equal expected, os.dll_info("/bin/date")
@@ -119,3 +141,39 @@ __END__
         ../bin/lib/oralog/libsk-1.0-oralog.sl.1 =>    /u1/lib/libsk-1.0-oralog.sl.1
 /usr/lib/dld.sl: Bad magic number for shared library: /oracle/products/110/lib/libclntsh.sl.11.1
 /usr/lib/dld.sl: Exec format error
+__END__
+         normal executable 
+         shared library dynamic path search:
+             SHLIB_PATH     enabled   first  
+             embedded path  disabled  second Not Defined
+         shared library list:
+             dynamic   /oracle/products/110/lib32/libclntsh.sl.11.1
+             dynamic   ../bin/lib/oracle/libsk-1.0-oracle.sl.1
+             dynamic   ../bin/lib/oralog/libsk-1.0-oralog.sl.1
+             dynamic   ../bin/lib/db/libsk-1.0-db.sl.1
+             dynamic   /opt/sk/platform/hp11-23-pa/gcc-3.4/lib/libstdc++.sl.6
+             dynamic   /usr/lib/libm.2
+             dynamic   /opt/sk/platform/hp11-23-pa/gcc-3.4/lib/libgcc_s.sl
+             dynamic   /usr/lib/libc.2
+         shared library binding:
+             immediate 
+         global hash table disabled
+         plabel caching disabled
+         global hash array size:1103
+         global hash array nbuckets:3
+         shared vtable support disabled
+         explicit unloading enabled
+         static branch prediction disabled
+         executable from stack: D (default)
+         kernel assisted branch prediction enabled
+         lazy swap allocation disabled
+         text segment locking disabled
+         data segment locking disabled
+         third quadrant private data space disabled
+         fourth quadrant private data space disabled
+         third quadrant global data space disabled
+         data page size: D (default)
+         instruction page size: D (default)
+         nulptr references enabled
+         shared library private mapping disabled
+         shared library text merging disabled
