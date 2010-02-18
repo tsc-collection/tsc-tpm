@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -60,12 +61,12 @@ module Distribution
 
     def descriptors(package)
       @links.keys.map do |_key|
-	file = FileInfo.new @links[_key]
-	descriptor = Descriptor.new(file)
-	descriptor.target = _key
-	descriptor.action = "symlink"
+        file = FileInfo.new @links[_key]
+        descriptor = Descriptor.new(file)
+        descriptor.target = _key
+        descriptor.action = "symlink"
 
-	descriptor
+        descriptor
       end
     end
   end

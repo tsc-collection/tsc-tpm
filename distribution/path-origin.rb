@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -22,7 +23,7 @@ module Distribution
 
           [ directory, *Array(_entry) ]
         }
-	descriptors = _module.descriptors '/'
+        descriptors = _module.descriptors '/'
         _module.entries.replace original_entries
 
         descriptors

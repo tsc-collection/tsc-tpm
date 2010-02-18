@@ -1,5 +1,5 @@
 =begin
-  vim: set sw=2:
+  vi: sw=2:
              Tone Software Corporation BSD License ("License")
   
                        Software Distribution Facility
@@ -74,20 +74,20 @@ module Distribution
 
     def descriptors(origin)
       files.map { |_file|
-	dirname, basename = File.split _file.path
-	top = File.smart_join origin, dirname
-	Dir.cd top do
-	  tree(basename).map { |_path|
-	    file = FileInfo.new _path
-	    process_file_entry file
+        dirname, basename = File.split _file.path
+        top = File.smart_join origin, dirname
+        Dir.cd top do
+          tree(basename).map { |_path|
+            file = FileInfo.new _path
+            process_file_entry file
 
-	    file_on_disk = File.lstat file.path
+            file_on_disk = File.lstat file.path
             file.mode ||= file_on_disk.mode
 
-	    if file_on_disk.directory?
-	      NodeTreeDescriptor.new file, top
-	    elsif file_on_disk.file?
-	      LeafTreeDescriptor.new file, top
+            if file_on_disk.directory?
+              NodeTreeDescriptor.new file, top
+            elsif file_on_disk.file?
+              LeafTreeDescriptor.new file, top
             elsif file_on_disk.symlink?
               if follow_symlinks?
                 file.mode = File.stat(file.path).mode
@@ -95,9 +95,9 @@ module Distribution
               else
                 LinkTreeDescriptor.new file, File.readlink(file.path)
               end
-	    end
-	  }
-	end
+            end
+          }
+        end
       }
     end
 

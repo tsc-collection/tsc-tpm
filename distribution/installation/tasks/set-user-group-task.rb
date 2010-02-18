@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -57,19 +58,19 @@ module Installation
     class SetUserGroupTask < Installation::Task
       def execute(*args)
         return unless args.empty? || args.include?(Etc.getpwuid.name)
-	communicator.progress 'Setting file ownerships' do |_progress|
-	  self.class.installation_actions.each do |_action|
-	    _action.set_user_and_group
-	    _progress.print
-	  end
-	end
+        communicator.progress 'Setting file ownerships' do |_progress|
+          self.class.installation_actions.each do |_action|
+            _action.set_user_and_group
+            _progress.print
+          end
+        end
       end
 
       def revert(*args)
       end
 
       def provides
-	'system-set-user-group'
+        'system-set-user-group'
       end
     end
   end

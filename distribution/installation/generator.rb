@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -56,8 +57,8 @@ module Installation
   class Generator
     class SubclassError < RuntimeError
       def initialize(subclass)
-	name = subclass.to_s.split("::")[1..-1].join('::')
-	super "Class #{name.inspect} is not a direct generator"
+        name = subclass.to_s.split("::")[1..-1].join('::')
+        super "Class #{name.inspect} is not a direct generator"
       end
     end
 
@@ -71,12 +72,12 @@ module Installation
       def_delegators Task, :installation_product_metainf, :installation_package_metainf
 
       def clear_recent_subclasses
-	@recent_subclasses.clear unless @recent_subclasses.nil?
+        @recent_subclasses.clear unless @recent_subclasses.nil?
       end
 
       def inherited(subclass)
-	raise SubclassError, subclass if @recent_subclasses.nil?
-	@recent_subclasses << subclass
+        raise SubclassError, subclass if @recent_subclasses.nil?
+        @recent_subclasses << subclass
       end
     end
 
@@ -103,7 +104,7 @@ module Installation
       FileUtils.remove_entry target rescue true
 
       File.open(target, 'w') do |_io|
-	_io.puts result
+        _io.puts result
       end
     end
 
@@ -127,7 +128,7 @@ module Installation
     def skip_lines_before_end_marker(array)
       end_marker = false
       array.reject { |_line|
-	"#{end_marker = (_line =~ %r{^\s*__END__\s*$})}" unless end_marker
+        "#{end_marker = (_line =~ %r{^\s*__END__\s*$})}" unless end_marker
       }
     end
 
@@ -152,27 +153,27 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
 
     class GeneratorTest < Test::Unit::TestCase
       def test_header_and_data
-	@generator.array = [ "aaa", "bbb", "__END__", "ddd" ]
-	assert_equal [ "ddd" ], @generator.skip
+        @generator.array = [ "aaa", "bbb", "__END__", "ddd" ]
+        assert_equal [ "ddd" ], @generator.skip
       end
 
       def test_no_header
-	@generator.array = [ "  __END__	\r\n", "ddd" ]
-	assert_equal [ "ddd" ], @generator.skip
+        @generator.array = [ "  __END__ \r\n", "ddd" ]
+        assert_equal [ "ddd" ], @generator.skip
       end
 
       def test_no_data
-	@generator.array = [ "aaa", "bbb", "ddd" ]
-	assert_equal [], @generator.skip
+        @generator.array = [ "aaa", "bbb", "ddd" ]
+        assert_equal [], @generator.skip
       end
 
       def test_empty_data
-	@generator.array = [ "aaa", "bbb", "ddd", "__END__"]
-	assert_equal [], @generator.skip
+        @generator.array = [ "aaa", "bbb", "ddd", "__END__"]
+        assert_equal [], @generator.skip
       end
 
       def setup
-	@generator = MockGenerator.new nil, nil
+        @generator = MockGenerator.new nil, nil
       end
     end
   end

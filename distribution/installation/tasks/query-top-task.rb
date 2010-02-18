@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -56,20 +57,20 @@ module Installation
   module Tasks
     class QueryTopTask < Installation::Task
       def provides
-	"system-query-top"
+        "system-query-top"
       end
 
       def execute
-	directory = File.expand_path ask_installation_directory, top
-	raise "Wrong installation directory" if directory.index(Dir.getwd) == 0
-	self.class.installation_top = directory
+        directory = File.expand_path ask_installation_directory, top
+        raise "Wrong installation directory" if directory.index(Dir.getwd) == 0
+        self.class.installation_top = directory
       end
 
       def revert
       end
 
       def ask_installation_directory
-	communicator.ask "Installation directory", top
+        communicator.ask "Installation directory", top
       end
 
       def top

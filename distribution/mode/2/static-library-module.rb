@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -13,7 +14,7 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.a" ]
+        _entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.a" ]
       }
     end
     def process_file_entry(file)
@@ -29,17 +30,17 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
   module Distribution
     class StaticLibraryModuleTest < Test::Unit::TestCase
       def test_files
-	LibraryModule.library_major = 15
-	LibraryModule.library_prefix = "tsc"
+        LibraryModule.library_major = 15
+        LibraryModule.library_prefix = "tsc"
 
-	_module = LibraryModule.new "lib" => %w{ ffc util }
+        _module = LibraryModule.new "lib" => %w{ ffc util }
 
-	assert_equal [ 
-	  FileInfo.new("lib/ffc/libtscffc.a", 0755), 
-	  FileInfo.new("lib/util/libtscutil.a", 0755) 
-	], _module.files
+        assert_equal [ 
+          FileInfo.new("lib/ffc/libtscffc.a", 0755), 
+          FileInfo.new("lib/util/libtscutil.a", 0755) 
+        ], _module.files
 
-	assert_equal "lib/ffc/libtscffc.a", _module.files.first.path_for_checksum
+        assert_equal "lib/ffc/libtscffc.a", _module.files.first.path_for_checksum
       end
     end
   end

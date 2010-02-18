@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -64,43 +65,43 @@ module Installation
       include Installation::Util::GroupManagement
 
       def provides
-	'system-query-user'
+        'system-query-user'
       end
 
       def execute
-	user = communicator.select Hash[
+        user = communicator.select Hash[
           :header => messenger.user_request,
           :preferred => self.class.installation_user
         ]
 
-	user_entry = (Etc::getpwnam user rescue create_user user)
-	group_entry = Etc::getgrgid(user_entry.gid)
+        user_entry = (Etc::getpwnam user rescue create_user user)
+        group_entry = Etc::getgrgid(user_entry.gid)
 
-	self.class.installation_user_entry = user_entry
-	self.class.installation_user = user_entry.name
+        self.class.installation_user_entry = user_entry
+        self.class.installation_user = user_entry.name
 
-	self.class.installation_group_entry = group_entry
-	self.class.installation_group = group_entry.name
+        self.class.installation_group_entry = group_entry
+        self.class.installation_group = group_entry.name
 
-	self.class.installation_top = user_entry.dir
+        self.class.installation_top = user_entry.dir
 
-	File.makedirs user_entry.dir
-	File.chown user_entry.uid, user_entry.gid, user_entry.dir
-	File.chmod 0755, user_entry.dir
+        File.makedirs user_entry.dir
+        File.chown user_entry.uid, user_entry.gid, user_entry.dir
+        File.chmod 0755, user_entry.dir
       end
 
       def revert
-	errors = []
-	[ :remove_added_users, :remove_added_groups ].each do |_method|
-	  begin
-	    self.send _method
-	  rescue Exception => exception
-	    errors << exception
-	  end
-	end
-	unless errors.empty?
-	  raise TSC::Error.new(*errors)
-	end
+        errors = []
+        [ :remove_added_users, :remove_added_groups ].each do |_method|
+          begin
+            self.send _method
+          rescue Exception => exception
+            errors << exception
+          end
+        end
+        unless errors.empty?
+          raise TSC::Error.new(*errors)
+        end
       end
     end
   end

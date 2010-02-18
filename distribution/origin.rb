@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -69,7 +70,7 @@ module Distribution
     class << self
       attr_writer :path
       def path
-	@path.to_s.strip.sub(/^\s*$/,'.')
+        @path.to_s.strip.sub(/^\s*$/,'.')
       end
     end
 
@@ -114,7 +115,7 @@ module Distribution
 
     def descriptors
       modules.map { |_module|
-	_module.descriptors self.class.path
+        _module.descriptors self.class.path
       }.flatten
     end
 

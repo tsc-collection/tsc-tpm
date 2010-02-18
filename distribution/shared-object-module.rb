@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -56,7 +57,7 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0..-2] + [ _entry.last.sub(%r{[.]#{extension}$}, '') + ".#{extension}" ]
+        _entry[0..-2] + [ _entry.last.sub(%r{[.]#{extension}$}, '') + ".#{extension}" ]
       }
     end
 
@@ -75,12 +76,12 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
       end
 
       def PENDING_test_strings
-	_module = SharedObjectModule.new "dapsys/modules" => %w{ exec syslog some.module }
-	assert_equal [ 
-	  FileInfo.new("dapsys/modules/exec/exec.so",0755), 
-	  FileInfo.new("dapsys/modules/syslog/syslog.so",0755),
-	  FileInfo.new("dapsys/modules/some.module/some.module.so",0755)
-	], _module.files
+        _module = SharedObjectModule.new "dapsys/modules" => %w{ exec syslog some.module }
+        assert_equal [ 
+          FileInfo.new("dapsys/modules/exec/exec.so",0755), 
+          FileInfo.new("dapsys/modules/syslog/syslog.so",0755),
+          FileInfo.new("dapsys/modules/some.module/some.module.so",0755)
+        ], _module.files
       end
     end
   end

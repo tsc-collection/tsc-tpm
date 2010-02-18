@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -61,14 +62,14 @@ module Distribution
 
     def descriptors(package)
       @module.paths.map do |_dir|
-	file = FileInfo.new _dir, Defaults.mode.directory
-	descriptor = Descriptor.new(file)
+        file = FileInfo.new _dir, Defaults.mode.directory
+        descriptor = Descriptor.new(file)
         descriptor.options.update @module.info
-	descriptor.target = _dir
-	descriptor.action = :directory
-	descriptor.print_destination = false
+        descriptor.target = _dir
+        descriptor.action = :directory
+        descriptor.print_destination = false
 
-	descriptor
+        descriptor
       end
     end
   end

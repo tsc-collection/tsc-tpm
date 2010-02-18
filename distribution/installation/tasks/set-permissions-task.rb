@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -55,19 +56,19 @@ module Installation
   module Tasks
     class SetPermissionsTask < Installation::Task
       def execute
-	communicator.progress 'Setting file permissions' do |_progress|
-	  self.class.installation_actions.each do |_action|
-	    _action.set_permissions
-	    _progress.print
-	  end
-	end
+        communicator.progress 'Setting file permissions' do |_progress|
+          self.class.installation_actions.each do |_action|
+            _action.set_permissions
+            _progress.print
+          end
+        end
       end
 
       def revert
       end
 
       def provides
-	'system-set-permissions'
+        'system-set-permissions'
       end
     end
   end

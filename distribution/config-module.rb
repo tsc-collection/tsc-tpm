@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -61,7 +62,7 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0..-2] + [ _entry.last.sub(%r{[.][^/.]*$},'') + '.ini' ]
+        _entry[0..-2] + [ _entry.last.sub(%r{[.][^/.]*$},'') + '.ini' ]
       }
     end
   end
@@ -73,12 +74,12 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
   module Distribution
     class ConfigModuleTest < Test::Unit::TestCase
       def test_config
-	 m = ConfigModule.new "aaa" => [ "bbb", "ccc.ini", "ddd.so" ]
-	 assert_equal [
-	   FileInfo.new("aaa/bbb.ini", 0644),
-	   FileInfo.new("aaa/ccc.ini", 0644),
-	   FileInfo.new("aaa/ddd.ini", 0644)
-	 ], m.files
+         m = ConfigModule.new "aaa" => [ "bbb", "ccc.ini", "ddd.so" ]
+         assert_equal [
+           FileInfo.new("aaa/bbb.ini", 0644),
+           FileInfo.new("aaa/ccc.ini", 0644),
+           FileInfo.new("aaa/ddd.ini", 0644)
+         ], m.files
       end
     end
   end

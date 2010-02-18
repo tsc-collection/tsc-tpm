@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -135,9 +136,9 @@ module Distribution
 
     def descriptors(package)
       @actions.map { |_action|
-	_action.descriptors package
+        _action.descriptors package
       }.flatten.each { |_descriptor|
-	_descriptor.set_exclude_patterns *@patterns
+        _descriptor.set_exclude_patterns *@patterns
         _descriptor.set_base(@base || package.base || package.product.base)
 
         _descriptor.fileset = self

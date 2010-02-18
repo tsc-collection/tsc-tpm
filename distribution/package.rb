@@ -1,5 +1,5 @@
-# vim: set sw=2:
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -138,7 +138,7 @@ module Distribution
 
     def descriptors
       @filesets.map { |_fileset|
-	_fileset.descriptors self
+        _fileset.descriptors self
       }.flatten
     end
 

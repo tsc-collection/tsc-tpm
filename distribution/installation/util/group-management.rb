@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -65,13 +66,13 @@ module Installation
       end
 
       def create_group(group)
-	raise TSC::OperationCanceled unless communicator.ask messenger.create_group_confirmation(group), true
-	
+        raise TSC::OperationCanceled unless communicator.ask messenger.create_group_confirmation(group), true
+        
         os.add_group(group)
-	communicator.report messenger.create_group_report(group)
+        communicator.report messenger.create_group_report(group)
 
-	new_group_registry << group
-	Etc::getgrnam group
+        new_group_registry << group
+        Etc::getgrnam group
       end
 
       def remove_added_groups
@@ -92,11 +93,11 @@ module Installation
       end
 
       def create_group_confirmation(group)
-	"Create group #{group.inspect}"
+        "Create group #{group.inspect}"
       end
 
       def create_group_report(group)
-	"Group #{group.inspect} created"
+        "Group #{group.inspect} created"
       end
 
       def remove_group_report(group)

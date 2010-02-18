@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
 
              Tone Software Corporation BSD License ("License")
   
@@ -70,11 +71,11 @@ module Installation
           generators.concat Generator.recent_subclasses
           raise "No gererators defined in #{source.inspect}" if generators.empty?
         }
-	generators.each do |_generator|
-	  _generator.new(target, saved_target).process_create if _generator
-	end
+        generators.each do |_generator|
+          _generator.new(target, saved_target).process_create if _generator
+        end
       ensure
-	Generator.clear_recent_subclasses
+        Generator.clear_recent_subclasses
       end
     end
   end

@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -60,14 +61,14 @@ module Distribution
 
     def descriptors(package)
       @links.map { |_dir, _links|
-	Array(_links).map { |_link|
-	  _link.map { |_target, _original|
-	    original_library = make_library_name _dir, _original
-	    target_library = make_library_name _dir, _target
+        Array(_links).map { |_link|
+          _link.map { |_target, _original|
+            original_library = make_library_name _dir, _original
+            target_library = make_library_name _dir, _target
 
-	    make_descriptor original_library, target_library
-	  }
-	}
+            make_descriptor original_library, target_library
+          }
+        }
       }
     end
 

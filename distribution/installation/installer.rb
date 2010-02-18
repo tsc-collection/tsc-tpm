@@ -1,5 +1,5 @@
-# vim: set sw=2:
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -64,19 +64,19 @@ module Installation
   class Installer
     class LocationError < TSC::Error
       def initialize(arg)
-	super arg, RuntimeError.new("Wrong location")
+        super arg, RuntimeError.new("Wrong location")
       end
     end
 
     class ArgumentError < TSC::Error
       def initialize(arg)
-	super arg, RuntimeError.new("Wrong arguments")
+        super arg, RuntimeError.new("Wrong arguments")
       end
     end
 
     class PackageError < TSC::Error
       def initialize(arg)
-	super arg, RuntimeError.new("No packages found")
+        super arg, RuntimeError.new("No packages found")
       end
     end
 

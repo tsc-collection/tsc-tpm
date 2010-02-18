@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -82,12 +83,12 @@ module Distribution
       Installation::Task.installation_parameters.update @product.params
 
       Dir.cd directory do
-	@config.actions.each do |_action|
-	  _action.keep = false if @force
-	  _action.create self, self
-	  _action.set_user_and_group if Process.uid == 0
-	  _action.set_permissions
-	end
+        @config.actions.each do |_action|
+          _action.keep = false if @force
+          _action.create self, self
+          _action.set_user_and_group if Process.uid == 0
+          _action.set_permissions
+        end
       end
     end
 

@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -57,16 +58,16 @@ module Distribution
     def descriptors(directory)
       self.entries.map do |_entry|
         _entry = Array(_entry)
-	if _entry.size > 1
-	  name = File.join _entry[1..-1]
-	  location = File.smart_join directory, _entry.first
-	else
-	  name = File.join _entry
-	  location = directory
-	end
-	file = FileInfo.new name
-	process_file_entry file
-	RubyDescriptor.new file, location
+        if _entry.size > 1
+          name = File.join _entry[1..-1]
+          location = File.smart_join directory, _entry.first
+        else
+          name = File.join _entry
+          location = directory
+        end
+        file = FileInfo.new name
+        process_file_entry file
+        RubyDescriptor.new file, location
       end
     end
   end

@@ -1,5 +1,5 @@
-# vim: set sw=2:
 =begin
+  vi: sw=2:
              Tone Software Corporation BSD License ("License")
   
                        Software Distribution Facility

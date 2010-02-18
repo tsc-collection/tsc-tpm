@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -70,22 +71,22 @@ module Installation
       end
 
       def create_user(user)
-	raise TSC::OperationCanceled unless communicator.ask messenger.create_user_confirmation(user), true
+        raise TSC::OperationCanceled unless communicator.ask messenger.create_user_confirmation(user), true
 
-	group = communicator.select Hash[
+        group = communicator.select Hash[
           :header => messenger.group_for_user_request(user),
           :preferred => self.class.installation_group
         ]
-	Etc::getgrnam group rescue create_group group
+        Etc::getgrnam group rescue create_group group
 
-	home = ask_home_directory user, self.class.installation_top
-	raise 'Wrong home directory' if home.index(Dir.getwd) == 0
+        home = ask_home_directory user, self.class.installation_top
+        raise 'Wrong home directory' if home.index(Dir.getwd) == 0
 
         os.add_user(user, group, home)
-	communicator.report messenger.create_user_report(user)
+        communicator.report messenger.create_user_report(user)
 
-	new_user_registry << user
-	Etc::getpwnam user
+        new_user_registry << user
+        Etc::getpwnam user
       end
 
       def remove_added_users
@@ -106,11 +107,11 @@ module Installation
       end
 
       def ask_home_directory(user, directory)
-	directory = communicator.select Hash[
+        directory = communicator.select Hash[
           :header => messenger.home_for_user_request(user), 
           :preferred => directory
         ]
-	File.expand_path directory
+        File.expand_path directory
       end
 
       def user_request
@@ -118,7 +119,7 @@ module Installation
       end
 
       def create_user_confirmation(user)
-	"Create user #{user.inspect}"
+        "Create user #{user.inspect}"
       end
 
       def group_for_user_request(user)
@@ -130,7 +131,7 @@ module Installation
       end
 
       def create_user_report(user)
-	"User #{user.inspect} created"
+        "User #{user.inspect} created"
       end
 
       def remove_user_report(user)

@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
              Tone Software Corporation BSD License ("License")
   
                        Software Distribution Facility
@@ -56,11 +57,11 @@ module Distribution
     #########
     def figure_target
       unless self.target_path.nil?
-	File.join self.target_path, *tree_item_target.split(File::SEPARATOR)[1..-1]
+        File.join self.target_path, *tree_item_target.split(File::SEPARATOR)[1..-1]
       else
-	unless self.target_directory.nil?
-	  File.join self.target_directory, tree_item_target
-	end
+        unless self.target_directory.nil?
+          File.join self.target_directory, tree_item_target
+        end
       end
     end
 

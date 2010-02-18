@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -56,7 +57,7 @@ module Distribution
     def entries
       super.map { |_entry|
         _entry = Array(_entry)
-	_entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.#{self.class.library_extension}" ]
+        _entry[0...-2] + [ _entry.last.tr('.', '/'), "lib#{self.class.library_prefix}#{_entry.last}.#{self.class.library_extension}" ]
       }
     end
 
@@ -73,17 +74,17 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
   module Distribution
     class LibraryModuleTest < Test::Unit::TestCase
       def test_files
-	LibraryModule.library_major = 15
-	LibraryModule.library_prefix = "tsc"
+        LibraryModule.library_major = 15
+        LibraryModule.library_prefix = "tsc"
 
-	_module = LibraryModule.new "lib" => %w{ ffc util }
+        _module = LibraryModule.new "lib" => %w{ ffc util }
 
-	assert_equal [ 
-	  FileInfo.new("lib/ffc/libtscffc.so",0755), 
-	  FileInfo.new("lib/util/libtscutil.so",0755) 
-	], _module.files
+        assert_equal [ 
+          FileInfo.new("lib/ffc/libtscffc.so",0755), 
+          FileInfo.new("lib/util/libtscutil.so",0755) 
+        ], _module.files
 
-	assert_equal "lib/ffc/libtscffc.so", _module.files.first.path_for_checksum
+        assert_equal "lib/ffc/libtscffc.so", _module.files.first.path_for_checksum
       end
     end
   end

@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -56,7 +57,7 @@ module Installation
   module Tasks
     class CheckUserGroupTask < Task
       def provides
-	'system-check-user-group'
+        'system-check-user-group'
       end
 
       def execute

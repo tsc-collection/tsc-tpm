@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -19,14 +20,14 @@ module Distribution
     def descriptors(package)
       @module.paths.map do |_file|
         info = FileInfo.new _file, Defaults.mode.file
-	descriptor = Descriptor.new(info)
+        descriptor = Descriptor.new(info)
 
         descriptor.options.update @module.info
-	descriptor.target = _file
-	descriptor.action = :touch
-	descriptor.print_destination = false
+        descriptor.target = _file
+        descriptor.action = :touch
+        descriptor.print_destination = false
 
-	descriptor
+        descriptor
       end
     end
   end

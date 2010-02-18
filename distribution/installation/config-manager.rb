@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -68,13 +69,13 @@ module Installation
 
     class ProductError < Error
       def initialize
-	super 'Multiple product definition'
+        super 'Multiple product definition'
       end
     end
 
     class PackageError < Error
       def initialize
-	super 'Multiple package definition'
+        super 'Multiple package definition'
       end
     end
 
@@ -84,9 +85,9 @@ module Installation
       @actions = []
 
       @config = Config.new Hash[
-	:product => proc { |_product| process_product _product },
-	:package => proc { |_package| process_package _package },
-	:action  => proc { |_action|  process_action  _action  }
+        :product => proc { |_product| process_product _product },
+        :package => proc { |_package| process_package _package },
+        :action  => proc { |_action|  process_action  _action  }
       ]
     end
 
@@ -117,48 +118,48 @@ module Installation
 
     class Config
       def initialize(actions)
-	@actions = actions
+        @actions = actions
       end
       def get_binding
-	binding
+        binding
       end
 
       private
       #######
       def product(*credentials)
-	@actions[:product].call TSC::Dataset.new(*credentials)
+        @actions[:product].call TSC::Dataset.new(*credentials)
       end
 
       def package(*credentials)
-	@actions[:package].call TSC::Dataset.new(*credentials)
+        @actions[:package].call TSC::Dataset.new(*credentials)
       end
 
       def install(*data)
-	@actions[:action].call InstallAction.new(*data)
+        @actions[:action].call InstallAction.new(*data)
       end
 
       def generate(*data)
-	@actions[:action].call GenerateAction.new(*data)
+        @actions[:action].call GenerateAction.new(*data)
       end
 
       def expand(*data)
-	@actions[:action].call ExpandAction.new(*data)
+        @actions[:action].call ExpandAction.new(*data)
       end
 
       def symlink(*data)
-	@actions[:action].call SymlinkAction.new(*data)
+        @actions[:action].call SymlinkAction.new(*data)
       end
 
       def remove(*data)
-	@actions[:action].call RemoveAction.new(*data)
+        @actions[:action].call RemoveAction.new(*data)
       end
 
       def directory(*data)
-	@actions[:action].call DirectoryAction.new(*data)
+        @actions[:action].call DirectoryAction.new(*data)
       end
 
       def touch(*data)
-	@actions[:action].call TouchAction.new(*data)
+        @actions[:action].call TouchAction.new(*data)
       end
     end
   end

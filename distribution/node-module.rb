@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -13,7 +14,7 @@ module Distribution
   module NodeMixin
     def descriptors(origin)
       files.map { |_file|
-	dirname, basename = File.split _file.path
+        dirname, basename = File.split _file.path
         detect_file_type(basename, File.smart_join(origin, dirname))
       }.flatten.compact
     end

@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -59,8 +60,8 @@ module Distribution
 
     def ==(other)
       if other.kind_of? self.class
-	other.path == @path and other.owner == @owner and 
-	other.group == @group and other.mode == @mode
+        other.path == @path and other.owner == @owner and 
+        other.group == @group and other.mode == @mode
       end
     end
   end

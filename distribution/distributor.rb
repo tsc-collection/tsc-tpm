@@ -1,5 +1,5 @@
 =begin
-vim: set sw=2:
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   

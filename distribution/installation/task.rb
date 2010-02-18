@@ -1,4 +1,5 @@
 =begin
+  vi: sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -57,8 +58,8 @@ module Installation
   class Task
     class SubclassError < RuntimeError
       def initialize(subclass)
-	name = subclass.to_s.split("::")[1..-1].join('::')
-	super "Class #{name.inspect} is not a direct task"
+        name = subclass.to_s.split("::")[1..-1].join('::')
+        super "Class #{name.inspect} is not a direct task"
       end
     end
 
@@ -68,8 +69,8 @@ module Installation
       attr_reader :subclasses
 
       def inherited(subclass)
-	raise SubclassError, subclass if @subclasses.nil?
-	@subclasses << subclass
+        raise SubclassError, subclass if @subclasses.nil?
+        @subclasses << subclass
       end
 
       def properties
