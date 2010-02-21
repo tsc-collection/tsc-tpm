@@ -63,12 +63,19 @@ module Installation
     end
 
     def make_target(progress, logger)
-      File.smart_copy source, target
+      if archive? && File.exists?(target)
+        merge_archive
+      else
+        File.smart_copy source, target
+      end
     end
 
     def compatible_target_types
       %w[ file ]
     end
 
+    def merge_archive
+      raise TSC::NotImplementedError, :merge_archive
+    end
   end
 end
