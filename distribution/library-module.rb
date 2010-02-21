@@ -73,12 +73,23 @@ module Distribution
     end
 
     def extension
-      self.class.library_extension
+      @extension ||= begin 
+        archive? ? "a" : self.class.library_extension
+      end
     end
 
     def process_file_entry(file)
       super
       file.path_for_checksum = file.path.sub(%r{[.]#{extension}$},'.a.reloc')
+      file.archive = archive?
+    end
+
+    #######
+
+    def archive?
+      @archive ||= begin
+        self.class.library_archive ? true : false
+      end
     end
   end
 end

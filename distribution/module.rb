@@ -60,6 +60,7 @@ module Distribution
     @@library_extension = 'so'
     @@library_prefix = nil
     @@library_major = nil
+    @@library_archive = false
 
     class << self
       def [](*args)
@@ -72,6 +73,14 @@ module Distribution
 
       def build
         @@build
+      end
+
+      def library_archive
+        @@library_archive
+      end
+
+      def library_archive=(state)
+        @@library_archive = state
       end
 
       def library_prefix

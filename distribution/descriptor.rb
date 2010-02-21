@@ -139,7 +139,8 @@ module Distribution
         :size => (File.size(@source) if File.file?(source)),
         :base => @base,
         :fileset => (fileset.name if fileset),
-        :keep => keep?
+        :keep => keep?, 
+        :archive => @file.archive?
       ]
     end
 

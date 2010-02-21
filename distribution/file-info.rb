@@ -53,6 +53,7 @@
 module Distribution
   class FileInfo
     attr_accessor :path, :owner, :group, :mode, :path_for_checksum, :build
+    attr_writer :archive
 
     def initialize(path,mode = nil,owner = nil, group = nil)
       @path, @mode, @owner, @group  = path, mode, owner, group
@@ -63,6 +64,10 @@ module Distribution
         other.path == @path and other.owner == @owner and 
         other.group == @group and other.mode == @mode
       end
+    end
+
+    def archive?
+      @archive ? true : false
     end
   end
 end
