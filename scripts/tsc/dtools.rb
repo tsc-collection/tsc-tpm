@@ -53,29 +53,29 @@ class Dir
       return unless File.directory? directory
 
       entries = { 
-	true  => [], 
-	false => [] 
+        true  => [], 
+        false => [] 
       }
       Find.find directory do |_file|
-	entries[ File.lstat(_file).directory? ] << _file
+        entries[ File.lstat(_file).directory? ] << _file
       end
       File.unlink *entries[false]
       entries[true].reverse_each do |_directory|
-	self.unlink _directory
+        self.unlink _directory
       end
     end
 
     def cd(directory,&block)
       if block.nil?
-	self.chdir directory
+        self.chdir directory
       else
-	original = self.getwd
-	begin
-	  self.chdir directory
-	  block.call
-	ensure
-	  self.chdir original
-	end
+        original = self.getwd
+        begin
+          self.chdir directory
+          block.call
+        ensure
+          self.chdir original
+        end
       end
     end
 
@@ -84,9 +84,9 @@ class Dir
 
       File.makedirs directory
       begin
-	cd directory, &block
+        cd directory, &block
       ensure
-	self.rm_r directory
+        self.rm_r directory
       end
     end
 
