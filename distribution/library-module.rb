@@ -81,7 +81,7 @@ module Distribution
     def process_file_entry(file)
       super
       file.path_for_checksum = file.path.sub(%r{[.]#{extension}$},'.a.reloc')
-      file.archive = archive?
+      file.archive = archive_append?
     end
 
     #######
@@ -89,6 +89,12 @@ module Distribution
     def archive?
       @archive ||= begin
         self.class.library_archive ? true : false
+      end
+    end
+
+    def archive_append?
+      @archive_append ||= begin
+        archive? && self.class.library_archive_append
       end
     end
   end

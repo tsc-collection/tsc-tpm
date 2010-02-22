@@ -82,12 +82,13 @@ module Installation
       target = Pathname.new(self.target).realpath
 
       Dir.temporary source.basename.to_s do
-        launch [ 'ar', 'x', source.to_s ]
+        launch [ 'ar', 'x', target.to_s ]
+        File.smart_copy source, target
+
         content = Dir.glob('*').reject { |_item|
           _item =~ %r{^[._]}
         }
-        launch [ 'ar', 'rc', target.to_s, *content ]
-        launch [ 'ranlib', target.to_s ]
+        launch [ '/bin/ar', 'rc', target.to_s, *content ]
       end
     end
   end

@@ -97,7 +97,7 @@ module Distribution
           @group = _argument
         },
         :top => proc { |_block, _argument|
-          @top = _argument
+          @top = File.expand_path(_argument.to_s)
         },
         :package => proc { |_block, *args|
           @packages.push Package.new(self, cache, *args, &_block)

@@ -61,6 +61,8 @@ module Distribution
     @@library_prefix = nil
     @@library_major = nil
     @@library_archive = false
+    @@library_archive = false
+    @@library_archive_append = true
 
     class << self
       def [](*args)
@@ -80,7 +82,16 @@ module Distribution
       end
 
       def library_archive=(state)
-        @@library_archive = state
+        @@library_archive = (state ? true : false)
+      end
+
+      def library_archive_append
+        @@library_archive_append
+      end
+
+      def library_archive_append=(state)
+        @@library_archive = true
+        @@library_archive_append = (state ? true : false)
       end
 
       def library_prefix
