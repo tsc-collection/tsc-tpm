@@ -43,6 +43,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
+require 'pathname'
 require 'ftools'
 require 'find'
 
@@ -64,7 +65,7 @@ class Dir
       end
     end
 
-    def cd(directory,&block)
+    def cd(directory, &block)
       if block.nil?
         self.chdir directory
       else
@@ -78,14 +79,16 @@ class Dir
       end
     end
 
-    def temporary(directory,&block)
-      return if block.nil?
+    def temporary(directory, options = {}, &block)
+      return unless block
+
+      params = TSC::Dataset[ :cleanup => true ].update(options)
 
       File.makedirs directory
       begin
         cd directory, &block
       ensure
-        self.rm_r directory
+        self.rm_r directory if params.cleanup?
       end
     end
 

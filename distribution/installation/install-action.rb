@@ -53,7 +53,10 @@
 require 'installation/action.rb'
 require 'installation/remove-action.rb'
 require 'tsc/ftools.rb'
+require 'tsc/dtools.rb'
+
 require 'etc'
+require 'pathname'
 
 module Installation
   class InstallAction < Action 
@@ -75,7 +78,17 @@ module Installation
     end
 
     def merge_archive
-      raise TSC::NotImplementedError, :merge_archive
+      source = Pathname.new(self.source).realpath
+      target = Pathname.new(self.target).realpath
+
+      Dir.temporary source.basename.to_s do
+        launch [ 'ar', 'x', source.to_s ]
+        content = Dir.glob('*').reject { |_item|
+          _item =~ %r{^[._]}
+        }
+        launch [ 'ar', 'rc', target.to_s, *content ]
+        launch [ 'ranlib', target.to_s ]
+      end
     end
   end
 end
