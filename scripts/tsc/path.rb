@@ -6,26 +6,30 @@
 # You must read and accept the license prior to use.
 
 require 'tsc/errors.rb'
+require 'pathname'
 
 module TSC
   class Path
     class << self
-      def current(name = nil)
+      def [] (name)
         path = self.new
 
-        generate_name_method_unless_nil name, class << path
+        generate_name_method name.to_s, class << path
           public_class_method :define_method
           self
         end
 
-        path.load
+        path
+      end
+
+      def current(name = nil)
+        (name ? self.[](name) : self.new).load
       end
 
       private
       #######
 
-      def generate_name_method_unless_nil(name, meta_class)
-        return unless name
+      def generate_name_method(name, meta_class)
         meta_class.define_method(:name) {
           name.to_s
         }
@@ -41,15 +45,6 @@ module TSC
 
       @front = []
       @back = []
-    end
-
-    def normalize(*entries)
-      entries.flatten.compact.map { |_entry|
-        _entry.to_s.split(':').map { |_component|
-          value = _component.strip
-          value unless value.empty?
-        }
-      }.flatten.compact
     end
 
     def load(name = nil)
@@ -75,8 +70,16 @@ module TSC
       self
     end
 
+    def before(*entries)
+      front normalize(*entries).reverse
+    end
+
+    def after(*entries)
+      back *entries
+    end
+
     def entries
-      @front.reverse + @entries + @back
+      (@front.reverse + @entries + @back).uniq
     end
 
     def find_all(name)
@@ -114,6 +117,19 @@ module TSC
     def to_csh_eval
       "setenv #{name} #{self.inspect}"
     end
+
+    private
+    #######
+    
+    def normalize(*entries)
+      entries.flatten.compact.map { |_entry|
+        _entry.to_s.split(':').map { |_component|
+          value = _component.strip
+          Pathname.new(value).cleanpath.to_s unless value.empty?
+        }
+      }.flatten.compact
+    end
+
   end
 
   class NamedPath < Path
@@ -156,6 +172,13 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
 
         TSC::Path.current(:ZZZ).front('uuu').back('ooo').install
         assert_equal "uuu:aaa:bbb:ccc:ooo", ENV['ZZZ']
+      end
+
+      def test_named
+        path = TSC::Path['abc']
+
+        assert_equal "abc", path.name
+        assert_equal [ 'uuu', 'zzz', 'bbb', 'aaa'], path.front('aaa:bbb:aaa:bbb').before('uuu:zzz').entries
       end
 
       def test_modify
