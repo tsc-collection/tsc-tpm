@@ -89,6 +89,10 @@ module TSC
         super 'aix'
       end
 
+      def library_path_name
+        'LIBPATH'
+      end
+
       def free_space(location)
         launch( [ 'df', '-k', location] ).first.slice(1).split.slice(2).to_i.KB
       end

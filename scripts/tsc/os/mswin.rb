@@ -14,6 +14,10 @@ module TSC
         super 'nt'
       end
 
+      def library_path_name
+        'PATH'
+      end
+
       def exe(path)
         suffix = '.exe'
         [ path.sub(%r{#{Regexp.quote(suffix)}$}, ''), suffix ].join

@@ -199,6 +199,7 @@ module TSC
       require 'getoptlong'
       require 'tsc/errors.rb'
       require 'tsc/launch.rb'
+      require 'tsc/path.rb'
       require 'tsc/box.rb'
       require 'tsc/string-utils.rb'
       require 'tsc/line-builder.rb'

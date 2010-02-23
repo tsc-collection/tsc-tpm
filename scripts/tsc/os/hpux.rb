@@ -18,6 +18,10 @@ module TSC
         super 'hpux'
       end
 
+      def library_path_name
+        'SHLIB_PATH:LD_LIBRARY_PATH'
+      end
+
       def free_space(location)
         launch([ 'df', '-k', location ]).join("\n").scan(%r{(\d+)\s+free allocated Kb\s*$}).flatten.first.to_i.KB
       end

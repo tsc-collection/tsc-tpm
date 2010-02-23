@@ -1,3 +1,4 @@
+# vi: sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # 
 # Distributed under the MIT Licence.
@@ -16,6 +17,10 @@ module TSC
 
       def initialize(name)
         @name = name
+      end
+
+      def library_path_name
+        'LD_LIBRARY_PATH'
       end
 
       def path(path)
