@@ -1,4 +1,4 @@
-# vim: set sw=2:
+# vi: sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # 
 # Distributed under the MIT Licence.
@@ -6,20 +6,77 @@
 # You must read and accept the license prior to use.
 
 require 'tsc/errors.rb'
-require 'pathname'
 
 module TSC
   class Path
+    module Operations
+      def to_s
+        entries.join(':')
+      end
+
+      def inspect
+        to_s.inspect
+      end
+
+      def find_all(name)
+        entries.map { |_entry|
+          [ Pathname.new(_entry).join(name).to_s ].map { |_path|
+            _path if File.exist?(_path)
+          }
+        }.flatten.compact.uniq
+      end
+    end
+
+    include Operations
+
+    class Composite
+      include Path::Operations
+
+      class << self
+        def delegate_to_list(*methods)
+          methods.each do |_method|
+            define_method _method do |*_args|
+              @list.each do |_item|
+                _item.send _method, *_args
+              end
+
+              self
+            end
+          end
+        end
+      end
+
+      def initialize(list)
+        @list = list
+      end
+
+      delegate_to_list :load, :install, :front, :back, :before, :after
+
+      def name
+        @list.map { |_item|
+          _item.name
+        }.join(':')
+      end
+
+      def entries
+        @list.map { |_item|
+          _item.entries
+        }.flatten.uniq
+      end
+    end
+
     class << self
       def [] (name)
-        path = self.new
+        figure_path_item name.to_s.split(':').map { |_name|
+          path = self.new
 
-        generate_name_method name.to_s, class << path
-          public_class_method :define_method
-          self
-        end
+          generate_name_method _name.strip, class << path
+            public_class_method :define_method
+            self
+          end
 
-        path
+          path
+        }
       end
 
       def current(name = nil)
@@ -28,6 +85,10 @@ module TSC
 
       private
       #######
+
+      def figure_path_item(list)
+        list.size == 1 ? list.first : Composite.new(list)
+      end
 
       def generate_name_method(name, meta_class)
         meta_class.define_method(:name) {
@@ -41,6 +102,8 @@ module TSC
     end
 
     def initialize(*entries)
+      require 'pathname'
+
       @entries = normalize(entries)
 
       @front = []
@@ -82,24 +145,6 @@ module TSC
       (@front.reverse + @entries + @back).uniq
     end
 
-    def find_all(name)
-      require 'pathname'
-
-      entries.map { |_entry|
-        [ Pathname.new(_entry).join(name).to_s ].map { |_path|
-          _path if File.exist?(_path)
-        }
-      }.flatten.compact.uniq
-    end
-
-    def to_s
-      entries.join(':')
-    end
-
-    def inspect
-      to_s.inspect
-    end
-
     def to_ruby_eval
       [
         %Q{ENV[#{name.inspect}] = (},
@@ -129,7 +174,6 @@ module TSC
         }
       }.flatten.compact
     end
-
   end
 
   class NamedPath < Path
@@ -203,6 +247,14 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         @path.install
 
         assert_equal '/bin/aaa:/bin/bbb', ENV['PATH']
+      end
+
+      def test_composite
+        path = TSC::Path['   n1    :   n2     ']
+        assert_equal 'n1:n2', path.name
+        path.before('aaa:bbb:zzz:aaa:bbb').install
+        assert_equal 'aaa:bbb:zzz', ENV['n1']
+        assert_equal 'aaa:bbb:zzz', ENV['n2']
       end
 
       def setup
