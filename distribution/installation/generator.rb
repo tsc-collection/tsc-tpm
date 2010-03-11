@@ -97,12 +97,12 @@ module Installation
     end
 
     def process_create
-      result = stream_or_nothing(target, saved_target) do |_input|
+      result = stream_or_nothing(target, saved_target) { |_input|
         create _input
-      end
+      }
+      return unless result
 
       FileUtils.remove_entry target rescue true
-
       File.open(target, 'w') do |_io|
         _io.puts result
       end

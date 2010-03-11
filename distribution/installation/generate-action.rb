@@ -62,6 +62,10 @@ module Installation
       :generate
     end
 
+    def preserve_target
+      super unless Pathname.new(target).symlink?
+    end
+
     def make_target(progress, logger)
       begin
         generators = []
@@ -77,6 +81,14 @@ module Installation
       ensure
         Generator.clear_recent_subclasses
       end
+    end
+
+    def change_file_ownership(*args)
+      super unless Pathname.new(target).symlink?
+    end
+
+    def change_file_mode(*args)
+      super unless Pathname.new(target).symlink?
     end
   end
 end
