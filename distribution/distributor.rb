@@ -119,9 +119,15 @@ module Distribution
       filesets
     end
 
+    def temporary_location
+      @temporary_location ||= begin
+        File.expand_path(ENV['TMPDIR'] || '/tmp')
+      end
+    end
+
     def install_content(*dirs)
       info = []
-      directory = "/tmp/distributor.#{$$}"
+      directory = File.join temporary_location, "distributor.#{$$}"
       begin
         File.makedirs directory
         TSC::Progress.new "Collecting information" do |_progress|
