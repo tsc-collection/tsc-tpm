@@ -50,9 +50,23 @@ module TSC
       #########
 
       def collect_library_info(file)
+        found = false
         launch([ 'chatr', file ]).first.map { |_line|
-          item = _line.scan(%r{^\s*dynamic\s+(\S+)\s*$}).flatten.first
-          [ File.basename(item), nil ] if item
+          items = _line.strip.split
+
+          if found == false
+            found = true if items == %w{shared library list:}
+            next
+          end
+
+          next if items.empty?
+
+          if items.last[-1] == ?:
+            found = false
+            next
+          end
+
+          [ File.basename(items.last), nil ]
         }.compact
       end
 
@@ -152,9 +166,9 @@ __END__
              embedded path  disabled  second Not Defined
          shared library list:
              dynamic   /oracle/products/110/lib32/libclntsh.sl.11.1
-             dynamic   ../bin/lib/oracle/libsk-1.0-oracle.sl.1
+             libsk-1.0-oracle.sl.1
              dynamic   ../bin/lib/oralog/libsk-1.0-oralog.sl.1
-             dynamic   ../bin/lib/db/libsk-1.0-db.sl.1
+             libsk-1.0-db.sl.1
              dynamic   /opt/sk/platform/hp11-23-pa/gcc-3.4/lib/libstdc++.sl.6
              dynamic   /usr/lib/libm.2
              dynamic   /opt/sk/platform/hp11-23-pa/gcc-3.4/lib/libgcc_s.sl

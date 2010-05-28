@@ -94,7 +94,12 @@ module TSC
       end
 
       def dll_info(file)
-        launch([ 'ldd', file ]).first
+        launch([ 'ldd', file ]).first.map { |_line|
+          items = _line.split("=>").map { |_item|
+            _item.strip
+          }
+          items.join(" => ") if items.size == 2
+        }.compact
       end
 
       # Left this mistyped method name for compatibility with the older code.
