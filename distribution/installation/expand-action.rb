@@ -69,10 +69,10 @@ module Installation
       flatten_types
     end
 
-    def set_permissions
+    def set_permissions(progress = nil, logger = nil)
     end
 
-    def set_user_and_group
+    def set_user_and_group(progress = nil, logger = nil)
       super
 
       Find.find(target) do |_target|

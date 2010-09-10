@@ -58,7 +58,7 @@ module Installation
       def execute
         communicator.progress 'Setting file permissions' do |_progress|
           self.class.installation_actions.each do |_action|
-            _action.set_permissions
+            _action.set_permissions _progress, self
             _progress.print
           end
         end

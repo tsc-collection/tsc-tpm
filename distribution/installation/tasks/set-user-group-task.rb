@@ -60,7 +60,7 @@ module Installation
         return unless args.empty? || args.include?(Etc.getpwuid.name)
         communicator.progress 'Setting file ownerships' do |_progress|
           self.class.installation_actions.each do |_action|
-            _action.set_user_and_group
+            _action.set_user_and_group _progress, self
             _progress.print
           end
         end

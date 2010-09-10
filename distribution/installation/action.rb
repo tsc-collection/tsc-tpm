@@ -114,8 +114,8 @@ module Installation
 
       @undo_action.create(progress, logger)
 
-      @undo_action.set_user_and_group if @file_ownership_changed
-      @undo_action.set_permissions
+      @undo_action.set_user_and_group progress, logger if @file_ownership_changed
+      @undo_action.set_permissions progress, logger
       @undo_action = nil
     end
 
@@ -127,19 +127,22 @@ module Installation
       progress.print if progress
     end
 
-    def set_permissions
+    def set_permissions(progress = nil, logger = nil)
       return unless top
 
-      change_file_mode permission || 0644, target if permission
+      logger.log :set_permissions, "p=#{permission.inspect}, t=#{target.inspect}" if logger
+      change_file_mode permission, target if permission
     end
 
-    def set_user_and_group
+    def set_user_and_group(progress = nil, logger = nil)
       return unless top
 
       stat = target_stat
 
       uid = user_entry.uid unless user_entry.uid == stat.uid
       gid = group_entry.gid unless group_entry.gid == stat.gid
+
+      logger.log :set_user_and_group, "u=#{uid.inspect}, g=#{gid.inspect}, t=#{target.inspect}" if logger
 
       change_file_ownership uid, gid, target
       @file_ownership_changed = true

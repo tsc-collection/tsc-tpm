@@ -58,7 +58,7 @@ require 'ftools'
 
 module Installation
   class SymlinkAction < Action 
-    def set_permissions
+    def set_permissions(progress = nil, logger = nil)
     end
 
     protected

@@ -59,10 +59,10 @@ module Installation
       super :if_types => [], *args
     end
 
-    def set_permissions
+    def set_permissions(progress = nil, logger = nil)
     end
 
-    def set_user_and_group
+    def set_user_and_group(progress = nil, logger = nil)
     end
 
     def name
