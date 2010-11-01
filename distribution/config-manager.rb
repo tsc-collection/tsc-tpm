@@ -99,6 +99,10 @@ module Distribution
       @product_settings.build = build
     end
 
+    def product_abi=(abi)
+      @product_settings.abi = abi
+    end
+
     def product_name=(name)
       @product_settings.name = name
     end

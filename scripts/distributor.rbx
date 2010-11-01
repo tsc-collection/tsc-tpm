@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-# vim: set sw=2:
 =begin
+  vim: set sw=2:
  
              Tone Software Corporation BSD License ("License")
   
@@ -77,7 +77,8 @@ class Application < TSC::Application
         [ '--product',   'Product name',             'string',    '-P' ],
         [ '--version',   'Product version',          'string',    '-V' ],
         [ '--tag',       'Product tag',              'string',    '-T' ],
-        [ '--build',     'Broduct build',            'number',    '-b', '-B' ],
+        [ '--build',     'Product build',            'number',    '-b', '-B' ],
+        [ '--abi',       'Product ABI',              'string',    '-A' ],
         [ '--prefix',    'Library prefix',           'string',    '-p' ],
         [ '--extension', 'Shared library extension', 'string',    '-E' ],
         [ '--major',     'Library major number',     'number',    '-l' ],
@@ -131,6 +132,7 @@ class Application < TSC::Application
       options.each do |_key, _value|
         case _key
           when 'build' then distributor.product_build = convert_to_integer(_value)
+          when 'abi' then distributor.product_abi = _value
           when 'product' then distributor.product_name = _value
           when 'version' then distributor.product_version = _value
           when 'tag' then distributor.product_tag = _value

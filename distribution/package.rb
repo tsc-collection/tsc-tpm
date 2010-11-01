@@ -148,7 +148,8 @@ module Distribution
         product.version,
         ("b#{product.build}" if product.build),
         filter_tags(normalize_tags),
-        product.platform
+        product.platform,
+        ("m#{product.abi}" if product.abi),
       ].flatten.compact.join('-') + '.tpm'
     end
 

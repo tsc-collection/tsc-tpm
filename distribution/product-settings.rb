@@ -13,7 +13,7 @@ require 'tsc/dataset.rb'
 
 module Distribution
   class ProductSettings < TSC::Dataset
-    attr_reader :name, :build, :version, :tags
+    attr_reader :name, :build, :version, :tags, :abi
     attr_accessor :library_prefix, :library_major
 
     def initialize
@@ -22,6 +22,10 @@ module Distribution
 
     def build=(value)
       @build = value if value
+    end
+
+    def abi=(value)
+      @abi = value if value
     end
 
     def version=(value)

@@ -63,7 +63,7 @@ module Distribution
     attr_reader :description, :user, :group, :top, :packages, :tag_filters,
                 :base, :params, :compatibility, :log, :notags
 
-    def_delegators :@settings, :name, :tags, :build, :version, :library_major, :library_prefix
+    def_delegators :@settings, :name, :tags, :build, :version, :library_major, :library_prefix, :abi
 
     def_delegators :@settings, :library_prefix=
     def_delegators :@settings, :library_major=

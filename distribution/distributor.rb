@@ -65,6 +65,7 @@ module Distribution
     def_delegators :@config, :filesets, :product
 
     def_delegators :@config, "product_build="
+    def_delegators :@config, "product_abi="
     def_delegators :@config, "product_name="
     def_delegators :@config, "product_version="
     def_delegators :@config, "product_tag="
