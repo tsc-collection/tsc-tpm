@@ -1,5 +1,5 @@
-# vim: set sw=2:
 =begin
+  vim: sw=2:
              Tone Software Corporation BSD License ("License")
   
                          Ruby Application Framework
@@ -122,11 +122,11 @@ module TSC
         info = Sys::Uname.uname
 
         arch = case info.architecture
-	  when 'i386'
-	    'x86'
-	  else
-	    info.architecture
-	end
+          when 'i386'
+            'x86'
+          else
+            info.architecture
+        end
         release = info.release.split('.').last
 
         [ "sun-#{release}-#{arch}", arch ]
@@ -218,14 +218,14 @@ module TSC
       end
 
       def lookup(platform)
-	platform = platform.to_s.strip.downcase
-	@supported.each do |_ids, _platforms|
-	  name, os, arch = Array(_ids).map { |_item| 
+        platform = platform.to_s.strip.downcase
+        @supported.each do |_ids, _platforms|
+          name, os, arch = Array(_ids).map { |_item| 
             _item.to_s # to accept symbols
           }
-	  return [ name, os, arch ] if [ name, *_platforms ].include? platform
-	end
-	raise UnsupportedError, platform
+          return [ name, os, arch ] if [ name, *_platforms ].include? platform
+        end
+        raise UnsupportedError, platform
       end
 
       private :new
