@@ -261,6 +261,13 @@ module TSC
       end
     end
 
+    def family
+      mapper = Hash.new(arch).update(
+        "amd64" => "x86"
+      )
+      "#{os}-#{mapper[arch]}"
+    end
+
     private
     #######
 
