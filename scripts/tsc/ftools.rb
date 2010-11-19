@@ -51,14 +51,14 @@ class File
     def smart_join(*args)
       args = args.flatten
       unless args.empty?
-	first = args.first
-	first = File.expand_path first if first =~ %r{^~}
-	second = smart_join *args[1..-1]
+        first = args.first
+        first = File.expand_path first if first =~ %r{^~}
+        second = smart_join *args[1..-1]
 
-	return first if second.nil?
-	return second if second =~ %r{^/} or first.nil?
+        return first if second.nil?
+        return second if second =~ %r{^/} or first.nil?
 
-	File.join first, second
+        File.join first, second
       end
     end
 
@@ -90,15 +90,15 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
       end
 
       def test_join
-	assert_nil File.smart_join
-	assert_equal 'aaa', File.smart_join('aaa')
-	assert_equal 'aaa/bbb', File.smart_join('aaa', 'bbb')
-	assert_equal 'aaa/bbb', File.smart_join(nil, 'aaa', nil, 'bbb', nil)
+        assert_nil File.smart_join
+        assert_equal 'aaa', File.smart_join('aaa')
+        assert_equal 'aaa/bbb', File.smart_join('aaa', 'bbb')
+        assert_equal 'aaa/bbb', File.smart_join(nil, 'aaa', nil, 'bbb', nil)
 
-	assert_equal '/bbb', File.smart_join('aaa', '/bbb')
-	assert_equal '/ccc', File.smart_join('aaa', 'bbb', '/ccc')
-	assert_equal '/bbb/ccc', File.smart_join('aaa', '/bbb', 'ccc')
-	assert_equal '/bbb/ccc', File.smart_join('aaa', '/bbb', nil, 'ccc')
+        assert_equal '/bbb', File.smart_join('aaa', '/bbb')
+        assert_equal '/ccc', File.smart_join('aaa', 'bbb', '/ccc')
+        assert_equal '/bbb/ccc', File.smart_join('aaa', '/bbb', 'ccc')
+        assert_equal '/bbb/ccc', File.smart_join('aaa', '/bbb', nil, 'ccc')
       end
     end
   end
