@@ -1,5 +1,5 @@
 =begin
-  vi: sw=2:
+  vim: sw=2:
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
   
   Distributed under the MIT Licence.
@@ -17,11 +17,14 @@ module Distribution
         original_entries = _module.entries.clone
         _module.entries.replace _module.entries.map { |_entry|
           entry = File.smart_join(_entry)
-          directory = path.entries.detect { |_directory|
-            File.exist? File.smart_join(_directory, entry)
-          } or raise "#{entry} not found in PATH"
 
-          [ directory, *Array(_entry) ]
+          catch :found do
+            path.entries.each do |_directory|
+              item = File.smart_join(_directory, entry)
+              throw :found, File.split(item) if File.exist?(item)
+            end
+            raise "#{entry} not found in PATH"
+          end
         }
         descriptors = _module.descriptors '/'
         _module.entries.replace original_entries
