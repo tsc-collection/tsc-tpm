@@ -9,19 +9,20 @@
 
 require 'origin.rb'
 require 'tsc/path.rb'
+require 'pathname'
 
 module Distribution
   class PathOrigin < Origin
     def descriptors
       modules.map { |_module|
         original_entries = _module.entries.clone
-        _module.entries.replace _module.entries.map { |_entry|
-          entry = File.smart_join(_entry)
+        _module.entries.replace _module.entries.map { |_first, *_rest|
+          entry = Pathname.new(_first).join(*_rest)
+          next File.split(entry.to_s) if entry.absolute?
 
           catch :found do
             path.entries.each do |_directory|
-              item = File.smart_join(_directory, entry)
-              throw :found, File.split(item) if File.exist?(item)
+              throw :found, [ _directory, entry.to_s ] if entry.expand_path(_directory).exist?
             end
             raise "#{entry} not found in PATH"
           end
