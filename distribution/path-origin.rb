@@ -22,7 +22,7 @@ module Distribution
 
           catch :found do
             path.entries.each do |_directory|
-              throw :found, [ _directory, entry.to_s ] if entry.expand_path(_directory).exist?
+              throw :found, [ _directory, entry.to_s ] if Pathname.new(_directory).join(entry).exist?
             end
             raise "#{entry} not found in PATH"
           end
