@@ -319,6 +319,7 @@ module TSC
         hppa2.0w-hpux11.00 
         hppa2.0w-hpux11.11 
         hppa2.0w-hpux11.23
+        hppa2.0w-hpux11.31
         ia64-hpux11.23 
       },
       [ 'windows-x86', :mswin, :x86 ] => %w{ i386-mswin32 },
