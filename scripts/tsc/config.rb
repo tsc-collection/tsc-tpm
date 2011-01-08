@@ -1,3 +1,4 @@
+# vi: sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # 
 # Distributed under the MIT Licence.
@@ -9,7 +10,7 @@ require 'yaml'
 
 module TSC
   class Config
-    attr_reader :location, :location_from_cwd, :hash
+    attr_reader :location, :location_from_cwd
 
     class << self
       def parse(*resource)
@@ -79,6 +80,23 @@ module TSC
 
     def serialize
       @hash.to_yaml
+    end
+
+    def hash(*items)
+      return @hash if items.empty?
+
+      items.inject(@hash) { |_memo, _item|
+        sections = _memo.map { |_key, _value|
+          next unless _key.to_s.downcase == _item.downcase
+          ensure_hash _value
+        }.compact
+
+        raise "No key #{items.join('.').inspect}" if sections.empty?
+
+        sections.inject { |_memo, _item|
+          _memo.merge _item
+        }
+      }
     end
   end
 end
