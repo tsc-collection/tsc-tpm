@@ -95,7 +95,7 @@ module TSC
 
         arch = case info.machine
           when 'i686', 'i386' then 'x86'
-          when 'x86_64' then 'amd64'
+          when 'x86_64', 'amd64' then 'x64'
           else info.machine
         end
 
@@ -263,7 +263,7 @@ module TSC
 
     def family
       mapper = Hash.new(arch).update(
-        "amd64" => "x86"
+        "x64" => "x86"
       )
       "#{os}-#{mapper[arch]}"
     end
