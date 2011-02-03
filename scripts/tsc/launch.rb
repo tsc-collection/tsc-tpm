@@ -1,6 +1,6 @@
 #!/bin/env ruby
-# vi: sw=2:
 =begin
+  vi: sw=2:
              Tone Software Corporation BSD License ("License")
   
                          Ruby Application Framework
@@ -140,6 +140,19 @@ module TSC
           Process.kill 'KILL', pid
         end
         Process.waitpid pid
+      end
+
+      def normalize_command_args(*args)
+        args.flatten.compact.map { |_item|
+          _item.to_s
+        }
+      end
+
+      def normalize_command_line(*args)
+        args.flatten.compact.map { |_item|
+          item = _item.to_s
+          item.count(" ():/[];&<>!\"\t\n\r\\").zero? ? item : item.inspect
+        }.join(' ')
       end
     end
 
