@@ -236,7 +236,7 @@ module TSC
       unless @strings_only
         errors = @content.select do |_item|
           case _item
-            when self.class
+            when TSC::Error
               _item.each_error(*(args + strings), &block) || true
             when Exception
               block.call(_item, *(args + strings)) || true
