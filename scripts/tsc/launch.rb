@@ -91,6 +91,10 @@ module TSC
           end
         end
       end
+
+      def to_s
+        message
+      end
     end
 
     def initialize(&child_setup_block)
