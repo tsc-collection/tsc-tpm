@@ -65,7 +65,6 @@ end
 if $0 == __FILE__ 
   require 'test/unit'
   require 'mocha'
-  require 'stubba'
   
   class TSC::CLI::CommunicatorTest < Test::Unit::TestCase
     attr_reader :communicator

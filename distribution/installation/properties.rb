@@ -106,7 +106,6 @@ end
 if $0 == __FILE__ 
   require 'test/unit'
   require 'mocha'
-  require 'stubba'
   
   module Installation
     class PropertiesTest < Test::Unit::TestCase

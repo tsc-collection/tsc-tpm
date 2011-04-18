@@ -12,7 +12,6 @@ require 'tsc/after-end-reader.rb'
 require 'installation/install-action.rb'
 
 require 'mocha'
-require 'stubba'
   
 context 'Remove action' do
   include TSC::AfterEndReader

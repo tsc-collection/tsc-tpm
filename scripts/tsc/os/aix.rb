@@ -143,10 +143,9 @@ end
 
 if $0 == __FILE__ 
   require 'test/unit'
-  require 'tsc/after-end-reader.rb'
-
   require 'mocha'
-  require 'stubba'
+
+  require 'tsc/after-end-reader.rb'
   
   module TSC
     module OS

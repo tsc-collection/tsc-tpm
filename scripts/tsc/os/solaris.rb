@@ -37,11 +37,10 @@ end
 
 if $0 == __FILE__ 
   require 'test/unit'
+  require 'mocha'
+  
   require 'tsc/after-end-reader.rb'
 
-  require 'mocha'
-  require 'stubba'
-  
   module TSC
     module OS
       class SolarisTest < Test::Unit::TestCase

@@ -46,7 +46,6 @@ end
 if $0 == __FILE__ 
   require 'test/unit'
   require 'mocha'
-  require 'stubba'
 
   module TSC
     class LineBuilderTest < Test::Unit::TestCase

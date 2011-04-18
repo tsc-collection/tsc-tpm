@@ -45,7 +45,6 @@ end
 if $0 == __FILE__ 
   require 'test/unit'
   require 'mocha'
-  require 'stubba'
 
   module Distribution
     class ProductSettingsTest < Test::Unit::TestCase

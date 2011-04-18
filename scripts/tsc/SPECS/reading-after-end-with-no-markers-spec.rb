@@ -8,10 +8,8 @@
   You must read and accept the license prior to use.
 =end
 
-require 'tsc/after-end-reader.rb'
-
 require 'mocha'
-require 'stubba'
+require 'tsc/after-end-reader.rb'
   
 context 'No end markers' do
   include TSC::AfterEndReader
