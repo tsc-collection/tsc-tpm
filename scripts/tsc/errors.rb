@@ -273,6 +273,10 @@ module TSC
         _item.flatten.join(': ')
       }.join('#')
     end
+
+    def to_s
+      message
+    end
   end
 
   class DeprecatedMethodError < Error
