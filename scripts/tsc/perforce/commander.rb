@@ -170,7 +170,7 @@ module TSC
   end
 end
 
-if $0 == __FILE__ or defined? Test::Unit::TestCase
+if $0 == __FILE__ 
   require 'tsc/application'
   p4 = TSC::Perforce::Commander.new
 
