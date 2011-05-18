@@ -64,7 +64,7 @@ module TSC
       # Returns an object representing current platform.
       #
       def current
-        name, os, arch = lookup(PLATFORM)
+        name, os, arch = lookup(RUBY_PLATFORM)
         case os
           when 'windows' then name, os, arch = fine_tune_windows
           when 'linux' then name, arch = fine_tune_linux
@@ -323,7 +323,7 @@ module TSC
         hppa2.0w-hpux11.31
         ia64-hpux11.23 
       },
-      [ 'windows-x86', :mswin, :x86 ] => %w{ i386-mswin32 },
+      [ 'windows-x86', :mswin, :x86 ] => %w{ i386-mswin32 i386-mingw32 },
       [ 'win32-sfu-x86', :interix, :x86 ] => %w{ i586-interix3 },
       [ 'java', :jvm, :any ] => %w{ java }
     ]
