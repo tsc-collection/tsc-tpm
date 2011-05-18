@@ -43,8 +43,9 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
+require 'tsc/ftools'
+
 require 'pathname'
-require 'ftools'
 require 'find'
 
 class Dir

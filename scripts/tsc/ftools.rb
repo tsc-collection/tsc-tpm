@@ -43,7 +43,11 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
-require 'ftools'
+begin
+  require 'ftools'
+rescue LoadError
+  $" << 'ftools'
+end
 
 class File
   class << self
