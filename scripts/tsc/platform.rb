@@ -185,6 +185,7 @@ module TSC
 
         arch = case info.machine
           when 'i386' then 'x86'
+          when 'x86_64' then 'x86'
           else 'ppc'
         end
         os = 'darwin'
@@ -292,6 +293,7 @@ module TSC
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 powerpc-aix5.3.0.0 },
       [ 'mac-universal', :darwin, :universal ] => %w{ 
+        universal-darwin11.0
         universal-darwin10.0
         universal-darwin9.0 
         universal-darwin8.0 
