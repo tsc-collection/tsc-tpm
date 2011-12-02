@@ -99,6 +99,22 @@ module TSC
           else info.machine
         end
 
+        IO.popen("rpm -qa") { |_io|
+          _io.readlines.each do |_line|
+            components = _line.split('-')
+
+            next unless components[1] == "release"
+            next unless components[0] == "sles"
+
+            suse_major = components[2].scan(%r{^(\d+)(?:[.]\d+)+$}).flatten.first
+            next unless suse_major
+
+            arch = 'x64' if arch == 'amd64'
+
+            return [ "suse-#{suse_major}-#{arch}", arch ]
+          end
+        }
+        
         kernel, version = info.release.scan(%r{^(\d+[.]\d+)[.](\d+)[.-]}).first
         distro = case kernel
           when '2.4'
@@ -264,7 +280,8 @@ module TSC
 
     def family
       mapper = Hash.new(arch).update(
-        "amd64" => "x86"
+        "amd64" => "x86",
+        "x64" => "x86"
       )
       "#{os}-#{mapper[arch]}"
     end
