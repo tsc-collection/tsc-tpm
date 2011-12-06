@@ -332,6 +332,8 @@ module TSC
         i686-darwin10.2.0
         i686-darwin10.5.0
         i686-darwin10.6.0
+        i386-darwin11.2.0
+        x86_64-darwin11.2.0
       },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
