@@ -212,7 +212,7 @@ module TSC
             print_error exception
             print_usage('===')
             exit 2
-          when TSC::Error, StandardError, Interrupt, *errors
+          when TSC::Error, StandardError, Interrupt, LoadError, *errors
             print_error exception
           else
             raise
