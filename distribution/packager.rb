@@ -1,14 +1,14 @@
 =begin
   vi: sw=2:
              Tone Software Corporation BSD License ("License")
-  
+
                        Software Distribution Facility
-                       
+
   Please read this License carefully before downloading this software. By
   downloading or using this software, you are agreeing to be bound by the
   terms of this License. If you do not or cannot agree to the terms of
   this License, please do not download or use the software.
-  
+
   Provides ability to package software (binaries, configuration files,
   etc.) into a set of self-installable well-compressed distribution files.
   They can be installed on a target system as sub-packages and removed or
@@ -18,23 +18,23 @@
   description can be used from software build environment to implement
   installation rules for trying out the binaries directly on a development
   system, thus decoupling compilation and installation rules.
-  
+
   Copyright (c) 2003, 2005, Tone Software Corporation
-  
+
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
     * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer. 
+      notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution. 
+      documentation and/or other materials provided with the distribution.
     * Neither the name of the Tone Software Corporation nor the names of
       its contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission. 
-  
+      from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -46,7 +46,7 @@
   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-=end 
+=end
 
 require 'tsc/ftools.rb'
 require 'tsc/platform.rb'
@@ -85,12 +85,12 @@ module Distribution
         metainf_dirs_info = metainf_directories(content_info, tools_info, prodinfo_info)
 
         info = [
-          package.product.info, 
+          package.product.info,
           package.info,
           metainf_dirs_info,
           prodinfo_info,
           properties_info,
-          tools_info, 
+          tools_info,
           content_info
         ]
 
@@ -114,8 +114,8 @@ module Distribution
           File.join(_path, what)
         }
       end.map { |_item|
-        Dir[_item].select { |_file| 
-          File.file? _file 
+        Dir[_item].select { |_file|
+          File.file? _file
         }
       }.flatten
     end
@@ -133,8 +133,8 @@ module Distribution
           end
         end
       end
-      result.map { |*_entry| 
-        _entry.flatten 
+      result.map { |*_entry|
+        _entry.flatten
       }
     end
 
@@ -207,7 +207,7 @@ module Distribution
           next if _file =~ %r{-test.rb$}
           next if File.basename(_file).index('test-') == 0
 
-          require _file 
+          require _file
         end
       end
     end
@@ -217,11 +217,11 @@ module Distribution
       locations = Hash[
         [ "tools/lib", Defaults.mode.file ] => figure_installation_library_files,
         [ "tools", Defaults.mode.file ] => figure_ruby_library_files,
-        [ "tools/bin", Defaults.mode.program ] => [ 
+        [ "tools/bin", Defaults.mode.program ] => [
           File.split(figure_ruby_path).reverse,
-          *%w{ 
-            tpm-install 
-            tpm 
+          *%w{
+            tpm-install
+            tpm
           }.map { |_file| [ _file, @config.binary_directory ] }
         ],
         [ "tools/bin", Defaults.mode.file ] => figure_tsc_library_files
@@ -244,7 +244,7 @@ module Distribution
           }
         }
       end
-      info + SymlinkAction.new(nil, 
+      info + SymlinkAction.new(nil,
         '.meta-inf/tools/bin/tpm-info'   => 'tpm-install',
         '.meta-inf/tools/bin/tpm-remove' => 'tpm-install',
         '.meta-inf/tools/bin/tpm-revert' => 'tpm-install',
@@ -327,8 +327,8 @@ module Distribution
           File.open(package_path, 'w') do |_io|
             _io.puts IO.readlines(installer).map { |_line|
               r = _line.scan(%r{^(\s*STREAM_UNCOMPRESS_COMMAND=)(.*)$}).first
-              if r 
-                r[0] + uncompress.inspect 
+              if r
+                r[0] + uncompress.inspect
               else
                 r = _line.scan(%r{^(\s*CPIO_COMMAND=)(.*)$}).first
                 if r
@@ -346,7 +346,7 @@ module Distribution
             launch 'find . -print', 'cpio -ov', "#{compress} >> #{package_path}" do
               _progress.print
             end
-          end 
+          end
         end
       rescue Exception
         File.rm_f package_path
@@ -356,7 +356,7 @@ module Distribution
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
 
   module Distribution

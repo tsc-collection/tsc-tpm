@@ -2,7 +2,7 @@
 
 =begin
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -14,7 +14,7 @@ require 'installation/install-action.rb'
 describe 'Install action' do
   include TSC::AfterEndReader
   include Installation
-  
+
   attr_reader :action
 
   before :each do

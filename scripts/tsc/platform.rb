@@ -1,35 +1,35 @@
 =begin
   vim: sw=2:
              Tone Software Corporation BSD License ("License")
-  
+
                          Ruby Application Framework
-  
+
   Please read this License carefully before downloading this software.  By
   downloading or using this software, you are agreeing to be bound by the
   terms of this License.  If you do not or cannot agree to the terms of
   this License, please do not download or use the software.
-  
+
   This is a Ruby class library for building applications. Provides common
   application services such as option parsing, usage output, exception
   handling, presentation, etc.  It also contains utility classes for data
   handling.
-  
+
   Copyright (c) 2003, 2005, Tone Software Corporation
-  
+
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
     * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer. 
+      notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution. 
+      documentation and/or other materials provided with the distribution.
     * Neither the name of the Tone Software Corporation nor the names of
       its contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission. 
-  
+      from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -51,7 +51,7 @@ require 'tsc/errors.rb'
 module TSC
   class Platform
     # This class performs platform determination by mapping a Ruby platform
-    # identifier to a class that implements queries for platform name, os and 
+    # identifier to a class that implements queries for platform name, os and
     # architecture. The class also implements platform comparision.
     #
     class UnsupportedError < TSC::Error
@@ -114,7 +114,7 @@ module TSC
             return [ "suse-#{suse_major}-#{arch}", arch ]
           end
         }
-        
+
         kernel, version = info.release.scan(%r{^(\d+[.]\d+)[.](\d+)[.-]}).first
         distro = case kernel
           when '2.4'
@@ -217,7 +217,7 @@ module TSC
             "10.5"
           when kernel >= 80000
             "10.4"
-          else 
+          else
             "X"
         end
 
@@ -237,7 +237,7 @@ module TSC
       def lookup(platform)
         platform = platform.to_s.strip.downcase
         @supported.each do |_ids, _platforms|
-          name, os, arch = Array(_ids).map { |_item| 
+          name, os, arch = Array(_ids).map { |_item|
             _item.to_s # to accept symbols
           }
           return [ name, os, arch ] if [ name, *_platforms ].include? platform
@@ -258,7 +258,7 @@ module TSC
         @name == self.class.send(:lookup, platform).first
       rescue UnsupportedError
         false
-      end 
+      end
     end
 
     # Returns a platform name when converting to a string.
@@ -309,24 +309,24 @@ module TSC
       [ 'lin-x86', :linux, :x86 ] => %w{ i686-linux i386-linux-gnu x86_64-linux},
       [ 'lin-ia64', :linux, :ia64 ] => %w{ ia64-linux ia64-linux-gnu },
       [ 'aix5-ppc', :aix, :ppc ] => %w{ powerpc-aix5.1.0.0 powerpc-aix5.2.0.0 powerpc-aix5.3.0.0 },
-      [ 'mac-universal', :darwin, :universal ] => %w{ 
+      [ 'mac-universal', :darwin, :universal ] => %w{
         universal-darwin11.0
         universal-darwin10.0
-        universal-darwin9.0 
-        universal-darwin8.0 
+        universal-darwin9.0
+        universal-darwin8.0
       },
-      [ 'mac-ppc', :darwin, :ppc ] => %w{ 
-        powerpc-darwin8.1.0 
-        powerpc-darwin8.0 
-        powerpc-darwin8.8.0 
-        powerpc-darwin8.9.0 
-        powerpc-darwin8.10.0 
-        powerpc-darwin8.11.0 
+      [ 'mac-ppc', :darwin, :ppc ] => %w{
+        powerpc-darwin8.1.0
+        powerpc-darwin8.0
+        powerpc-darwin8.8.0
+        powerpc-darwin8.9.0
+        powerpc-darwin8.10.0
+        powerpc-darwin8.11.0
       },
-      [ 'mac-x86', :darwin, :x86 ] => %w{ 
-        i686-darwin8.6.1 
+      [ 'mac-x86', :darwin, :x86 ] => %w{
+        i686-darwin8.6.1
         i686-darwin8.7.1
-        i686-darwin8.9.1 
+        i686-darwin8.9.1
         i686-darwin9.3.0
         i686-darwin9.7.0
         i686-darwin10.2.0
@@ -337,12 +337,12 @@ module TSC
       },
       [ 'tru64', :osf, :alpha ] => %w{ alphaev67-osf5.1b },
       [ 'osf4', :osf, :alpha ] => %w{ alphaev67-osf4.0f },
-      [ 'hpux', :hpux, :parisc ] => %w{ 
-        hppa2.0w-hpux11.00 
-        hppa2.0w-hpux11.11 
+      [ 'hpux', :hpux, :parisc ] => %w{
+        hppa2.0w-hpux11.00
+        hppa2.0w-hpux11.11
         hppa2.0w-hpux11.23
         hppa2.0w-hpux11.31
-        ia64-hpux11.23 
+        ia64-hpux11.23
       },
       [ 'windows-x86', :mswin, :x86 ] => %w{ i386-mswin32 i386-mingw32 },
       [ 'win32-sfu-x86', :interix, :x86 ] => %w{ i586-interix3 },
@@ -351,7 +351,7 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   TSC::Platform.current.driver
 
@@ -380,7 +380,7 @@ if $0 == __FILE__
 
       def setup
       end
-      
+
       def teardown
       end
     end

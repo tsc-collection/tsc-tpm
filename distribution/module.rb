@@ -1,14 +1,14 @@
 =begin
   vi: sw=2:
              Tone Software Corporation BSD License ("License")
-  
+
                        Software Distribution Facility
-                       
+
   Please read this License carefully before downloading this software. By
   downloading or using this software, you are agreeing to be bound by the
   terms of this License. If you do not or cannot agree to the terms of
   this License, please do not download or use the software.
-  
+
   Provides ability to package software (binaries, configuration files,
   etc.) into a set of self-installable well-compressed distribution files.
   They can be installed on a target system as sub-packages and removed or
@@ -18,23 +18,23 @@
   description can be used from software build environment to implement
   installation rules for trying out the binaries directly on a development
   system, thus decoupling compilation and installation rules.
-  
+
   Copyright (c) 2003, 2005, Tone Software Corporation
-  
+
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
     * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer. 
+      notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution. 
+      documentation and/or other materials provided with the distribution.
     * Neither the name of the Tone Software Corporation nor the names of
       its contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission. 
-  
+      from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -46,7 +46,7 @@
   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  
+
 =end
 
 require 'file-info.rb'
@@ -171,7 +171,7 @@ module Distribution
         case _arg
           when Distribution::Module
             depot.concat _arg.entries
-          when Hash 
+          when Hash
             _arg.each do |_key, _value|
               if Symbol === _key
                 @info[_key] = _value
@@ -191,7 +191,7 @@ module Distribution
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
 
   module Distribution
@@ -203,36 +203,36 @@ if $0 == __FILE__
 
       def test_hash
         m = Module.new "aaa" => [ "bbb", "ccc"]
-        assert_equal [ 
-          ["aaa", "bbb"], 
-          ["aaa", "ccc"] 
+        assert_equal [
+          ["aaa", "bbb"],
+          ["aaa", "ccc"]
         ], m.entries
       end
 
       def test_mixture
-        m = Module.new "zzz", 
+        m = Module.new "zzz",
                              {
-                               "aaa" => [ { 
-                                            "uuu" => ["bbb", "ccc"] 
-                                          }, 
+                               "aaa" => [ {
+                                            "uuu" => ["bbb", "ccc"]
+                                          },
                                           "sss"
-                                        ] 
-                             }, 
+                                        ]
+                             },
                              "ooo"
-        assert_equal [ 
-          "zzz", 
-          ["aaa", "uuu", "bbb"], 
-          ["aaa", "uuu", "ccc"], 
-          ["aaa", "sss"], 
-          "ooo" 
+        assert_equal [
+          "zzz",
+          ["aaa", "uuu", "bbb"],
+          ["aaa", "uuu", "ccc"],
+          ["aaa", "sss"],
+          "ooo"
         ], m.entries
 
-        assert_equal [ 
-          FileInfo.new("zzz"), 
-          FileInfo.new("aaa/uuu/bbb"), 
-          FileInfo.new("aaa/uuu/ccc"), 
-          FileInfo.new("aaa/sss"), 
-          FileInfo.new("ooo") 
+        assert_equal [
+          FileInfo.new("zzz"),
+          FileInfo.new("aaa/uuu/bbb"),
+          FileInfo.new("aaa/uuu/ccc"),
+          FileInfo.new("aaa/sss"),
+          FileInfo.new("ooo")
         ], m.files
       end
 
@@ -249,9 +249,9 @@ if $0 == __FILE__
       def test_module
         m = Module.new "aaa" => [ "bbb", "ccc"]
         m1 = Module.new m
-        assert_equal [ 
-          ["aaa", "bbb"], 
-          ["aaa", "ccc"] 
+        assert_equal [
+          ["aaa", "bbb"],
+          ["aaa", "ccc"]
         ], m1.entries
       end
     end

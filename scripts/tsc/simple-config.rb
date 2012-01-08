@@ -1,34 +1,34 @@
 #
 #            Tone Software Corporation BSD License ("License")
-# 
+#
 #                        Ruby Application Framework
-# 
+#
 # Please read this License carefully before downloading this software.  By
 # downloading or using this software, you are agreeing to be bound by the
 # terms of this License.  If you do not or cannot agree to the terms of
 # this License, please do not download or use the software.
-# 
+#
 # This is a Ruby class library for building applications. Provides common
 # application services such as option parsing, usage output, exception
 # handling, presentation, etc.  It also contains utility classes for data
 # handling.
-# 
+#
 # Copyright (c) 2003, 2005, Tone Software Corporation
-# 
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
 # met:
 #   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer. 
+#     notice, this list of conditions and the following disclaimer.
 #   * Redistributions in binary form must reproduce the above copyright
 #     notice, this list of conditions and the following disclaimer in the
-#     documentation and/or other materials provided with the distribution. 
+#     documentation and/or other materials provided with the distribution.
 #   * Neither the name of the Tone Software Corporation nor the names of
 #     its contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission. 
-# 
+#     from this software without specific prior written permission.
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
 # IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 # TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -40,20 +40,20 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 
 =begin
   Configuration file management. It reads in configuration, provides method to
   change, add or remove parameters and save it back to the file keeping original
   spacing and comments as much as possible.
-    A configuration file can contain empty lines, comment lines or parameter 
+    A configuration file can contain empty lines, comment lines or parameter
   specification lines. Comment lines are those where the first non-space
   character is '#'. Parameter specification lines are of the following format:
 	<parameter> '=' <value> [ <comment> ]
-    Where <parameter> a sequence of non-space characters (no '=' or '#' either); 
-  <value> is a set of any characters starting and ending with a non-space 
-  character; <comment> is a set of characters up to the end of a line 
-  starting with character '#'. Any part of a parameter specification line 
+    Where <parameter> a sequence of non-space characters (no '=' or '#' either);
+  <value> is a set of any characters starting and ending with a non-space
+  character; <comment> is a set of characters up to the end of a line
+  starting with character '#'. Any part of a parameter specification line
   may be surrounded with space characters.
     Examples of parameter specification lines:
 	aaa=bbb # aaa => >bbb<
@@ -94,7 +94,7 @@ module TSC
 
 	    unless _entry.size == 8
 	      raise [
-		"Wrong entry in", 
+		"Wrong entry in",
 		if _filename
 		  [ "file", _filename ]
 		end,
@@ -123,7 +123,7 @@ module TSC
 	}
       else
 	args.each { |_io|
-	  _io.puts [ 
+	  _io.puts [
 	    *@properties.map { |_property, _value, _result|
 	      _result.join
 	    }
@@ -163,7 +163,7 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'tempfile'
 
@@ -203,11 +203,11 @@ if $0 == __FILE__
       assert_equal "AAA", @config.get("aaa")
     end
     def test_bad_format
-      [ 
+      [
         "aaa = bbb = ccc",
 	"bbb = "
       ].each do |_content|
-	assert_raises(RuntimeError,"For #{_content}") do 
+	assert_raises(RuntimeError,"For #{_content}") do
 	  @config.load [ _content ]
 	end
       end
@@ -225,10 +225,10 @@ if $0 == __FILE__
       @config.save @result
 
       assert_equal 7, @result.size
-      [ 
+      [
         "",
 	"  # kljlkjlkjlkjlkjlj",
-	"zzz = ZZZ # set", 
+	"zzz = ZZZ # set",
 	"     aaa=ccc  ",
 	"# kljlkjlkjlkjlkjlj",
 	"bbb=       ooo   ",
@@ -257,10 +257,10 @@ if $0 == __FILE__
 
     def setup
       @config = TSC::SimpleConfig.new
-      @source = [ 
+      @source = [
         "",
 	"  # kljlkjlkjlkjlkjlj",
-	"zzz = ggg # set", 
+	"zzz = ggg # set",
 	"     aaa=ccc  ",
 	"# kljlkjlkjlkjlkjlj",
 	"bbb=       ooo   "

@@ -1,5 +1,5 @@
 # Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -17,10 +17,10 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
-  
+
   module TSC
     class OpenDatasetTest < Test::Unit::TestCase
       attr_reader :dataset
@@ -50,7 +50,7 @@ if $0 == __FILE__
       def setup
         @dataset = TSC::OpenDataset.new( :aaa => 17, :bbb => 'zzz' )
       end
-      
+
       def teardown
         @dataset = nil
       end

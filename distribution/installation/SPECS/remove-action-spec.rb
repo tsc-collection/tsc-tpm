@@ -2,7 +2,7 @@
 
 =begin
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -12,10 +12,10 @@ require 'tsc/after-end-reader.rb'
 require 'installation/install-action.rb'
 
 require 'mocha'
-  
+
 context 'Remove action' do
   include TSC::AfterEndReader
-  
+
   attr_reader :action, :progress, :logger
 
   setup do

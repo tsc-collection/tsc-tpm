@@ -1,7 +1,7 @@
 =begin
   vi: sw=2:
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -63,10 +63,10 @@ module Installation
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
-  
+
   module Installation
     module Tasks
       class QueryPasswordTaskTest < Test::Unit::TestCase
@@ -75,7 +75,7 @@ if $0 == __FILE__
 
         def setup
         end
-        
+
         def teardown
         end
       end

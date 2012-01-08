@@ -1,6 +1,6 @@
 =begin
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -90,10 +90,10 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
-  
+
   module TSC
     class ByteMeasureTest < Test::Unit::TestCase
       def test_inspect
@@ -115,7 +115,7 @@ if $0 == __FILE__
         assert_equal '0.49 KB', ByteMeasure.kilobytes(3).to_same_units(500).to_s
         assert_equal '2048 KB', ByteMeasure.kilobytes(3).to_same_units(ByteMeasure.megabytes(2)).to_s
       end
-      
+
       def test_no_fractional_bytes
         assert_equal '4 bytes', ByteMeasure.bytes(4.6).to_s
       end

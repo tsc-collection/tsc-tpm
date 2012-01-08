@@ -1,5 +1,5 @@
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -52,7 +52,7 @@ module TSC
 
     def read_resource_from(directory)
       begin
-        Config.parse(directory, resource_name) 
+        Config.parse(directory, resource_name)
       rescue Errno::ENOENT
         nil
       end
@@ -76,9 +76,9 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
-  
+
   module TSC
     class ConfigLocatorTest < Test::Unit::TestCase
       def test_nothing

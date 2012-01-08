@@ -1,7 +1,7 @@
 =begin
   vi: sw=2:
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -28,12 +28,12 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
 
   require 'tsc/after-end-reader.rb'
-  
+
   module TSC
     module OS
       class DarwinTest < Test::Unit::TestCase
@@ -48,7 +48,7 @@ if $0 == __FILE__
         def setup
           @os = Darwin.new
         end
-        
+
         def teardown
           @os = nil
         end

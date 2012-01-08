@@ -8,7 +8,7 @@ lib = java.lang.System.getProperty("jruby.lib")
 TSC_JRUBY_TOP = home
 
 $:.replace $:.map { |_path|
-  case 
+  case
     when _path[0, lib.size] == lib
       [ _path[home.size.next..-1], _path ]
 

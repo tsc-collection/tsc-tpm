@@ -1,7 +1,7 @@
 =begin
   vi: sw=2:
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -26,7 +26,7 @@ module TSC
         def process(file)
           produce_object_dump(file).map { |_line|
             next unless _line =~ %r{^\d+\s+\S+}
-            index, item, *members  = _line.split 
+            index, item, *members  = _line.split
 
             if members.empty?
               update_library_path item
@@ -127,7 +127,7 @@ module TSC
       end
 
       def set_user_groups(user, *groups)
-        launch [ 
+        launch [
           'chuser',
           "groups=#{groups.flatten.join(',')}",
           user
@@ -141,12 +141,12 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
 
   require 'tsc/after-end-reader.rb'
-  
+
   module TSC
     module OS
       class AixTest < Test::Unit::TestCase
@@ -202,7 +202,7 @@ if $0 == __FILE__
         def setup
           @os = Aix.new
         end
-        
+
         def teardown
           @os = nil
         end
@@ -221,19 +221,19 @@ __END__
                         ***Loader Section***
                       Loader Header Information
 VERSION#         #SYMtableENT     #RELOCent        LENidSTR
-0x00000001       0x000000f9       0x00002b70       0x00000315       
+0x00000001       0x000000f9       0x00002b70       0x00000315
 
 #IMPfilID        OFFidSTR         LENstrTBL        OFFstrTBL
-0x00000008       0x000220b8       0x00000773       0x000223cd       
+0x00000008       0x000220b8       0x00000773       0x000223cd
 
 
                         ***Import File Strings***
-INDEX  PATH                          BASE                MEMBER              
+INDEX  PATH                          BASE                MEMBER
 0      /abc/zzz:/usr/lib:/lib:/usr/local/lib
-1                                    libc.a              shr.o               
-2                                    libpthread.a        shr_comm.o          
-3                                    libpthread.a        shr_xpg5.o          
-4                                    libclntsh.a         shr.o               
-5                                    libstdc++.a         libstdc++.so.6      
-6                                    libdl.a             shr.o               
-7                                    libgcc_s.a          shr.o               
+1                                    libc.a              shr.o
+2                                    libpthread.a        shr_comm.o
+3                                    libpthread.a        shr_xpg5.o
+4                                    libclntsh.a         shr.o
+5                                    libstdc++.a         libstdc++.so.6
+6                                    libdl.a             shr.o
+7                                    libgcc_s.a          shr.o

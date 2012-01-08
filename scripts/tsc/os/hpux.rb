@@ -1,7 +1,7 @@
 =begin
   vi: sw=2:
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -88,12 +88,12 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
 
   require 'tsc/after-end-reader.rb'
-  
+
   module TSC
     module OS
       class HpuxTest < Test::Unit::TestCase
@@ -136,7 +136,7 @@ if $0 == __FILE__
         def setup
           @os = Hpux.new
         end
-        
+
         def teardown
           @os = nil
         end
@@ -159,9 +159,9 @@ __END__
 /usr/lib/dld.sl: Bad magic number for shared library: /oracle/products/110/lib/libclntsh.sl.11.1
 /usr/lib/dld.sl: Exec format error
 __END__
-         normal executable 
+         normal executable
          shared library dynamic path search:
-             SHLIB_PATH     enabled   first  
+             SHLIB_PATH     enabled   first
              embedded path  disabled  second Not Defined
          shared library list:
              dynamic   /oracle/products/110/lib32/libclntsh.sl.11.1
@@ -173,7 +173,7 @@ __END__
              dynamic   /opt/sk/platform/hp11-23-pa/gcc-3.4/lib/libgcc_s.sl
              dynamic   /usr/lib/libc.2
          shared library binding:
-             immediate 
+             immediate
          global hash table disabled
          plabel caching disabled
          global hash array size:1103

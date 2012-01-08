@@ -1,6 +1,6 @@
 # vi: sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -115,9 +115,9 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
-  
+
   module TSC
     module OS
       class GenericTest < Test::Unit::TestCase
@@ -136,7 +136,7 @@ if $0 == __FILE__
         def setup
           @os = Generic.new('sample')
         end
-        
+
         def teardown
           @os = nil
         end

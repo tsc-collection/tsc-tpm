@@ -1,35 +1,35 @@
 # vim: set sw=2:
 =begin
              Tone Software Corporation BSD License ("License")
-  
+
                          Ruby Application Framework
-  
+
   Please read this License carefully before downloading this software.  By
   downloading or using this software, you are agreeing to be bound by the
   terms of this License.  If you do not or cannot agree to the terms of
   this License, please do not download or use the software.
-  
+
   This is a Ruby class library for building applications. Provides common
   application services such as option parsing, usage output, exception
   handling, presentation, etc.  It also contains utility classes for data
   handling.
-  
+
   Copyright (c) 2003, 2005, Tone Software Corporation
-  
+
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
     * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer. 
+      notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution. 
+      documentation and/or other materials provided with the distribution.
     * Neither the name of the Tone Software Corporation nor the names of
       its contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission. 
-  
+      from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -41,7 +41,7 @@
   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-=end  
+=end
 
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # Distributed under the MIT Licence.
@@ -55,30 +55,30 @@ module TSC
   # It accepts option descriptions and provides command line parsing as well
   # as usage help formatting. It implements default options for help request
   # and verbose error reporting. Aslo provides pretty exception handling,
-  # showing exeption(s) messages and, in case for verbose option, backtrace 
+  # showing exeption(s) messages and, in case for verbose option, backtrace
   # information.
   #
   class Application
     attr_reader :script_name, :script_location, :options, :registry
 
-    # Creates and application, passing it optional command line descriptor 
-    # (if the first argument is aString) and an array of option descriptors  
-    # (themselves arrays) in the form: 
+    # Creates and application, passing it optional command line descriptor
+    # (if the first argument is aString) and an array of option descriptors
+    # (themselves arrays) in the form:
     #    <option>, <description> [, <argument> [, <alias> ] ... ]
     #
-    # <option> It is what must be specified with two leading dashes ('--') on 
+    # <option> It is what must be specified with two leading dashes ('--') on
     #   the command line.
     # <alias> It is a one-character option alias, to be specified with leadint
     #   dash ('-'). More than one may be specified.
     # <description> It is an option description that will appear in the usage
     #   print out.
-    # <argument> If not nil, designates that an argument is required for an 
-    #   option. Also, it will appear in the usage print out, enclosed in 
+    # <argument> If not nil, designates that an argument is required for an
+    #   option. Also, it will appear in the usage print out, enclosed in
     #   angle brackets (<>).
-    # 
-    # The following options are always present: --help (-h) that prints out 
+    #
+    # The following options are always present: --help (-h) that prints out
     # usage information, and --verbose (-v) that turns on verbose mode for
-    # error diagnostics. When used with a block, invokes method 'start' with 
+    # error diagnostics. When used with a block, invokes method 'start' with
     # the specified block.
     #
     def initialize(*args, &block)
@@ -88,11 +88,11 @@ module TSC
 
       @appconf = TSC::Dataset[
         :script => $0,
-        :subcommand => nil, 
-        :arguments => TSC::Dataset[ :usage => nil, :description => nil ], 
-        :options => [], 
-        :description => nil, 
-        :examples => nil, 
+        :subcommand => nil,
+        :arguments => TSC::Dataset[ :usage => nil, :description => nil ],
+        :options => [],
+        :description => nil,
+        :examples => nil,
         :verbose => nil
       ]
       block.call(@appconf) if block
@@ -104,7 +104,7 @@ module TSC
       $: << script_location
 
       if String === args.first && TSC::Dataset === @appconf.arguments && @appconf.arguments.usage.nil?
-        @appconf.arguments.usage = args.shift 
+        @appconf.arguments.usage = args.shift
       end
       @registry = OptionRegistry.new
 
@@ -120,10 +120,10 @@ module TSC
     end
 
     # Default start method that processes the command line arguments and
-    # calls a specified block, if any, passing it a hash of collected 
+    # calls a specified block, if any, passing it a hash of collected
     # options. A derrived class may override this method to so more
     # sofisticated processing.
-    # 
+    #
     def start(&block) # :yields: options
       handle_errors do
         process_command_line
@@ -131,7 +131,7 @@ module TSC
       end
     end
 
-    # Returns true if no option processing yet or option 'verbose' 
+    # Returns true if no option processing yet or option 'verbose'
     # was specified.
     #
     def verbose?
@@ -146,7 +146,7 @@ module TSC
       options.verbose = state
     end
 
-    def platform 
+    def platform
       @platform ||= begin
         require 'tsc/platform.rb'
         TSC::Platform.current
@@ -251,15 +251,15 @@ module TSC
     end
 
     # Invokes a block, passing it the specified exit code, and then exits
-    # with the same code. Provided only as a convenient way to write 
+    # with the same code. Provided only as a convenient way to write
     # one-liner verifications.
-    # 
+    #
     def do_and_exit(code = 0, &block) # :yields: exit_code
       block.call(code) if block
       exit code
     end
 
-    def find_in_path(command) 
+    def find_in_path(command)
       ENV['PATH'].to_s.split(File::PATH_SEPARATOR).map { |_location|
         Dir[File.join(os.path(_location), command)].first
       }.compact
@@ -269,7 +269,7 @@ module TSC
       adjust_ruby_loadpath File.dirname(File.dirname(File.dirname(__FILE__)))
       require 'rbconfig'
     end
-    
+
     def adjust_ruby_loadpath(top)
       local_ruby_top = File.expand_path(top)
 
@@ -300,7 +300,7 @@ module TSC
       GetoptLong.new *@registry.entries.map { |_entry|
         option, description, argument, aliases = _entry.to_a
 
-        [ option ] + aliases + [ 
+        [ option ] + aliases + [
           argument ? GetoptLong::REQUIRED_ARGUMENT : GetoptLong::NO_ARGUMENT
         ]
       }
@@ -318,8 +318,8 @@ module TSC
         'USAGE',
         indent(
           [
-            script_name, 
-            '[<options>]', 
+            script_name,
+            '[<options>]',
             if @appconf.subcommand
               [
                 @appconf.subcommand,
@@ -369,9 +369,9 @@ module TSC
     def print_error(exception)
       print_diagnostics TSC::Error.textualize(
         exception, Hash[
-          :originator => script_name, 
-          :stderr => proc { |_line| 
-            '  stderr> ' + _line 
+          :originator => script_name,
+          :stderr => proc { |_line|
+            '  stderr> ' + _line
           },
           :backtrace => verbose? && proc { |_line|
             '  ' + _line.sub(%r{^#{script_location}/}, '')
@@ -390,7 +390,7 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
   require 'set'
@@ -403,8 +403,8 @@ if $0 == __FILE__
 
     class ApplicationTest < Test::Unit::TestCase
       def test_with_options
-        app = TSC::Application.new( 
-          [ 'test', 'Test', 'thing', '-t', 'T' ], 
+        app = TSC::Application.new(
+          [ 'test', 'Test', 'thing', '-t', 'T' ],
           [ 'install', 'Install' ]
         )
         ARGV.replace %w{ -v -ta -Tb -v --test c --install }
@@ -417,8 +417,8 @@ if $0 == __FILE__
       end
 
       def test_options_compatibility
-        app = TSC::Application.new( 
-          [ 'host', 'Host', 'name', '-m' ], 
+        app = TSC::Application.new(
+          [ 'host', 'Host', 'name', '-m' ],
           [ 'system', 'System', 'name' ]
         )
         ARGV.replace %w{ -ma -mb --system s1 }
@@ -431,8 +431,8 @@ if $0 == __FILE__
       end
 
       def test_comma_separated_arguments
-        app = TSC::Application.new( 
-          [ 'host', 'Host', 'name', '-m' ], 
+        app = TSC::Application.new(
+          [ 'host', 'Host', 'name', '-m' ],
           [ 'system', 'System', 'name' ]
         )
         ARGV.replace %w{ -ma -mb,c -md --system s1,s2 }
@@ -448,7 +448,7 @@ if $0 == __FILE__
       end
 
       def test_with_dashed_options
-        app = TSC::Application.new( 
+        app = TSC::Application.new(
           [ 'no-system', 'Exclude system', 'name' ],
           [ 'no-host', 'Exclude host', 'name' ]
         )

@@ -2,35 +2,35 @@
 =begin
   vi: sw=2:
              Tone Software Corporation BSD License ("License")
-  
+
                          Ruby Application Framework
-  
+
   Please read this License carefully before downloading this software.  By
   downloading or using this software, you are agreeing to be bound by the
   terms of this License.  If you do not or cannot agree to the terms of
   this License, please do not download or use the software.
-  
+
   This is a Ruby class library for building applications. Provides common
   application services such as option parsing, usage output, exception
   handling, presentation, etc.  It also contains utility classes for data
   handling.
-  
+
   Copyright (c) 2003, 2005, Tone Software Corporation
-  
+
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
     * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer. 
+      notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution. 
+      documentation and/or other materials provided with the distribution.
     * Neither the name of the Tone Software Corporation nor the names of
       its contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission. 
-  
+      from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -42,12 +42,12 @@
   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-=end  
+=end
 
 require 'tsc/errors.rb'
 
 TSC::Error.ignore LoadError do
-  # Try to require it here and ignore the failure. There will be another 
+  # Try to require it here and ignore the failure. There will be another
   # attempt where it is really needed (see bellow). Need this to make sure
   # "timeout.rb" gets into packages when this file is loaded from the packager
   # and yet does not cause load problems until Ruby's load path is adjusted
@@ -129,7 +129,7 @@ module TSC
       def stop(pid, tolerance = 3)
         require 'timeout'
         Process.kill 'INT', pid rescue return
-        begin 
+        begin
           timeout tolerance do
             loop do
               Process.kill 0, pid rescue break
@@ -253,8 +253,8 @@ module TSC
     end
 
     def close_io(*args)
-      args.flatten.compact.each do |_io| 
-        _io.close rescue IOError 
+      args.flatten.compact.each do |_io|
+        _io.close rescue IOError
       end
     end
 
@@ -276,7 +276,7 @@ module Kernel
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
 
   module TSC
@@ -294,7 +294,7 @@ if $0 == __FILE__
       end
 
       def test_two_failed_and_errors
-        begin 
+        begin
           launch "echo aaa 1>&2; false", "echo bbb 1>&2; false"
           flunk "No expected exception"
         rescue TSC::Error => exception

@@ -2,7 +2,7 @@
 
 =begin
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -10,7 +10,7 @@
 
 require 'mocha'
 require 'tsc/after-end-reader.rb'
-  
+
 context 'Two end markers' do
   include TSC::AfterEndReader
 

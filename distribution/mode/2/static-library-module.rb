@@ -1,7 +1,7 @@
 =begin
   vi: sw=2:
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE.MIT' for details.
   You must read and accept the license prior to use.
@@ -24,7 +24,7 @@ module Distribution
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
 
   module Distribution
@@ -35,9 +35,9 @@ if $0 == __FILE__
 
         _module = LibraryModule.new "lib" => %w{ ffc util }
 
-        assert_equal [ 
-          FileInfo.new("lib/ffc/libtscffc.a", 0755), 
-          FileInfo.new("lib/util/libtscutil.a", 0755) 
+        assert_equal [
+          FileInfo.new("lib/ffc/libtscffc.a", 0755),
+          FileInfo.new("lib/util/libtscutil.a", 0755)
         ], _module.files
 
         assert_equal "lib/ffc/libtscffc.a", _module.files.first.path_for_checksum

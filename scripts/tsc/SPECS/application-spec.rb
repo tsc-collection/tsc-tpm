@@ -1,11 +1,11 @@
 # vim: set sw=2:
 =begin
   Copyright (c) 2008, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
-  
+
   Author: Gennady Bystritsky (gennady.bystritsky@quest.com)
 =end
 
@@ -17,7 +17,7 @@ describe TSC::Application do
   before do
     @app = TSC::Application.new { |_config|
       _config.options = [
-        [ 'action', 'Action', 'name', 'a', '-A' ], 
+        [ 'action', 'Action', 'name', 'a', '-A' ],
         [ 'host', 'Host', 'name', 'm', 'machine' ],
         [ 'system', 'System', 'name' ],
         [ 'force', 'Force', nil, 'f' ],

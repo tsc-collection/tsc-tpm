@@ -1,5 +1,5 @@
 # Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -48,7 +48,7 @@ end
 
 if $0 == __FILE__
   require 'test/unit'
-  
+
   module TSC
     class ByteUnitsTest < Test::Unit::TestCase
       def test_units
@@ -59,7 +59,7 @@ if $0 == __FILE__
 
       def setup
       end
-      
+
       def teardown
       end
     end

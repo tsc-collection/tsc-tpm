@@ -1,35 +1,35 @@
 =begin
   vi: sw=2:
              Tone Software Corporation BSD License ("License")
-  
+
                          Ruby Application Framework
-  
+
   Please read this License carefully before downloading this software.  By
   downloading or using this software, you are agreeing to be bound by the
   terms of this License.  If you do not or cannot agree to the terms of
   this License, please do not download or use the software.
-  
+
   This is a Ruby class library for building applications. Provides common
   application services such as option parsing, usage output, exception
   handling, presentation, etc.  It also contains utility classes for data
   handling.
-  
+
   Copyright (c) 2003, 2005, Tone Software Corporation
-  
+
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
     * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer. 
+      notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution. 
+      documentation and/or other materials provided with the distribution.
     * Neither the name of the Tone Software Corporation nor the names of
       its contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission. 
-  
+      from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
   IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -56,7 +56,7 @@ module TSC
 
     class << self
       # Ignores specified list of errors or StandardError if none
-      # specified for the block execution. Returns the ignored 
+      # specified for the block execution. Returns the ignored
       # exception or nil.
       #
       def ignore(*errors, &block)
@@ -78,9 +78,9 @@ module TSC
         end
       end
 
-      # Relays an exception raised during the block execution to a 
+      # Relays an exception raised during the block execution to a
       # specified thread if the exception is of one of the types in
-      # in a specified list or any exception if none specified. 
+      # in a specified list or any exception if none specified.
       # Returns the relayed exception or nil.
       #
       def relay(thread, *errors, &block)
@@ -92,11 +92,11 @@ module TSC
       end
 
       # Performs undo operations when an error occurs while executing a
-      # specified block. The block is passed an undo stack, to which it 
+      # specified block. The block is passed an undo stack, to which it
       # should push proc blocks that implement undo operation, or use method
-      # 'add' with a block. Undo operations will be executed in the reverse 
+      # 'add' with a block. Undo operations will be executed in the reverse
       # order. If exception raised during undo operations, they all will be
-      # collected and raised together with the original exception in one 
+      # collected and raised together with the original exception in one
       # compound TSC::Error instance.
       #
       def undo(*errors, &block)
@@ -134,14 +134,14 @@ module TSC
       end
 
       def textualize(exception, options = {}, &block)
-        stderr_processor = case processor = options[:stderr] 
+        stderr_processor = case processor = options[:stderr]
           when Proc, nil, false then processor
           else proc { |_line|
             '  stderr> ' + _line
           }
         end
 
-        backtrace_processor = case processor = options[:backtrace] 
+        backtrace_processor = case processor = options[:backtrace]
           when Proc, nil, false then processor
           else proc { |_line|
             '  ' + _line
@@ -208,7 +208,7 @@ module TSC
         class << collector
           def add(*strings, &block)
             self.push strings.empty? ? block : proc {
-              begin 
+              begin
                 block.call
               rescue Exception => exception
                 raise TSC::Error, [ strings, exception ]
@@ -284,7 +284,7 @@ module TSC
       super args, 'Deprecated'
     end
   end
-  
+
   class NotImplementedError < Error
     def initialize(*args)
       super args, 'Not implemented yet'
@@ -307,10 +307,10 @@ module TSC
     attr_reader :operations
 
     def initialize(operation, action, *args)
-      super [ 
+      super [
         (
-          [ 'Operation' ] + 
-          Array(operation).map { |_item| _item.to_s.inspect } + 
+          [ 'Operation' ] +
+          Array(operation).map { |_item| _item.to_s.inspect } +
           [ action ]
         ).join(' '),
 
@@ -320,7 +320,7 @@ module TSC
       ].join(', ')
     end
   end
-  
+
   class OperationCanceled < OperationError
     def initialize(*args)
       super args.shift, 'canceled', *args
@@ -335,10 +335,10 @@ module TSC
 
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'tsc/launch.rb'
-  
+
   module TSC
     class ErrorTest < Test::Unit::TestCase
       def test_ignore_one
@@ -393,7 +393,7 @@ if $0 == __FILE__
 
       def test_several_compound
         assert_equal(
-          'aaa: bbb: zzz#aaa: bbb: uuu', 
+          'aaa: bbb: zzz#aaa: bbb: uuu',
           TSC::Error.new('aaa', 'bbb', RuntimeError.new('zzz'), RuntimeError.new('uuu')).message
         )
       end
@@ -477,9 +477,9 @@ if $0 == __FILE__
 
       def setup
       end
-      
+
       def teardown
       end
     end
   end
-end                                                                                                                          
+end

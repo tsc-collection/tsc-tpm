@@ -1,6 +1,6 @@
 # vim: set sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -62,10 +62,10 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
-  
+
   class TSC::CLI::CommunicatorTest < Test::Unit::TestCase
     attr_reader :communicator
 
@@ -75,7 +75,7 @@ if $0 == __FILE__
     def setup
       @communicator = TSC::CLI::Communicator.new
     end
-    
+
     def teardown
     end
   end

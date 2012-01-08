@@ -1,6 +1,6 @@
 =begin
   Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-  
+
   Distributed under the MIT Licence.
   This is free software. See 'LICENSE' for details.
   You must read and accept the license prior to use.
@@ -24,7 +24,7 @@ module TSC
     end
 
     def padding
-      @padding ||= TSC::Dataset[ 
+      @padding ||= TSC::Dataset[
         :left => (@params[:left_pad] || @params[:width_pad] || 0),
         :right => (@params[:right_pad] || @params[:width_pad] || 0),
         :top => (@params[:top_pad] || @params[:hight_pad] || 0),
@@ -95,7 +95,7 @@ module TSC
       #######
 
       def collect_margins_and_sizes
-        [ 
+        [
           self.map { |_line|
             [ _line.index(%r{\S}), _line.size ]
           }.transpose
@@ -105,10 +105,10 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
-  
+
   module TSC
     class BoxTest < ::Test::Unit::TestCase
       def test_indented
@@ -122,7 +122,7 @@ if $0 == __FILE__
 
       def test_simple
         box = Box["   aaa\n   bbbb\n   ccc\n\n\n"]
-        assert_equal [ 
+        assert_equal [
           'aaa ', 'bbbb', 'ccc '
         ], box.map
       end
@@ -130,8 +130,8 @@ if $0 == __FILE__
       def test_padded
 
         box = Box.new "   aaa\n   bbb\n   ccc", :width_pad => 2, :hight_pad => 1
-        assert_equal [ 
-          '       ', '  aaa  ', '  bbb  ', '  ccc  ', '       ' 
+        assert_equal [
+          '       ', '  aaa  ', '  bbb  ', '  ccc  ', '       '
         ], box.map
       end
     end

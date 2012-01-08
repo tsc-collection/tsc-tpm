@@ -1,6 +1,6 @@
 # vim: set sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -61,7 +61,7 @@ module TSC
 
             result = item.first
             display = item.last
-            
+
             if register_item(:choice, result)
               add_choice _menu, display do
                 Response.selected(result)
@@ -175,17 +175,17 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
-  
+
   class TSC::CLI::SelectorTest < Test::Unit::TestCase
     def test_nothing
     end
 
     def setup
     end
-    
+
     def teardown
     end
   end

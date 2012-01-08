@@ -1,6 +1,6 @@
 # vim: set sw=2:
 # Copyright (c) 2007, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -44,9 +44,9 @@ module TSC
     def method_missing(name, *args)
       key = name.to_s
       catch :missing do
-        return case key.slice(-1) 
-          when ?= 
-            set(key.slice(0...-1), *args) 
+        return case key.slice(-1)
+          when ?=
+            set(key.slice(0...-1), *args)
 
           when ??
             get(key.slice(0...-1), *args) ? true : false
@@ -85,7 +85,7 @@ end
 if $0 == __FILE__
   require 'test/unit'
   require 'mocha'
-  
+
   module TSC
     class DatasetTest < Test::Unit::TestCase
       attr_reader :dataset
@@ -124,7 +124,7 @@ if $0 == __FILE__
       def setup
         @dataset = TSC::Dataset.new( :aaa => 17, :bbb => "zzz" )
       end
-      
+
       def teardown
         @dataset = nil
       end

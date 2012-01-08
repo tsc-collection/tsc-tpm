@@ -1,34 +1,34 @@
 #
 #            Tone Software Corporation BSD License ("License")
-# 
+#
 #                        Ruby Application Framework
-# 
+#
 # Please read this License carefully before downloading this software.  By
 # downloading or using this software, you are agreeing to be bound by the
 # terms of this License.  If you do not or cannot agree to the terms of
 # this License, please do not download or use the software.
-# 
+#
 # This is a Ruby class library for building applications. Provides common
 # application services such as option parsing, usage output, exception
 # handling, presentation, etc.  It also contains utility classes for data
 # handling.
-# 
+#
 # Copyright (c) 2003, 2005, Tone Software Corporation
-# 
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
 # met:
 #   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer. 
+#     notice, this list of conditions and the following disclaimer.
 #   * Redistributions in binary form must reproduce the above copyright
 #     notice, this list of conditions and the following disclaimer in the
-#     documentation and/or other materials provided with the distribution. 
+#     documentation and/or other materials provided with the distribution.
 #   * Neither the name of the Tone Software Corporation nor the names of
 #     its contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission. 
-# 
+#     from this software without specific prior written permission.
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
 # IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 # TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -40,7 +40,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 
 =begin
 
@@ -59,11 +59,11 @@ You can freely distribute/modify this library.
 This is a simple example.
 
   require 'monitor.rb'
-  
+
   buf = []
   buf.extend(MonitorMixin)
   empty_cond = buf.new_cond
-  
+
   # consumer
   Thread.start do
     loop do
@@ -73,7 +73,7 @@ This is a simple example.
       end
     end
   end
-  
+
   # producer
   while line = ARGF.gets
     buf.synchronize do
@@ -155,7 +155,7 @@ module TSC
     class ConditionVariable
       class Timeout < Exception
       end
-      
+
       include InternalMonitorOperations
 
       def initialize(monitor)
@@ -175,7 +175,7 @@ module TSC
         @waiters.add Thread.current
 
         result = wait_event_or_timer timer
-        
+
         @waiters.remove Thread.current
         @monitor.mon_wait_and_capture count
         Thread.critical = false
@@ -215,7 +215,7 @@ module TSC
             Thread.pass
             sleep timeout
             #
-            # Here we enter the critical section so that it will be in effect when 
+            # Here we enter the critical section so that it will be in effect when
             # the waiter's thread enters its rescue block. It will be released
             # there.
             #
@@ -233,7 +233,7 @@ module TSC
           #
           # When we get here, Thread.critical is set to true in the timer
           # thread, if any. All other exceptions are passed "as is" to be
-          # enveloped into MonitorMixin::MonitorError by mon_synchronize 
+          # enveloped into MonitorMixin::MonitorError by mon_synchronize
           # and re-raised.
           #
           is_event = false
@@ -243,10 +243,10 @@ module TSC
         is_event
       end
     end
-    
+
     include InternalMonitorOperations
     include Initializable
-    
+
     class << self
       include Initializable
       def extend_object(obj)
@@ -262,7 +262,7 @@ module TSC
     def new_cond
       ConditionVariable.new self
     end
-    
+
     def mon_try_enter
       result = false
       Thread.critical = true
@@ -297,18 +297,18 @@ module TSC
         mon_enter
         yield
       rescue Exception => exception
-        raise 
+        raise
       ensure
         begin
           Thread.critical = true
           if @mon_owner == Thread.current
             mon_exit
-          else 
+          else
             case exception
-              when nil 
+              when nil
                 # raise MonitorError, RuntimeError.new "releasing wrong monitor"
               when MonitorError
-              else 
+              else
                 raise MonitorError, exception
             end
           end
@@ -361,7 +361,7 @@ module TSC
   end
 end
 
-if $0 != "-e" and $0 == __FILE__ 
+if $0 != "-e" and $0 == __FILE__
   require 'test/unit'
   require 'timeout'
 

@@ -1,6 +1,6 @@
 # vi: sw=2:
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
-# 
+#
 # Distributed under the MIT Licence.
 # This is free software. See 'LICENSE' for details.
 # You must read and accept the license prior to use.
@@ -165,7 +165,7 @@ module TSC
 
     private
     #######
-    
+
     def normalize(*entries)
       entries.flatten.compact.map { |_entry|
         _entry.to_s.split(':').map { |_component|
@@ -198,9 +198,9 @@ module TSC
   end
 end
 
-if $0 == __FILE__ 
+if $0 == __FILE__
   require 'test/unit'
-  
+
   module TSC
     class PATHTest < Test::Unit::TestCase
       def test_to_s
@@ -260,7 +260,7 @@ if $0 == __FILE__
       def setup
         @path = PATH.new('/bin/aaa', '/bin/bbb')
       end
-      
+
       def teardown
         @path = nil
       end
