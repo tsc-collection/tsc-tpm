@@ -95,7 +95,7 @@ module TSC
 
         arch = case info.machine
           when 'i686', 'i386' then 'x86'
-          when 'x86_64' then 'amd64'
+          when 'x86_64' then 'x64'
           else info.machine
         end
 
@@ -108,8 +108,6 @@ module TSC
 
             suse_major = components[2].scan(%r{^(\d+)(?:[.]\d+)+$}).flatten.first
             next unless suse_major
-
-            arch = 'x64' if arch == 'amd64'
 
             return [ "suse-#{suse_major}-#{arch}", arch ]
           end
