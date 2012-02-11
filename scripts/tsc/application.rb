@@ -262,7 +262,7 @@ module TSC
 
     def find_in_path(command)
       ENV['PATH'].to_s.split(File::PATH_SEPARATOR).map { |_location|
-        Dir[File.join(os.path(_location), command)].first
+        Dir[ File.join(_location, command) ].first
       }.compact
     end
 
