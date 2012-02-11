@@ -229,6 +229,7 @@ module TSC
       require 'set'
 
       processor = option_processor.extend(Enumerable)
+      order = order[:order] if Hash === order
 
       processor.quiet = true
       processor.ordering = GetoptLong::REQUIRE_ORDER if order
