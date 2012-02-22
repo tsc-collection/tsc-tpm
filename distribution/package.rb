@@ -185,7 +185,7 @@ module Distribution
     private
     #######
     def normalize_tasks(tasks)
-      tasks.join("\n").map { |_line| _line.split }.reject { |_entry| _entry.empty? }
+      tasks.join("\n").map { |_line| _line.split(%r{[@/]|\s+}) }.reject { |_entry| _entry.empty? }
     end
   end
 end
