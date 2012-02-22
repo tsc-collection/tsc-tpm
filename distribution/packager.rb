@@ -103,7 +103,7 @@ module Distribution
     end
 
     def figure_ruby_path
-      find_in_path(os.exe('ruby'), ENV.to_hash['PATH'].split(':')).first
+      File.join Config::CONFIG.values_at('bindir', 'ruby_install_name')
     end
 
     def find_in_path(what, where)
