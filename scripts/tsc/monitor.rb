@@ -369,7 +369,7 @@ if $0 != "-e" and $0 == __FILE__
 
   class MonitorTest < Test::Unit::TestCase
     def test_timing
-      Thread.new {
+      t = Thread.new {
         sleep 1
         @monitor.synchronize {
           @condition.broadcast
@@ -380,9 +380,10 @@ if $0 != "-e" and $0 == __FILE__
         @result = @condition.wait 2
       }
       assert_equal true, @result
+      t.join
     end
     def test_event
-      Thread.new {
+      t = Thread.new {
         sleep 1
         @monitor.synchronize {
           @condition.signal
@@ -392,9 +393,10 @@ if $0 != "-e" and $0 == __FILE__
         @result = @condition.wait 2
       }
       assert_equal true, @result
+      t.join
     end
     def test_timeout
-      Thread.new {
+      t = Thread.new {
         sleep 1
         @monitor.synchronize {
           sleep 1
@@ -405,6 +407,7 @@ if $0 != "-e" and $0 == __FILE__
         @result = @condition.wait 1
       }
       assert_equal false, @result
+      t.join
     end
 
     def setup
