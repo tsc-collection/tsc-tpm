@@ -1,5 +1,5 @@
-# vim: set sw=2:
 =begin
+  vim: sw=2:
   Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 
   Distributed under the MIT Licence.

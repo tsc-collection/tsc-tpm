@@ -1,6 +1,5 @@
-#!/bin/env ruby
 =begin
-  vi: sw=2:
+  vim: sw=2:
              Tone Software Corporation BSD License ("License")
 
                          Ruby Application Framework

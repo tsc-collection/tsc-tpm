@@ -1,4 +1,5 @@
 =begin
+  vim: sw=2:
              Tone Software Corporation BSD License ("License")
 
                          Ruby Application Framework
