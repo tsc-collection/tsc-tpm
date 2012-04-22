@@ -362,7 +362,7 @@ module TSC
   end
 end
 
-if $0 != "-e" and $0 == __FILE__
+if $0 == __FILE__
   require 'test/unit'
   require 'timeout'
 
@@ -370,7 +370,7 @@ if $0 != "-e" and $0 == __FILE__
 
   class MonitorTest < Test::Unit::TestCase
     def test_timing
-      t = Thread.new {
+      make_thread {
         sleep 1
         @monitor.synchronize {
           @condition.broadcast
@@ -381,10 +381,10 @@ if $0 != "-e" and $0 == __FILE__
         @result = @condition.wait 2
       }
       assert_equal true, @result
-      t.join
     end
+
     def test_event
-      t = Thread.new {
+      make_thread {
         sleep 1
         @monitor.synchronize {
           @condition.signal
@@ -394,10 +394,10 @@ if $0 != "-e" and $0 == __FILE__
         @result = @condition.wait 2
       }
       assert_equal true, @result
-      t.join
     end
+
     def test_timeout
-      t = Thread.new {
+      make_thread {
         sleep 1
         @monitor.synchronize {
           sleep 1
@@ -408,15 +408,23 @@ if $0 != "-e" and $0 == __FILE__
         @result = @condition.wait 1
       }
       assert_equal false, @result
-      t.join
+    end
+
+    def make_thread(&block)
+      @thread = Thread.new(&block)
     end
 
     def setup
       @monitor = TSC::Monitor.new
       @condition = TSC::Monitor::ConditionVariable.new @monitor
       @result = nil
+      @thread = nil
     end
+
     def teardown
+      @thread.join if @thread
+
+      @thread = nil
       @condition = nil
       @monitor = nil
     end
