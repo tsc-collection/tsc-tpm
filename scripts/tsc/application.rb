@@ -131,6 +131,21 @@ module TSC
       end
     end
 
+    def script_real_name
+      @script_real_name ||= script_real_path.basename.to_s
+    end
+
+    def script_real_location
+      @script_real_location ||= script_real_path.dirname
+    end
+
+    def script_real_path
+      @script_real_path ||= begin
+        require 'pathname'
+        Pathname.new(@appconf.script).realpath
+      end
+    end
+
     # Returns true if no option processing yet or option 'verbose'
     # was specified.
     #
