@@ -70,7 +70,7 @@ module Installation
 
     def make_target(progress, logger)
       FileUtils.remove_entry(target) rescue true
-      FileUtils.ln_s source.gsub(%r{^[.](?=/)}, top), target
+      FileUtils.ln_s massaged_source, target
     end
 
     def change_file_mode(*args)
@@ -83,6 +83,21 @@ module Installation
 
     def target_stat
       File.lstat(target)
+    end
+
+    def massaged_source
+      source.gsub(%r{^[^/]+(?=/)}) { |_fragment|
+        case _fragment
+          when '.', '#{top}'
+            top
+
+          when '#{installation_top}'
+            Task.installation_top
+
+          else
+            _fragment
+        end
+      }
     end
   end
 end
