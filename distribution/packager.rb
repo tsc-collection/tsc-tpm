@@ -68,13 +68,19 @@ module Distribution
       @os = platform.driver
     end
 
-    def create(directory)
+    def create(directory, dump_path = false)
       return if package.do_not_build
 
       directory ||= Dir.getwd
 
       package_path = File.expand_path File.join("#{directory}", package.build_package_name)
       package_temp_directory = "#{package_path}-#{$$}"
+
+      if dump_path
+        File.open Pathname.new(package_path).dirname.join([ package.name.downcase, 'tpm-path' ].join('.')), 'w' do |_io|
+          _io.puts package_path
+        end
+      end
 
       File.makedirs package_temp_directory
       begin
@@ -97,6 +103,8 @@ module Distribution
         make_prodinfo info.flatten.compact, package_temp_directory
         make_properties package.product.params, package_temp_directory
         make_package package_temp_directory, package_path
+
+        puts package_path
       ensure
         Dir.rm_r package_temp_directory
       end

@@ -86,7 +86,8 @@ class Application < TSC::Application
         [ '--output',    'Output directory',         'directory', '-o' ],
         [ '--force',     'Force installation',       nil,         '-f' ],
         [ '--require',   'File to require',          'file',      '-r' ],
-        [ '--oneoff',    'Create oneoff package',    'descriptor'      ],
+        [ '--oneoff',    'Create oneoff package',    'descriptor' ],
+        [ '--dump-path', 'Dump TPM package path',    nil,         '-d' ],
         [ '--test',      'Setup unit tests',         nil,         '-t' ]
       ]
       _conf.description = [
@@ -142,6 +143,7 @@ class Application < TSC::Application
         end
       end
 
+      distributor.dump_path = options.dump_path?
       distributor.parse_prodinfo @prodinfo
 
       if options.install?

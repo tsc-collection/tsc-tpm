@@ -60,7 +60,7 @@ module Distribution
   class Distributor
     extend Forwardable
 
-    attr_accessor :binary_directory, :force
+    attr_accessor :binary_directory, :force, :dump_path
 
     def_delegators :@config, :filesets, :product
 
@@ -93,7 +93,7 @@ module Distribution
       directory, *packages = args
       @config.product.packages.each do |_package|
         if packages.empty? == true or packages.include? _package.name
-          Packager.new(_package, self).create directory
+          Packager.new(_package, self).create directory, dump_path
         end
       end
     end
