@@ -93,7 +93,7 @@ module TSC
     end
 
     def initialize(&child_setup_block)
-      raise "JRuby not supported" if PLATFORM == 'java'
+      raise "JRuby not supported" if RUBY_PLATFORM == 'java'
 
       @child_setup_blocks = []
       @parent_setup_blocks = []
