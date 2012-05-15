@@ -100,15 +100,22 @@ module TSC
       # compound TSC::Error instance.
       #
       def undo(*errors, &block)
+        params = TSC::Dataset[ :raise => true ].tap { |_params|
+          _params.update errors.pop if Hash === errors.last
+        }
         stack = collector
         on_error(block, [ stack ], RuntimeError, *errors) do |_error|
           begin
-            persist(*stack.flatten.compact.reverse)
+            persist *stack.flatten.compact.reverse.map { |_block|
+              proc {
+                _block.call _error
+              }
+            }
           rescue Exception => undo_error
             raise self.new(_error, undo_error)
           end
 
-          raise
+          raise if params.raise
         end
       end
 
