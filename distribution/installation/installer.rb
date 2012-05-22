@@ -111,7 +111,7 @@ module Installation
         product = _config.product
         package = _config.package
 
-        puts "#{product.name}#{package.name}"
+        puts "#{product.name}#{package.name}:"
         puts "  Description: #{product.description}/#{package.description}"
         puts "  Platform:    #{product.platform}"
         puts [
