@@ -22,10 +22,8 @@ module TSC
 
       def find_all(name)
         entries.map { |_entry|
-          [ Pathname.new(_entry).join(name).to_s ].map { |_path|
-            _path if File.exist?(_path)
-          }
-        }.flatten.compact.uniq
+          Dir[ Pathname.new(_entry).join(name) ]
+        }.flatten
       end
     end
 
@@ -37,9 +35,9 @@ module TSC
       class << self
         def delegate_to_list(*methods)
           methods.each do |_method|
-            define_method _method do |*_args|
+            define_method _method do |*_args, &block|
               @list.each do |_item|
-                _item.send _method, *_args
+                _item.send _method, *_args, &block
               end
 
               self
@@ -125,22 +123,22 @@ module TSC
       self
     end
 
-    def front(*entries)
-      @front.concat normalize(entries)
+    def front(*entries, &block)
+      @front.concat normalize(entries, &block)
       self
     end
 
-    def back(*entries)
-      @back.concat normalize(entries)
+    def back(*entries, &block)
+      @back.concat normalize(entries, &block)
       self
     end
 
-    def before(*entries)
-      front normalize(*entries).reverse
+    def before(*entries, &block)
+      front normalize(*entries, &block).reverse
     end
 
-    def after(*entries)
-      back *entries
+    def after(*entries, &block)
+      back *entries, &block
     end
 
     def entries
@@ -168,13 +166,16 @@ module TSC
     private
     #######
 
-    def normalize(*entries)
+    def normalize(*entries, &block)
+      block ||= proc { |_item|
+        _item
+      }
       entries.flatten.compact.map { |_entry|
         _entry.to_s.split(':').map { |_component|
           value = _component.strip
-          Pathname.new(value).cleanpath.to_s unless value.empty?
+          block.call(Pathname.new(value).cleanpath) unless value.empty?
         }
-      }.flatten.compact
+      }.flatten.compact.map(&:to_s)
     end
   end
 
@@ -257,6 +258,10 @@ if $0 == __FILE__
         path.before('aaa:bbb:zzz:aaa:bbb').install
         assert_equal 'aaa:bbb:zzz', ENV['n1']
         assert_equal 'aaa:bbb:zzz', ENV['n2']
+      end
+
+      def test_find_all
+        assert_equal [ '/bin/ls' ], TSC::PATH.current.find_all('ls')
       end
 
       def setup
