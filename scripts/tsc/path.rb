@@ -261,7 +261,7 @@ if $0 == __FILE__
       end
 
       def test_find_all
-        assert_equal [ '/bin/ls' ], TSC::PATH.current.find_all('ls')
+        assert TSC::PATH.current.find_all('ls').include? '/bin/ls'
       end
 
       def setup
