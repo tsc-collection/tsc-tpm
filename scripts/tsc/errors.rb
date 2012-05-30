@@ -46,6 +46,8 @@
 # Copyright (c) 2006, Gennady Bystritsky <bystr@mac.com>
 # Distributed under the MIT Licence.
 
+require 'tsc/dataset.rb'
+
 module TSC
   # This class is a base for all other exceptions in the framework.
   # It is initialized error messages as well as other exception classes, thus
