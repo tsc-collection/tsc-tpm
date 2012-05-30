@@ -22,7 +22,7 @@ module TSC
 
       def find_all(name)
         entries.map { |_entry|
-          Dir[ Pathname.new(_entry).join(name) ]
+          Dir[ Pathname.new(_entry).join(name).to_s ]
         }.flatten
       end
     end
