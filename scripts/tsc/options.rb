@@ -25,26 +25,27 @@ module TSC
       @hash = {}
 
       entries.each do |_entry|
-        name = _entry.option[2..-1]
-        self.class.make_method "#{normalize(name)}?" do
-          @hash.has_key? name
-        end
-
-        if _entry.argument
-          self.class.make_method normalize(name) do
-            Array(@hash[name]).first
+        normalize _entry.option[2..-1] do |_name, _normalized|
+          self.class.make_method _normalized + '?' do
+            @hash.has_key? _name
           end
 
-          self.class.make_method "#{normalize(name)}_list?" do
-            Array(@hash[name]).size > 1
-          end
+          if _entry.argument
+            self.class.make_method _normalized do
+              Array(@hash[_name]).first
+            end
 
-          self.class.make_method "#{normalize(name)}_list" do
-            Array(@hash[name])
-          end
-        else
-          self.class.make_method name do
-            Array(@hash[name]).size if @hash.has_key?(name)
+            self.class.make_method _normalized + '_list?' do
+              Array(@hash[_name]).size > 1
+            end
+
+            self.class.make_method _normalized + '_list' do
+              Array @hash[_name]
+            end
+          else
+            self.class.make_method _normalized do
+              Array(@hash[_name]).size if @hash.has_key? _name
+            end
           end
         end
       end
@@ -119,7 +120,7 @@ module TSC
     #######
 
     def normalize(name)
-      name.strip.tr('-', '_')
+      yield name, name.strip.tr('-', '_')
     end
 
     class << self
