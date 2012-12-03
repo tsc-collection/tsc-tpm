@@ -42,9 +42,33 @@ module TSC
             self.class.make_method _normalized + '_list' do
               Array @hash[_name]
             end
+
+            self.class.make_method _normalized + '=' do |_value|
+              Array(_value).each do |_value|
+                set _name, _value.to_s
+              end
+            end
           else
             self.class.make_method _normalized do
               Array(@hash[_name]).size if @hash.has_key? _name
+            end
+
+            self.class.make_method _normalized + '=' do |_value|
+              case _value
+                when true
+                  _value = 1
+                  redo
+
+                when false
+                  _value = 0
+                  redo
+
+                else
+                  _value.to_s.to_i.tap do |_count|
+                    break @hash.delete _name unless _count > 0
+                    @hash[_name] = [ '' ] * _count
+                  end
+              end
             end
           end
         end
@@ -97,23 +121,6 @@ module TSC
 
     def set(name, value)
       (@hash[name] ||= []).concat value.include?(',') ? value.split(%r{\s*[,]\s*}) : [ value ]
-    end
-
-    def verbose=(value)
-      while true
-        if value == true
-          return if verbose?
-          value = 1
-        else
-          count = value.to_s.to_i
-          if count > 0
-            @hash['verbose'] = [ '' ] * count
-          else
-            @hash.delete('verbose')
-          end
-          return
-        end
-      end
     end
 
     private
