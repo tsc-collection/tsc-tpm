@@ -93,7 +93,8 @@ module TSC
         :options => [],
         :description => nil,
         :examples => nil,
-        :verbose => nil
+        :verbose => nil,
+        :backtrace => nil
       ]
       block.call(@appconf) if block
 
@@ -109,6 +110,7 @@ module TSC
       @registry = OptionRegistry.new
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
+      @registry.add 'backtrace', 'Outputs exception backtrace on error', nil, '--bt'
       @registry.add 'help', 'Prints out this help message', nil, 'h', '?'
       @registry.add 'debug', 'Starts the interactive debugger', nil
 
@@ -116,7 +118,10 @@ module TSC
       @registry.add_bulk *Array(@appconf.options)
 
       @options = Options.new @registry.entries
-      options.verbose = ENV['TRACE'].to_s.split.include?(script_name) || @appconf.verbose
+      ENV['TRACE'].to_s.split.include?(script_name).tap do |_trace|
+        options.verbose = @appconf.verbose || _trace
+        options.backtrace = @appconf.backtrace || _trace
+      end
     end
 
     # Default start method that processes the command line arguments and
@@ -389,7 +394,7 @@ module TSC
           :stderr => proc { |_line|
             '  stderr> ' + _line
           },
-          :backtrace => verbose? && proc { |_line|
+          :backtrace => options.backtrace? && proc { |_line|
             '  ' + _line.sub(%r{^#{script_location}/}, '')
           }
         ]

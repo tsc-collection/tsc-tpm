@@ -30,6 +30,7 @@ describe TSC::Application do
     it 'should have correct display format' do
       app.registry.format_entries.should == [
         ['           -v, ', '--verbose      ', 'Turns verbose mode on'],
+        ['         --bt, ', '--backtrace    ', 'Outputs exception backtrace on error'],
         ['       -h, -?, ', '--help         ', 'Prints out this help message'],
         ['               ', '--debug        ', 'Starts the interactive debugger'],
         ['       -a, -A, ', '--action <name>', 'Action'],
@@ -109,7 +110,7 @@ describe TSC::Application do
     it 'should be possible to reset it to true' do
       options.verbose = true
       options.verbose?.should == true
-      options.verbose.should == 2
+      options.verbose.should == 1
 
       options.verbose = false
       options.verbose?.should == false
@@ -141,6 +142,24 @@ describe TSC::Application do
     it 'should be available via application' do
       app.verbose?.should == true
       app.verbose.should == 2
+    end
+  end
+
+  context 'backtrace option processing' do
+    before do
+      ARGV.replace [ '--backtrace', '--bt' ]
+      @options = app.start { |_app|
+        _app.options
+      }
+    end
+
+    after do
+      ARGV.replace []
+    end
+
+    it 'should have proper option count' do
+      options.backtrace?.should == true
+      options.backtrace.should == 2
     end
   end
 end
