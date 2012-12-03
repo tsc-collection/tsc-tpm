@@ -26,7 +26,7 @@ describe TSC::Application do
     }
   end
 
-  describe "options" do
+  context "options" do
     it "should have correct display format" do
       app.registry.format_entries.should == [
         ["           -v, ", "--verbose      ", "Turns verbose mode on"],
@@ -41,7 +41,7 @@ describe TSC::Application do
     end
   end
 
-  describe "option processing" do
+  context "option processing" do
     before do
       ARGV.replace [ '-v', '-a', 'zzz', '-a', 'bbb', '-m', '', '-fff' ]
       @options = app.start { |_app|
@@ -83,7 +83,7 @@ describe TSC::Application do
     end
   end
 
-  describe "verbose option processing" do
+  context "verbose option processing" do
     before do
       ARGV.replace [ '-v', '-v' ]
       @options = app.start { |_app|
