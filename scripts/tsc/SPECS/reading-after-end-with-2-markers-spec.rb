@@ -11,22 +11,22 @@
 require 'mocha'
 require 'tsc/after-end-reader.rb'
 
-context 'Two end markers' do
+describe 'Two end markers' do
   include TSC::AfterEndReader
 
-  specify 'default item available' do
+  it 'should have default item' do
     read_after_end_marker(__FILE__).should == "abcd\n"
   end
 
-  specify 'default item same as first item' do
+  it 'should have default item same as first item' do
     read_after_end_marker(__FILE__).should == read_after_end_marker(__FILE__, 0)
   end
 
-  specify 'second item available' do
+  it 'should have second item' do
     read_after_end_marker(__FILE__, 1).should == "zzzz\nZZZZ\n"
   end
 
-  specify 'third item not available' do
+  it 'should have third item' do
     read_after_end_marker(__FILE__, 2).should be(nil)
   end
 end

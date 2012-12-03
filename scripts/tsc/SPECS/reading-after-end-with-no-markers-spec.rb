@@ -11,14 +11,14 @@
 require 'mocha'
 require 'tsc/after-end-reader.rb'
 
-context 'No end markers' do
+describe 'No end markers' do
   include TSC::AfterEndReader
 
-  specify 'default item not available' do
-    read_after_end_marker(__FILE__).should be(nil)
+  it 'should not have default item' do
+    read_after_end_marker(__FILE__).should be nil
   end
 
-  specify 'first item not available' do
-    read_after_end_marker(__FILE__, 0).should be(nil)
+  it 'should not have irst item' do
+    read_after_end_marker(__FILE__, 0).should be nil
   end
 end
