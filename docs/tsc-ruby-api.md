@@ -5,8 +5,8 @@
 TSC Ruby Applicaiton Framework and API
 ======================================
 
-This document present the inforamtion on Ruby application framework and the
-corresponding API that is part of TSC packate.
+This document presents the inforamtion on Ruby application framework and the
+corresponding API that is part of TSC package.
 
 Overview
 --------
