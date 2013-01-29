@@ -71,8 +71,12 @@ module Distribution
 
       @include_ruby_gems = [ 'highline', 'sys-uname' ]
       @parser = ConfigParser.new cache, Hash[
-        :name => proc { |_block, _argument|
-          @name = _argument
+        :name => proc { |_block, *_argument|
+          if _argument.empty?
+            @name
+          else
+            @name = _argument.first
+          end
         },
         :build_name => proc { |_block, _argument|
           @build_name = _argument
