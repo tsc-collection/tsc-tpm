@@ -60,6 +60,7 @@ module TSC
   #
   class Application
     attr_reader :script_name, :script_location, :options, :registry
+    attr_reader :suboptions
 
     # Creates and application, passing it optional command line descriptor
     # (if the first argument is aString) and an array of option descriptors
@@ -82,9 +83,9 @@ module TSC
     # the specified block.
     #
     def initialize(*args, &block)
-      require 'tsc/option-registry.rb'
-      require 'tsc/options.rb'
-      require 'tsc/dataset.rb'
+      require 'tsc/option-registry'
+      require 'tsc/options'
+      require 'tsc/dataset'
 
       @appconf = TSC::Dataset[
         :script => $0,
@@ -108,6 +109,7 @@ module TSC
         @appconf.arguments.usage = args.shift
       end
       @registry = OptionRegistry.new
+      @subregistry = OptionRegistry.new
 
       @registry.add 'verbose', 'Turns verbose mode on', nil, 'v'
       @registry.add 'backtrace', 'Outputs exception backtrace on error', nil, '--bt'
@@ -117,7 +119,9 @@ module TSC
       @registry.add_bulk *args
       @registry.add_bulk *Array(@appconf.options)
 
-      @options = Options.new @registry.entries
+      @options = TSC::Options.new @registry.entries
+      @suboptions = TSC::Options.new @subregistry.entries
+
       ENV['TRACE'].to_s.split.include?(script_name).tap do |_trace|
         options.verbose = @appconf.verbose || _trace
         options.backtrace = @appconf.backtrace || _trace
@@ -168,7 +172,7 @@ module TSC
 
     def platform
       @platform ||= begin
-        require 'tsc/platform.rb'
+        require 'tsc/platform'
         TSC::Platform.current
       end
     end
@@ -204,8 +208,19 @@ module TSC
       end
     end
 
-    protected
-    #########
+    def subcommand(name)
+      @appconf.subcommand = name
+      @subregistry = OptionRegistry.new
+
+      TSC::Dataset[ :arguments => nil, :description => nil, :options => nil ].tap do |_conf|
+        yield _conf
+        @subregistry.add_bulk *Array(_conf.options)
+        @appconf.arguments = _conf.arguments
+        @appconf.description = _conf.description
+      end
+
+      @suboptions = TSC::Options.new(@subregistry.entries)
+    end
 
     # Provides a harness for errors. Calls a specified block, rescueing
     # a specified list of exceptions to form pretty error messages and
@@ -217,12 +232,13 @@ module TSC
 
       localize_ruby_loadpath
       require 'getoptlong'
-      require 'tsc/errors.rb'
-      require 'tsc/launch.rb'
-      require 'tsc/path.rb'
-      require 'tsc/box.rb'
-      require 'tsc/string-utils.rb'
-      require 'tsc/line-builder.rb'
+
+      require 'tsc/errors'
+      require 'tsc/launch'
+      require 'tsc/path'
+      require 'tsc/box'
+      require 'tsc/string-utils'
+      require 'tsc/line-builder'
 
       begin
         block.call(options)
@@ -244,12 +260,12 @@ module TSC
     # Processes command line according to the option descriptors provided on
     # creation.
     #
-    def process_command_line(order = false)
+    def process_command_line(order = false, help = true)
       require 'getoptlong'
       require 'set'
 
       processor = option_processor.extend(Enumerable)
-      order = order[:order] if Hash === order
+      order, help = order.values_at(:order, :help) if Hash === order
 
       processor.quiet = true
       processor.ordering = GetoptLong::REQUIRE_ORDER if order
@@ -259,7 +275,7 @@ module TSC
       end
 
       require 'debug' if options.debug?
-      return options unless options.help?
+      return options unless options.help? and help
 
       print_usage
       exit 0
@@ -318,7 +334,7 @@ module TSC
 
     def option_processor
       require 'getoptlong'
-      GetoptLong.new *@registry.entries.map { |_entry|
+      GetoptLong.new *(@registry.entries + @subregistry.entries).map { |_entry|
         option, description, argument, aliases = _entry.to_a
 
         [ option ] + aliases + [
@@ -328,7 +344,12 @@ module TSC
     end
 
     def usage_description
-      @appconf.description
+      @appconf.description.tap { |_description|
+        case _description
+          when Proc
+            break _description.call
+        end
+      }
     end
 
     def print_usage(*args)
@@ -340,25 +361,34 @@ module TSC
         indent(
           [
             script_name,
-            '[<options>]',
+            '[ <options> ... ]',
             if @appconf.subcommand
               [
                 @appconf.subcommand,
-                '[<sub-options>]'
+                "[ <#{@appconf.subcommand}-options> ... ]"
               ]
             end,
             (TSC::Dataset === @appconf.arguments ? @appconf.arguments.usage : @appconf.arguments.to_s)
           ].flatten.compact.join(' ')
         ),
-        [
-          '',
-          (@appconf.subcommand ? 'SUB-OPTIONS' : 'OPTIONS'),
+        [ '',
+          'OPTIONS',
           indent(
             @registry.format_entries.map { |_aliases, _option, _description|
               "#{_aliases}#{_option}   #{_description}"
             }
           )
         ],
+        if @appconf.subcommand
+          [ '',
+            "#{@appconf.subcommand.upcase} OPTIONS",
+            indent(
+              @subregistry.format_entries.map { |_aliases, _option, _description|
+                "#{_aliases}#{_option}   #{_description}"
+              }
+            )
+          ]
+        end,
         if TSC::Dataset === @appconf.arguments and @appconf.arguments.description
           [
             '',
@@ -370,13 +400,14 @@ module TSC
             )
           ]
         end,
-        if usage_description
-          [
+        Array(usage_description).flatten.compact.tap { |_description|
+          next if _description.empty?
+          break [
             '',
             'DESCRIPTION',
-            indent(usage_description)
+            indent(_description)
           ]
-        end,
+        },
         if @appconf.examples
           [
             '',
