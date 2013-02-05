@@ -76,7 +76,7 @@ module TSC
 
       def wrap_with(*args, &block)
         on_error(block, [], StandardError) do |_error|
-          raise self.new(args, _error)
+          raise (LabeledError === _error ? _error.class : self).new(args, _error)
         end
       end
 
@@ -288,27 +288,36 @@ module TSC
     end
   end
 
-  class DeprecatedMethodError < Error
-    def initialize(*args)
-      super args, 'Deprecated'
+  class LabeledError < Error
+    def initialize(label, args)
+      return super args if args.any? { |_object|
+        self.class === _object
+      }
+      super label, args
     end
   end
 
-  class NotImplementedError < Error
+  class DeprecatedMethodError < LabeledError
     def initialize(*args)
-      super args, 'Not implemented yet'
+      super 'Deprecated', args
     end
   end
 
-  class MissingResourceError < Error
+  class NotImplementedError < LabeledError
     def initialize(*args)
-      super args, 'Resource missing'
+      super 'Not implemented yet', args
     end
   end
 
-  class UsageError < Error
+  class MissingResourceError < LabeledError
     def initialize(*args)
-      super 'Wrong usage', *args
+      super 'Resource missing', args
+    end
+  end
+
+  class UsageError < LabeledError
+    def initialize(*args)
+      super 'Wrong usage', args
     end
   end
 
