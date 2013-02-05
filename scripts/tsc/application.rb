@@ -214,6 +214,7 @@ module TSC
 
       TSC::Dataset[ :arguments => nil, :description => nil, :options => nil ].tap do |_conf|
         yield _conf
+
         @subregistry.add_bulk *Array(_conf.options)
         @appconf.arguments = _conf.arguments
         @appconf.description = _conf.description

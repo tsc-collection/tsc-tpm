@@ -79,6 +79,16 @@ module TSC
       @hash.keys
     end
 
+    def update(other)
+      @hash.keys.each do |_key|
+        other[_key].tap do |_value|
+          @hash[_key] = _value if _value
+        end
+      end
+
+      self
+    end
+
     def [](name)
       result = Array(@hash[name])
       case result.size
