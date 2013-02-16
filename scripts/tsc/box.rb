@@ -50,7 +50,7 @@ module TSC
     end
 
     def to_s
-      map.join("\n")
+      map.to_a.join("\n")
     end
 
     private
