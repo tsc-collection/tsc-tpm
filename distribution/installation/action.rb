@@ -139,8 +139,8 @@ module Installation
 
       stat = target_stat
 
-      uid = user_entry.uid unless user_entry.uid == stat.uid
-      gid = group_entry.gid unless group_entry.gid == stat.gid
+      uid = user_entry.uid if user_entry and user_entry.uid != stat.uid
+      gid = group_entry.gid if group_entry and group_entry.gid != stat.gid
 
       logger.log :set_user_and_group, "u=#{uid.inspect}, g=#{gid.inspect}, t=#{target.inspect}" if logger
 
