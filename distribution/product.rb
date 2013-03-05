@@ -84,11 +84,19 @@ module Distribution
         :description => proc { |_block, _argument|
           @description = _argument
         },
-        :version => proc { |_block, _argument|
-          @settings.version = _argument unless @settings.version
+        :version => proc { |_block, *_args|
+          if _args.empty?
+            @settings.version
+          else
+            @settings.version = _args.last unless @settings.version
+          end
         },
-        :build => proc { |_block, _argument|
-          @settings.build = _argument unless @settings.build
+        :build => proc { |_block, *_args|
+          if _args.empty?
+            @settings.build
+          else
+            @settings.build = _argument unless @settings.build
+          end
         },
         :user => proc { |_block, _argument|
           @user = _argument
