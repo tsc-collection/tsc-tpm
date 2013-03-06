@@ -84,8 +84,12 @@ module Distribution
         :description => proc { |_block, _argument|
           @description = _argument
         },
-        :filesets => proc { |_block, _argument|
-          @filesets = _argument
+        :filesets => proc { |_block, *_args|
+          if _args.empty?
+            Array(@filesets)
+          else
+            @filesets = _args.flatten
+          end
         },
         :tasks => proc { |_block, *_argument|
           @tasks += normalize_tasks(_argument)
@@ -188,8 +192,32 @@ module Distribution
 
     private
     #######
+
     def normalize_tasks(tasks)
-      tasks.join("\n").map { |_line| _line.split(%r{[@/]|\s+}) }.reject { |_entry| _entry.empty? }
+      compact_array tasks.join("\n").lines.map { |_line|
+        normalize_single_task _line.strip
+      }
+    end
+
+    def normalize_single_task(task)
+      return if task.empty?
+
+      task.scan(%r{^(.+)?\s*[(]\s*(.+?(?:\s*,\s*.+?)*)?\s*[)]$}).tap do |_chunks|
+        next if _chunks.empty?
+        return normalize_array _chunks.flatten.map { |_chunk|
+          _chunk.split(',') if _chunk
+        }
+      end
+
+      task.split %r{[@/]|\s+}
+    end
+
+    def normalize_array(array)
+      array.flatten.compact
+    end
+
+    def compact_array(array)
+      array.compact
     end
   end
 end

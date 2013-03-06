@@ -71,8 +71,12 @@ module Distribution
       @description = args.shift
 
       @parser = ConfigParser.new cache, Hash[
-        :name => proc { |_block, _argument|
-          @name = _argument
+        :name => proc { |_block, *_args|
+          if _args.empty?
+            @name
+          else
+            @name = _args.first
+          end
         },
         :description => proc { |_block, _argument|
           @description = _argument
