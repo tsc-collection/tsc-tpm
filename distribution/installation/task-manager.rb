@@ -141,8 +141,12 @@ module Installation
         Task.installation_group_entry = Etc.getgrnam(group) rescue nil
       else
         if Task.installation_user_entry
-          Task.installation_group_entry = Etc.getgrgid(Task.installation_user_entry.gid)
-          Task.installation_group = Task.installation_group_entry.name
+          TSC::Error.ignore do
+            Etc.getgrgid Task.installation_user_entry.gid do |_entry|
+              Task.installation_group_entry = _entry
+              Task.installation_group = _entry.name
+            end
+          end
         else
           Task.installation_group_entry = nil
           Task.installation_group = nil
