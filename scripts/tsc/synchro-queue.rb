@@ -66,6 +66,10 @@ module TSC
       @high_water_mark = 0
     end
 
+    def size
+      @queue.size
+    end
+
     def read(size)
       get
     end
