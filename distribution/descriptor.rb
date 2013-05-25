@@ -52,7 +52,7 @@
 
 require 'tsc/ftools'
 require 'ftools'
-require 'md5'
+require 'digest/md5'
 
 module Distribution
   class Descriptor
@@ -213,7 +213,7 @@ module Distribution
     end
 
     def calculate_checksum(path)
-      digest = MD5.new
+      digest = Digest::MD5.new
       File.open path do |_io|
         while chunk = _io.read(1024) do
           digest.update chunk
