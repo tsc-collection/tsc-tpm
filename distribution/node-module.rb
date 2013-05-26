@@ -40,6 +40,9 @@ module Distribution
         when file_stat.file?
           LeafTreeDescriptor.new(file, location)
 
+        when file_stat.directory?
+          NodeTreeDescriptor.new(file, location)
+
         when file_stat.symlink?
           dirname, basename = File.split(File.readlink(path))
           [
