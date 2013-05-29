@@ -34,23 +34,31 @@ module Distribution
       file = FileInfo.new name
       process_file_entry(file)
 
-      file.mode ||= file_stat.mode
+      loop do
+        file.mode ||= file_stat.mode
 
-      case
-        when file_stat.file?
-          LeafTreeDescriptor.new(file, location)
+        return case
+          when file_stat.file?
+            LeafTreeDescriptor.new(file, location)
 
-        when file_stat.directory?
-          NodeTreeDescriptor.new(file, location)
+          when file_stat.directory?
+            NodeTreeDescriptor.new(file, location)
 
-        when file_stat.symlink?
-          dirname, basename = File.split(File.readlink(path))
-          [
-            LinkTreeDescriptor.new(file, basename),
-            detect_file_type(basename, File.expand_path(dirname, location))
-          ]
-        else
-          raise "Unsupported file type for #{path.inspect}"
+          when file_stat.symlink?
+            if info[:follow]
+              file_stat = File.stat(path)
+              next
+            end
+
+            dirname, basename = File.split(File.readlink(path))
+            [
+              LinkTreeDescriptor.new(file, basename),
+              detect_file_type(basename, File.expand_path(dirname, location))
+            ]
+
+          else
+            raise "Unsupported file type for #{path.inspect}"
+        end
       end
     end
   end

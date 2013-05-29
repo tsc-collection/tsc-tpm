@@ -54,6 +54,8 @@ require 'find'
 
 module Distribution
   class TreeModule < Module
+    include Distribution::NodeMixin
+
     def initialize(*args, &block)
       b = nil
       super *args, &b
@@ -73,61 +75,38 @@ module Distribution
     end
 
     def descriptors(origin)
-      files.map { |_file|
-        dirname, basename = File.split _file.path
-        top = File.smart_join origin, dirname
-        Dir.cd top do
-          tree(basename).map { |_path|
-            file = FileInfo.new _path
-            process_file_entry file
+      [].tap do |_descriptors|
+        super.each do |_descriptor|
+          _descriptors << _descriptor
 
-            file_on_disk = File.lstat file.path
-            file.mode ||= file_on_disk.mode
-
-            case
-              when file_on_disk.file?
-                LeafTreeDescriptor.new file, top
-
-              when file_on_disk.directory?
-                NodeTreeDescriptor.new file, top
-
-              when file_on_disk.symlink?
-                if follow_symlinks?
-                  file.mode = File.stat(file.path).mode
-                  LeafTreeDescriptor.new file, top
-                else
-                  LinkTreeDescriptor.new file, File.readlink(file.path)
+          if _descriptor.action? 'directory'
+            File.split(_descriptor.source).tap do |_dirname, _basename|
+              Dir.cd _dirname do
+                tree _basename do |_path|
+                  _descriptors.concat Array(detect_file_type(_path, _dirname)).flatten.compact
                 end
-
-              else
-                raise "Unsupported file type for #{path.inspect}"
+              end
             end
-          }
+          end
         end
-      }
+      end
     end
 
     private
     #######
 
     def tree(top)
-      [].tap do |_entries|
-        Find.find top + File::SEPARATOR do |_path|
-          case @filter.call *File.split(_path)
-            when nil
-              Find.prune
+      Find.find top + File::SEPARATOR do |_path|
+        case @filter.call *File.split(_path)
+          when nil
+            Find.prune
 
-            when false
+          when false
 
-            else
-              _entries.push _path
-          end
+          else
+            yield _path
         end
       end
-    end
-
-    def follow_symlinks?
-      info[:follow]
     end
   end
 end
