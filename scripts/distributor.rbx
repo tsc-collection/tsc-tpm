@@ -74,6 +74,7 @@ class Application < TSC::Application
         [ '--install',   'Install',                  nil,         '-i' ],
         [ '--source',    'Source top directory',     'directory'  ],
         [ '--binary',    'Binary top directory',     'directory'  ],
+        [ '--top',       'Default installation top', 'directory'  ],
         [ '--product',   'Product name',             'string',    '-P' ],
         [ '--version',   'Product version',          'string',    '-V' ],
         [ '--tag',       'Product tag',              'string',    '-T' ],
@@ -136,6 +137,7 @@ class Application < TSC::Application
           when 'abi' then distributor.product_abi = _value
           when 'product' then distributor.product_name = _value
           when 'version' then distributor.product_version = _value
+          when 'top' then distributor.product_top = _value
           when 'tag' then distributor.product_tag = _value
           when 'prefix' then distributor.product_library_prefix = _value
           when 'major' then distributor.product_library_major = convert_to_integer(_value)

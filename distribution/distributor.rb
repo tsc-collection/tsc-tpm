@@ -68,6 +68,7 @@ module Distribution
     def_delegators :@config, "product_abi="
     def_delegators :@config, "product_name="
     def_delegators :@config, "product_version="
+    def_delegators :@config, "product_top="
     def_delegators :@config, "product_tag="
     def_delegators :@config, "product_library_prefix="
     def_delegators :@config, "product_library_extension="

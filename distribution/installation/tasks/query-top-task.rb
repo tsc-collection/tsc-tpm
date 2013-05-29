@@ -61,7 +61,7 @@ module Installation
       end
 
       def execute
-        directory = File.expand_path ask_installation_directory, top
+        directory = File.expand_path ask_installation_directory, Task.working_directory || Dir.pwd
         raise "Wrong installation directory" if directory.index(Dir.getwd) == 0
         self.class.installation_top = directory
       end

@@ -67,6 +67,7 @@ module Installation
 
     class << self
       attr_reader :subclasses
+      attr_accessor :working_directory
 
       def inherited(subclass)
         raise SubclassError, subclass if @subclasses.nil?

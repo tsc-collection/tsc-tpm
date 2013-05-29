@@ -60,15 +60,16 @@ module Distribution
   class Product
     extend Forwardable
 
-    attr_reader :description, :user, :group, :top, :packages, :tag_filters,
+    attr_reader :description, :user, :group, :packages, :tag_filters,
                 :base, :params, :compatibility, :log, :notags
 
-    def_delegators :@settings, :name, :tags, :build, :version, :library_major, :library_prefix, :abi
+    def_delegators :@settings, :name, :tags, :build, :version, :top, :library_major, :library_prefix, :abi
 
     def_delegators :@settings, :library_prefix=
     def_delegators :@settings, :library_major=
     def_delegators :@settings, :build=
     def_delegators :@settings, :version=
+    def_delegators :@settings, :top=
 
     def initialize(cache, settings, *args, &block)
       name = args.shift
@@ -95,7 +96,7 @@ module Distribution
           if _args.empty?
             @settings.build
           else
-            @settings.build = _argument unless @settings.build
+            @settings.build = _args.last unless @settings.build
           end
         },
         :user => proc { |_block, _argument|
@@ -104,8 +105,12 @@ module Distribution
         :group => proc { |_block, _argument|
           @group = _argument
         },
-        :top => proc { |_block, _argument|
-          @top = File.expand_path(_argument.to_s)
+        :top => proc { |_block, *_args|
+          if _args.empty?
+            @settings.top
+          else
+            @settings.top = _args.last unless @settings.top
+          end
         },
         :package => proc { |_block, *args|
           @packages.push Package.new(self, cache, *args, &_block)

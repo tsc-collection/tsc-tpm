@@ -262,6 +262,10 @@ module Installation
         end
       end
 
+      if app.options.directory?
+        Task.working_directory = app.options.directory
+      end
+
       @logger = Logger.new('INSTALL', package_name(config), config.product.version)
       task_manager = TaskManager.new(communicator, logger, config)
 

@@ -111,6 +111,10 @@ module Distribution
       @product_settings.version = version
     end
 
+    def product_top=(top)
+      @product_settings.top = top
+    end
+
     def product_tag=(tags)
       @product_settings.tags = tags
     end
