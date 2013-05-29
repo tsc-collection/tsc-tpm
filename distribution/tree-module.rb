@@ -60,12 +60,12 @@ module Distribution
       b = nil
       super *args, &b
 
-      @filter = block || proc { |_localtion, _item|
+      @filter = block || proc { |_location, _item|
         case _item
-          when '.svn'
+          when '.svn', 'CVS', '.git', 'unit-tests'
             nil
 
-          when %r{^test-}, %r{.+-spec.rb}
+          when %r{^test-}, %r{.-spec.rb$}, %r{^[Mm]akefile$}, 'Jamfile'
             false
 
           else
@@ -96,16 +96,9 @@ module Distribution
     #######
 
     def tree(top)
-      Find.find top + File::SEPARATOR do |_path|
-        case @filter.call *File.split(_path)
-          when nil
-            Find.prune
-
-          when false
-
-          else
-            yield _path
-        end
+      Find.find top do |_path|
+        next yield _path if @filter.call *File.split(_path)
+        Find.prune if File.directory? _path
       end
     end
   end
