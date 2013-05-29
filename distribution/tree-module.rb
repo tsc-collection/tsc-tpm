@@ -84,17 +84,23 @@ module Distribution
             file_on_disk = File.lstat file.path
             file.mode ||= file_on_disk.mode
 
-            if file_on_disk.directory?
-              NodeTreeDescriptor.new file, top
-            elsif file_on_disk.file?
-              LeafTreeDescriptor.new file, top
-            elsif file_on_disk.symlink?
-              if follow_symlinks?
-                file.mode = File.stat(file.path).mode
+            case
+              when file_on_disk.file?
                 LeafTreeDescriptor.new file, top
+
+              when file_on_disk.directory?
+                NodeTreeDescriptor.new file, top
+
+              when file_on_disk.symlink?
+                if follow_symlinks?
+                  file.mode = File.stat(file.path).mode
+                  LeafTreeDescriptor.new file, top
+                else
+                  LinkTreeDescriptor.new file, File.readlink(file.path)
+                end
+
               else
-                LinkTreeDescriptor.new file, File.readlink(file.path)
-              end
+                raise "Unsupported file type for #{path.inspect}"
             end
           }
         end
@@ -105,21 +111,23 @@ module Distribution
     #######
 
     def tree(top)
-      entries = []
-      Find.find(top + File::SEPARATOR) { |_path|
-        case @filter.call *File.split(_path)
-          when nil
-            Find.prune
-          when false
-          else
-            entries.push _path
+      [].tap do |_entries|
+        Find.find top + File::SEPARATOR do |_path|
+          case @filter.call *File.split(_path)
+            when nil
+              Find.prune
+
+            when false
+
+            else
+              _entries.push _path
+          end
         end
-      }
-      entries
+      end
     end
 
     def follow_symlinks?
-      @follow_symlinks ||= info[:follow]
+      info[:follow]
     end
   end
 end
