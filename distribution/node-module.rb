@@ -23,7 +23,7 @@ module Distribution
     #######
 
     def detect_file_type(name, location)
-      path = File.join(location, name)
+      path = File.smart_join(location, name)
       begin
         file_stat = File.lstat(path)
       rescue Errno::ENOENT
@@ -50,10 +50,10 @@ module Distribution
               next
             end
 
-            dirname, basename = File.split(File.readlink(path))
+            reference = File.readlink(path)
             [
-              LinkTreeDescriptor.new(file, basename),
-              detect_file_type(basename, File.expand_path(dirname, location))
+              LinkTreeDescriptor.new(file, reference),
+              detect_file_type(File.smart_join(File.dirname(name), reference), location)
             ]
 
           else
