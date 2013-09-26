@@ -65,6 +65,16 @@ module Installation
 
     @subclasses = []
 
+    class << Task
+      def archive=(state)
+        @archive = state
+      end
+
+      def archive?
+        @archive
+      end
+    end
+
     class << self
       attr_reader :subclasses
       attr_accessor :working_directory
@@ -76,14 +86,6 @@ module Installation
 
       def properties
         Properties.app
-      end
-
-      def archive=(state)
-        @archive = state
-      end
-
-      def archive?
-        @archive
       end
 
       def method_missing(*args)
@@ -132,6 +134,10 @@ module Installation
 
     def params
       self.class.installation_parameters
+    end
+
+    def archive?
+      Task.archive?
     end
   end
 end
