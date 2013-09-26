@@ -258,6 +258,7 @@ module Installation
 
           actions.each do |_action|
             _action.base = archive_content_location
+            _action.undoable = false
           end
         end
       end
