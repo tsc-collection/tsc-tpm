@@ -104,12 +104,12 @@ module TSC
             components = _line.split('-')
 
             next unless components[1] == "release"
-            next unless components[0] == "sles"
+            next unless [ 'sles', 'openSUSE' ].include? components[0]
 
-            suse_major = components[2].scan(%r{^(\d+)(?:[.]\d+)+$}).flatten.first
-            next unless suse_major
+            suse_id = suse_compatibility_id components[2].scan(%r{^(\d+)(?:[.](\d+))+$}).flatten.map(&:to_i)
+            next unless suse_id
 
-            return [ "suse-#{suse_major}-#{arch}", arch ]
+            return [ "suse-#{suse_id}-#{arch}", arch ]
           end
         }
 
@@ -129,6 +129,14 @@ module TSC
         end
 
         [ "#{distro}-#{arch}", arch ]
+      end
+
+      def suse_compatibility_id(components)
+        unless components.empty?
+          components.tap do |_major, _minor, *_rest|
+            return [ 11, 12 ].include?(_major) ? 11 : _major
+          end
+        end
       end
 
       def fine_tune_solaris
