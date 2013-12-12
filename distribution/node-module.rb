@@ -52,8 +52,8 @@ module Distribution
 
             reference = File.readlink(path)
             [
-              LinkTreeDescriptor.new(file, reference),
-              detect_file_type(File.smart_join(File.dirname(name), reference), location)
+              detect_file_type(File.smart_join(File.dirname(name), reference), location),
+              LinkTreeDescriptor.new(file, reference)
             ]
 
           else
