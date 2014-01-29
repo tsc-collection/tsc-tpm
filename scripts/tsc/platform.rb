@@ -123,7 +123,11 @@ module TSC
               else 'rh'
             end
           when '2.6'
-            'rh-40'
+            case version.to_i
+                when 9 then 'rh-40'
+                when 18 then 'rh-50'
+                when 32 then 'rh-60'
+            end
           else
             'lin'
         end
