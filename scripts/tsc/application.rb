@@ -220,7 +220,7 @@ module TSC
         @appconf.description = _conf.description
       end
 
-      @suboptions = TSC::Options.new(@subregistry.entries)
+      @suboptions = TSC::Options.new @subregistry.entries
     end
 
     # Provides a harness for errors. Calls a specified block, rescueing
@@ -366,7 +366,9 @@ module TSC
             if @appconf.subcommand
               [
                 @appconf.subcommand,
-                "[ <#{@appconf.subcommand}-options> ... ]"
+                unless @subregistry.entries.empty?
+                  "[ <#{@appconf.subcommand}-options> ... ]"
+                end
               ]
             end,
             (TSC::Dataset === @appconf.arguments ? @appconf.arguments.usage : @appconf.arguments.to_s)
@@ -380,7 +382,7 @@ module TSC
             }
           )
         ],
-        if @appconf.subcommand
+        if @appconf.subcommand and @subregistry.entries.empty? == false
           [ '',
             "#{@appconf.subcommand.upcase} OPTIONS",
             indent(
