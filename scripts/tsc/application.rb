@@ -50,6 +50,10 @@ SCRIPT_LINES__ = Hash.new { |_hash, _key|
   _hash[_key] = IO.readlines(_key) rescue []
 }
 
+require 'tsc/option-registry'
+require 'tsc/options'
+require 'tsc/dataset'
+
 module TSC
   # This class provides an application framework for any Ruby application.
   # It accepts option descriptions and provides command line parsing as well
@@ -60,7 +64,6 @@ module TSC
   #
   class Application
     attr_reader :script_name, :script_location, :options, :registry
-    attr_reader :suboptions
 
     # Creates and application, passing it optional command line descriptor
     # (if the first argument is aString) and an array of option descriptors
@@ -83,10 +86,6 @@ module TSC
     # the specified block.
     #
     def initialize(*args, &block)
-      require 'tsc/option-registry'
-      require 'tsc/options'
-      require 'tsc/dataset'
-
       @appconf = TSC::Dataset[
         :script => $0,
         :subcommand => nil,
@@ -97,17 +96,18 @@ module TSC
         :verbose => nil,
         :backtrace => nil
       ]
-      block.call(@appconf) if block
+      block.call @appconf if block
 
       location, name = File.split File.expand_path(@appconf.script)
       @script_location = location
-      @script_name = name.sub(%r{[.]rb.*$}i, '')
+      @script_name = name.sub %r{[.]rb.*$}i, ''
 
       $: << script_location
 
       if String === args.first && TSC::Dataset === @appconf.arguments && @appconf.arguments.usage.nil?
         @appconf.arguments.usage = args.shift
       end
+
       @registry = OptionRegistry.new
       @subregistry = OptionRegistry.new
 
@@ -120,7 +120,6 @@ module TSC
       @registry.add_bulk *Array(@appconf.options)
 
       @options = TSC::Options.new @registry.entries
-      @suboptions = TSC::Options.new @subregistry.entries
 
       ENV['TRACE'].to_s.split.include?(script_name).tap do |_trace|
         options.verbose = @appconf.verbose || _trace
@@ -136,7 +135,7 @@ module TSC
     def start(&block) # :yields: options
       handle_errors do
         process_command_line
-        block.call(self) if block
+        block.call self if block
       end
     end
 
@@ -220,7 +219,7 @@ module TSC
         @appconf.description = _conf.description
       end
 
-      @suboptions = TSC::Options.new @subregistry.entries
+      TSC::Options.new @subregistry.entries
     end
 
     # Provides a harness for errors. Calls a specified block, rescueing
@@ -246,8 +245,11 @@ module TSC
       rescue Exception => exception
         case exception
           when TSC::UsageError, GetoptLong::InvalidOption, GetoptLong::MissingArgument
+            print_diagnostics '==='
+            print_usage
+            print_diagnostics '==='
+
             print_error exception
-            print_usage('===')
             exit 2
           when TSC::Error, StandardError, Interrupt, LoadError, *errors
             print_error exception
