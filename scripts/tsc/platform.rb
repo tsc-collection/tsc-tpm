@@ -89,6 +89,17 @@ module TSC
       private
       #######
 
+      def which(cmd)
+        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+        ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+          exts.each { |ext|
+            exe = File.join(path, "#{cmd}#{ext}")
+            return exe if File.executable? exe
+          }
+        end
+        return nil
+      end
+
       def fine_tune_linux
         require 'sys/uname'
         info = Sys::Uname.uname
@@ -99,39 +110,49 @@ module TSC
           else info.machine
         end
 
-        IO.popen("rpm -qa") { |_io|
-          _io.readlines.each do |_line|
-            components = _line.split('-')
+        if which("rpm") then
+          IO.popen("rpm -qa") { |_io|
+            _io.readlines.each do |_line|
+              components = _line.split('-')
 
-            next unless components[1] == "release"
-            next unless [ 'sles', 'openSUSE' ].include? components[0]
+              next unless components[1] == "release"
+              next unless [ 'sles', 'openSUSE' ].include? components[0]
 
-            suse_id = suse_compatibility_id components[2].scan(%r{^(\d+)(?:[.](\d+))+$}).flatten.map(&:to_i)
-            next unless suse_id
+              suse_id = suse_compatibility_id components[2].scan(%r{^(\d+)(?:[.](\d+))+$}).flatten.map(&:to_i)
+              next unless suse_id
 
-            return [ "suse-#{suse_id}-#{arch}", arch ]
+              return [ "suse-#{suse_id}-#{arch}", arch ]
+            end
+          }
+          kernel, version = info.release.scan(%r{^(\d+[.]\d+)[.](\d+)[.-]}).first
+          distro = case kernel
+            when '2.4'
+              case version.to_i
+                when 9 then 'rh-21'
+                when 21 then 'rh-30'
+                when 20 then 'rh-9'
+                else 'rh'
+              end
+            when '2.6'
+              case version.to_i
+                  when 9 then 'rh-40'
+                  when 18 then 'rh-50'
+                  when 32 then 'rh-60'
+              end
+            else
+              'lin'
           end
-        }
-
-        kernel, version = info.release.scan(%r{^(\d+[.]\d+)[.](\d+)[.-]}).first
-        distro = case kernel
-          when '2.4'
-            case version.to_i
-              when 9 then 'rh-21'
-              when 21 then 'rh-30'
-              when 20 then 'rh-9'
-              else 'rh'
+          elsif which("lsb_release") #Ubuntu
+            codename = ""
+            IO.popen("lsb_release -c") { |_io|
+              _io.readlines.each do |_line|
+                codename = _line.scan(%r{^Codename:\t(.+)$}).first.first
+              end
+            }
+            distro = "ubuntu-#{codename}"
+            else
+              distro='lin'
             end
-          when '2.6'
-            case version.to_i
-                when 9 then 'rh-40'
-                when 18 then 'rh-50'
-                when 32 then 'rh-60'
-            end
-          else
-            'lin'
-        end
-
         [ "#{distro}-#{arch}", arch ]
       end
 
