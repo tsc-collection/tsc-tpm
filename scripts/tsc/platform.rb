@@ -116,12 +116,19 @@ module TSC
               components = _line.split('-')
 
               next unless components[1] == "release"
-              next unless [ 'sles', 'openSUSE' ].include? components[0]
 
-              suse_id = suse_compatibility_id components[2].scan(%r{^(\d+)(?:[.](\d+))+$}).flatten.map(&:to_i)
-              next unless suse_id
+              case
+                when [ 'sles', 'openSUSE' ].include?(components[0])
+                  version = suse_compatibility_id components[2].scan(%r{^(\d+)(?:[.](\d+))+$}).flatten.map(&:to_i)
+                  next unless version
+                  return [ "suse-#{version}-#{arch}", arch ]
 
-              return [ "suse-#{suse_id}-#{arch}", arch ]
+                when [ 'centos' ].include?(components[0])
+                  # centos-release-6-5.el6.centos.11.2.x86_64
+                  major = components[2]
+                  minor = components[3].scan(%r{^(\d+)[.].*$}).flatten.map(&:to_i)
+                  return [ "centos-#{major}#{minor}-#{arch}", arch ]
+              end
             end
           }
           kernel, version = info.release.scan(%r{^(\d+[.]\d+)[.](\d+)[.-]}).first
