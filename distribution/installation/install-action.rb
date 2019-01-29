@@ -56,8 +56,7 @@ require 'etc'
 
 module Installation
   class InstallAction < Action 
-    protected
-    #########
+
     def name
       :install
     end
@@ -66,31 +65,9 @@ module Installation
       File.smart_copy source, target
     end
 
-    def target_type
-      :file
+    def compatible_target_types
+      %w[ file ]
     end
 
-    def undo_for_existing
-      stat = File.stat(target)
-      user = Etc::getpwuid(stat.uid).name rescue Task.installation_user
-      group = Etc::getgrgid(stat.gid).name rescue Task.installation_group
-
-      InstallAction.new self, :target => target, :source => figure_saved_target_path, :user => user, :group => group, :permission => stat.mode
-    end
-
-    def undo_for_non_existing
-      RemoveAction.new self, :target => target
-    end
-
-    def preserve_target
-      return unless File.exists? target
-      File.smart_copy target, figure_saved_target_path
-    end
-
-    private
-    #######
-    def figure_saved_target_path
-      File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
-    end
   end
 end

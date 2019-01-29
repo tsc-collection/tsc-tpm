@@ -26,21 +26,15 @@ end
 
 if $0 == __FILE__ or defined? Test::Unit::TestCase
   require 'test/unit'
+  require 'mocha'
+  require 'stubba'
 
   module Distribution
     class StaticLibraryModuleTest < Test::Unit::TestCase
-      def test_files
-	LibraryModule.library_major = 15
-	LibraryModule.library_prefix = "tsc"
+      def test_nothing
+      end
 
-	_module = LibraryModule.new "lib" => %w{ ffc util }
-
-	assert_equal [ 
-	  FileInfo.new("lib/ffc/libtscffc.a", 0755), 
-	  FileInfo.new("lib/util/libtscutil.a", 0755) 
-	], _module.files
-
-	assert_equal "lib/ffc/libtscffc.a", _module.files.first.path_for_checksum
+      def setup
       end
     end
   end

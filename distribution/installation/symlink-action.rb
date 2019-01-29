@@ -62,47 +62,14 @@ module Installation
 
     protected
     #########
+
     def name
       :symlink
     end
 
     def make_target(progress, logger)
-      TSC::Error.ignore(SystemCallError) {
-        info = File.lstat(target)
-        case
-          when info.directory?
-            Dir.rm_r(target)
-          else
-            File.unlink(target)
-        end
-      }
-      File.symlink source.gsub(%r{^[.](?=/)}, top), target
-    end
-
-    def preserve_target
-    end
-
-    def undo_for_existing
-      info = File.lstat(target)
-      user = Etc::getpwuid(info.uid).name rescue Task.installation_user
-      group = Etc::getgrgid(info.gid).name rescue Task.installation_group
-      case 
-        when info.directory?
-          DirectoryAction.new self, :target => target, :source => nil, :user => user, :group => group, :permission => info.mode
-        when info.symlink?
-          SymlinkAction.new self, :target => target, :source => File.readlink(target)
-        else
-          preserve = File.join(Task.installation_preserve_top, target).squeeze File::SEPARATOR
-          InstallAction.new self, :target => target, :source => preserve, :user => user, :group => group, :permission => info.mode
-      end
-    end
-
-    def target_type
-      [ :link, :directory, :file ]
-    end
-
-    def undo_for_non_existing
-      RemoveAction.new self, :target => target
+      FileUtils.remove_entry(target) rescue true
+      FileUtils.ln_s source.gsub(%r{^[.](?=/)}, top), target
     end
 
     def change_file_mode(*args)

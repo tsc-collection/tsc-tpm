@@ -54,44 +54,28 @@ require 'tsc/dtools'
 
 module Installation
   class RemoveAction < Action
+    def initialize(*args)
+      super :if_types => [], *args
+    end
+
     def set_permissions
     end
 
     def set_user_and_group
     end
 
-    protected
-    #########
     def name
       :remove
     end
 
     def make_target(progress, logger)
-      begin
-        unless if_types.empty?
-          return unless if_types.include? File.ftype(target)
-        end
+      return unless File.symlink?(target) || File.exist?(target)
+      return unless if_types.empty? || if_types.include?(File.ftype(target))
 
-	if File.directory? target
-	  Dir.rm_r target
-	else
-	  File.delete target
-	end
-      rescue
-      end
+      FileUtils.remove_entry target
     end
 
-    def remove_target
-    end
-
-    def target_type
-      [ :file, :directory, :link ]
-    end
-
-    def preserve_target
-    end
-
-    def undo_for_existing
+    def remove_target(progress, logger)
     end
 
     def undo_for_non_existing

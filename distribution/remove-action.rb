@@ -50,16 +50,17 @@
 =end
 
 require 'action.rb'
+require 'module.rb'
 
 module Distribution
   class RemoveAction < Action
     def initialize(cache, *files)
       super cache
-      @files = files.flatten
+      @module = Module.new(*files)
     end
     
     def descriptors(package)
-      @files.map do |_file|
+      @module.paths.map do |_file|
         make_descriptor _file
       end
     end

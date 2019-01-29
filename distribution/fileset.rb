@@ -59,6 +59,7 @@ require 'symlink-action.rb'
 require 'directory-action.rb'
 require 'remove-action.rb'
 require 'conditional-remove-action.rb'
+require 'touch-action.rb'
 
 module Distribution
   class Fileset
@@ -95,6 +96,9 @@ module Distribution
         },
         :library_link => proc { |_block, *_links|
           add_action LibraryLinkAction, *_links
+        },
+        :touch => proc { |_block, *_files|
+          add_action TouchAction, *_files
         },
         :remove => proc { |_block, *_files|
           add_action RemoveAction, *_files

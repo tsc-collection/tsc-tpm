@@ -57,6 +57,7 @@ require 'tsc/errors.rb'
 
 require 'installation/logger.rb'
 require 'installation/communicator.rb'
+require 'installation/properties.rb'
 
 module Installation
   class Installer
@@ -155,8 +156,8 @@ module Installation
         @logger = Logger.new('REMOVE', package_name(_config), _config.product.version)
 
         Dir.cd top_directory do
+          Properties.app = Properties.load(Properties.figure_properties_file(_config))
           task_manager = TaskManager.new(communicator, logger, _config)
-          task_manager.restore_properties
 
           begin
             task_manager.event_processor.remove_started do
@@ -165,8 +166,6 @@ module Installation
             end
 
             task_manager.revert
-
-            Dir.rm_r Task.installation_product_metainf
             task_manager.event_processor.remove_finished
           rescue => exception
             logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
@@ -220,10 +219,11 @@ module Installation
 
     def make_a_guess
       prodinfo = figure_prodinfo_file
-      if prodinfo.empty?
-        look_for_packages
+      if prodinfo
+        Properties.app = Properties.load(Properties.figure_properties_file)
+        process_prodinfo prodinfo
       else
-        process_prodinfo prodinfo.first
+        look_for_packages
       end
     end
 
@@ -256,7 +256,7 @@ module Installation
           communicator.report '[ ' + package_description(config) + ' ]'
         }
         task_manager.execute !options.key?('nocleanup')
-        task_manager.preserve_properties
+        Properties.app.save(Properties.app.installation_package_properties)
 
       rescue => exception
         logger.log TSC::Error.textualize(exception, :stderr => true, :backtrace => true)
@@ -342,9 +342,7 @@ module Installation
     end
 
     def figure_prodinfo_file
-      files = Dir[ 'meta-inf/prodinfo' ]
-      raise "No prodinfo file" if files.empty?
-      files
+      Dir[ 'meta-inf/prodinfo' ].first
     end
   end
 end

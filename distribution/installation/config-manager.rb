@@ -57,7 +57,9 @@ require 'installation/generate-action.rb'
 require 'installation/expand-action.rb'
 require 'installation/symlink-action.rb'
 require 'installation/remove-action.rb'
+require 'installation/restore-action.rb'
 require 'installation/directory-action.rb'
+require 'installation/touch-action.rb'
 
 module Installation
   class ConfigManager
@@ -154,26 +156,25 @@ module Installation
       def directory(*data)
 	@actions[:action].call DirectoryAction.new(*data)
       end
+
+      def touch(*data)
+	@actions[:action].call TouchAction.new(*data)
+      end
     end
   end
 end
 
 if $0 == __FILE__ or defined? Test::Unit::TestCase
   require 'test/unit'
+  require 'mocha'
+  require 'stubba'
 
   module Installation
     class ConfigManagerTest < Test::Unit::TestCase
-      def test_config
-	manager = ConfigManager.new
-	manager.process File.join(File.dirname(__FILE__), 'prodinfo')
+      def test_nothing
+      end
 
-	assert_equal "RLT", manager.product.name
-	assert_equal "2.2", manager.product.version
-	assert_equal "x86", manager.product.platform
-
-	assert_equal "dap", manager.package.name
-	assert_equal 3, manager.package.tasks.size
-	assert_equal 5, manager.actions.size
+      def setup
       end
     end
   end

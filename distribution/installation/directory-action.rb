@@ -57,28 +57,32 @@ require 'etc'
 
 module Installation
   class DirectoryAction < Action 
-    protected
-    #########
+    def initialize(*args)
+      super :force => false, *args
+    end
+
     def name
       :directory
     end
 
     def make_target(progress, logger)
-      File.makedirs target
+      FileUtils.makedirs target
     end
 
-    def remove_target
-      begin
-	Dir.delete target
-      rescue
+    def remove_target(progress, logger)
+      if force 
+        logger.log name, "Removing hierarchy #{target}"
+        FileUtils.remove_entry target
+      else
+        FileUtils.rmdir target rescue true
       end
     end
 
-    def preserve_target
+    def compatible_target_types
+      %w[ directory ]
     end
 
-    def target_type
-      :directory
+    def preserve_target
     end
 
     def undo_for_existing
@@ -89,8 +93,5 @@ module Installation
       DirectoryAction.new self, :target => target, :source =>nil, :user => user, :group => group, :permisison => stat.mode
     end
 
-    def undo_for_non_existing
-      RemoveAction.new self, :target => target
-    end
   end
 end

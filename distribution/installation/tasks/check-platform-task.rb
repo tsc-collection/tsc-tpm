@@ -7,6 +7,7 @@
 =end
 
 require 'tsc/platform.rb'
+require 'installation/task.rb'
 
 module Installation
   module Tasks
@@ -20,7 +21,6 @@ module Installation
         current = TSC::Platform.current.name
 
         return if [ product.platform, *product.compatible ].include?(current)
-
         raise "Product platform #{product.platform.inspect} is not compatible with #{current.inspect}"
       end
 
@@ -38,19 +38,7 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   module Installation
     module Tasks
       class CheckPlatformTaskTest < Test::Unit::TestCase
-        attr_reader :task
-
-        def test_execute
-          assert_nothing_raised do
-            task.execute
-          end
-        end
-
-        def test_revert
-          assert_nothing_raised do
-            task.revert
-          end
-        end
+        attr_reader :task, :communicator, :logger
 
         def test_provides
           assert_equal 'system-check-platform', task.provides
@@ -61,12 +49,12 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
         end
 
         def setup
-          @task = CheckPlatformTask.new
+          @communicator = mock('communicator')
+          @logger = mock('logger')
+
+          @task = CheckPlatformTask.new(communicator, logger)
         end
-        
-        def teardown
-          @task = nil
-        end
+
       end
     end
   end

@@ -50,8 +50,11 @@
 require 'tsc/ftools.rb'
 require 'tsc/platform.rb'
 
+require 'fileutils'
 require 'tracer'
 require 'pp'
+
+require 'installation/properties.rb'
 
 module Distribution
   class Packager
@@ -77,18 +80,21 @@ module Distribution
         content_info = copy_files_and_collect_info(package_temp_directory)
         tools_info = make_tools(package_temp_directory)
         prodinfo_info = prodinfo_descriptor.info
+        properties_info = properties_descriptor.info
         metainf_dirs_info = metainf_directories(content_info, tools_info, prodinfo_info)
 
         info = [
           package.product.info, 
           package.info,
-          prodinfo_info,
           metainf_dirs_info,
+          prodinfo_info,
+          properties_info,
           tools_info, 
           content_info
         ]
 
         make_prodinfo info.flatten.compact, package_temp_directory
+        make_properties package.product.params, package_temp_directory
         make_package package_temp_directory, package_path
       ensure
         Dir.rm_r package_temp_directory
@@ -263,6 +269,15 @@ module Distribution
       descriptor
     end
 
+    def properties_descriptor
+      descriptor = Descriptor.new FileInfo.new("properties", Defaults.mode.file)
+      descriptor.action = "install"
+      descriptor.add_destination_component "meta-inf"
+      descriptor.target_directory = ".meta-inf/packages/#{package.name}"
+
+      descriptor
+    end
+
     def make_prodinfo(info, directory)
       prodinfo_path = File.join directory, "meta-inf", "prodinfo"
       File.makedirs File.dirname(prodinfo_path)
@@ -270,6 +285,15 @@ module Distribution
       File.open(prodinfo_path, "w") do |_io|
 	_io.puts *info.compact
       end
+    end
+
+    def make_properties(params, directory)
+      path = File.join directory, 'meta-inf', 'properties'
+      FileUtils.makedirs File.dirname(path)
+
+      properties = Installation::Properties.new
+      properties.installation_parameters.update params
+      properties.save(path)
     end
 
     def copy_files_and_collect_info(directory)

@@ -80,19 +80,28 @@ module Installation
       end
     end
 
-    attr_reader :target
+    attr_reader :target, :saved_target
 
-    def initialize(target)
+    def initialize(target, saved_target)
       @target = target
+      @saved_target = saved_target
+    end
+
+    def stream_or_nothing(*items, &block)
+      items.each do |_item|
+        return File.open(_item, 'r', &block) if File.exists?(_item) && File.lstat(_item).file?
+      end
+
+      block.call StringIO.new
     end
 
     def process_create
-      source = File.exist?(target) ? target : '/dev/null'
-      result = File.open(source, 'r') do |_io|
-	create _io
+      result = stream_or_nothing(target, saved_target) do |_input|
+        create _input
       end
 
-      File.rm_f target
+      FileUtils.remove_entry target rescue true
+
       File.open(target, 'w') do |_io|
 	_io.puts result
       end
@@ -110,6 +119,7 @@ module Installation
 
     protected
     #########
+
     def readlines_after_end_marker(file)
       skip_lines_before_end_marker IO.readlines(file)
     end
@@ -139,28 +149,30 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
         skip_lines_before_end_marker @array
       end
     end
+
     class GeneratorTest < Test::Unit::TestCase
       def test_header_and_data
 	@generator.array = [ "aaa", "bbb", "__END__", "ddd" ]
 	assert_equal [ "ddd" ], @generator.skip
       end
+
       def test_no_header
 	@generator.array = [ "  __END__	\r\n", "ddd" ]
 	assert_equal [ "ddd" ], @generator.skip
       end
+
       def test_no_data
 	@generator.array = [ "aaa", "bbb", "ddd" ]
 	assert_equal [], @generator.skip
       end
+
       def test_empty_data
 	@generator.array = [ "aaa", "bbb", "ddd", "__END__"]
 	assert_equal [], @generator.skip
       end
+
       def setup
-	@generator = MockGenerator.new nil
-      end
-      def teardown
-	@generator = nil
+	@generator = MockGenerator.new nil, nil
       end
     end
   end

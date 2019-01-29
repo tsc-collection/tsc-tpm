@@ -141,62 +141,15 @@ end
 
 if $0 == __FILE__ or defined? Test::Unit::TestCase
   require 'test/unit'
+  require 'mocha'
+  require 'stubba'
 
   module Distribution
     class DistributorTest < Test::Unit::TestCase
-      def test_descriptors
-        package = "abcdef"
-        class << package
-          def name
-            self
-          end
-        end
-        distributor = Distributor.new File.join(File.dirname(__FILE__), 'prodinfo')
-
-        distributor.product_library_prefix = "tsc"
-        distributor.product_library_major = 17
-        
-        distributor.product_build = 17
-        distributor.product_source_path = "src"
-        distributor.product_binary_path = "bin"
-
-        assert_equal 11, distributor.filesets[0].descriptors(package).size
-        assert_equal 5, distributor.filesets[1].descriptors(package).size
-        assert_equal 8, distributor.filesets[2].descriptors(package).size
-
-        ffc = distributor.filesets[0].descriptors(package)[1]
-
-        assert ffc.source?(%r{#{Regexp.quote "bin/lib/ffc/libtscffc.so.*.17"}$})
-        assert ffc.action?("install")
-        assert true, ffc.checksum_source?(%r{bin/lib/ffc/libtscffc\.so\.reloc\.o$})
-        assert true, ffc.target?('lib/libtscffc.so.*.17')
-        assert true, ffc.destination?(%r{^contents/location-\d+/libtscffc\.so\.\*\.17$})
-
-        rltconfig = distributor.filesets[0].descriptors(package)[6]
-
-        assert rltconfig.source?(%r{src/conf/rltconfig$})
-        assert rltconfig.action?('install')
-        assert rltconfig.checksum_source?(nil)
-        assert rltconfig.target?('/etc/init.d/reliatel')
-        assert rltconfig.destination?(%r{^contents/location-\d+/rltconfig$})
-
-        reliatel = distributor.filesets[0].descriptors(package)[7]
-        assert reliatel.action?('symlink')
-        assert reliatel.source?('/etc/init.d/reliatel')
-        assert reliatel.target?('/etc/rc2.d/S94reliatel')
-        assert reliatel.destination?(nil)
-
-        task = distributor.filesets[1].descriptors(package)[4]
-        assert task.action?('install')
-        assert task.source?(%r{bin/conf/make-config\.rb$})
-        assert task.destination?('meta-inf/installation/tasks/make-config.rb')
-        assert task.target?('.meta-inf/packages/abcdef/installation/tasks/make-config.rb')
-
-        reliatel = distributor.filesets[0].descriptors(package)[10]
-        assert reliatel.action?('directory')
-        assert reliatel.source?(%r{log$})
-        assert reliatel.target?('log')
-        assert reliatel.destination?(nil)
+      def test_nothing
+      end
+      
+      def setup
       end
     end
   end

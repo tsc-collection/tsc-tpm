@@ -70,16 +70,10 @@ if $0 == __FILE__ or defined?(Test::Unit::TestCase)
   module Installation
     class LoggerTest < Test::Unit::TestCase
 
-      def NO_test_path
-        logger = Logger.new 'INSTALL', 'bbb', 'ccc'
-
-        assert_equal '', logger.path
+      def test_nothing
       end
 
       def setup
-      end
-      
-      def teardown
       end
     end
   end

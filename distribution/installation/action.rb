@@ -58,6 +58,8 @@ require 'etc'
 
 require 'fileutils'
 
+require 'installation/task.rb'
+
 module Installation
   class Action < TSC::Dataset
     attr_writer :undoable
@@ -75,7 +77,7 @@ module Installation
     end
 
     def initialize(*args)
-      super :base => nil, *args
+      super :base => nil, :remove => true, *args
 
       @undo_action = nil
       @undoable = true
@@ -84,19 +86,19 @@ module Installation
 
     def create(progress = nil, logger = nil)
       return unless top
-
-      if File.exists?(target)
-        return if keep
-        ensure_target_type
-      end
+      return if keep && File.exists?(target) && compatible_target_types.include?(File.ftype(target))
 
       if @undoable
-        if File.exists?(target)
-          preserve_target
-          @undo_action = undo_for_existing
-        else
-          @undo_action = undo_for_non_existing
+        @undo_action = begin
+          if File.exists?(target)
+            preserve_target
+            undo_for_existing
+          else
+            undo_for_non_existing
+          end
         end
+
+        @undo_action.undoable = false if @undo_action
       end
 
       logger.log name, target if logger
@@ -109,18 +111,16 @@ module Installation
       return unless top
       return unless @undo_action
 
-      @undo_action.undoable = false
-      @undo_action.create
+      @undo_action.create(progress, logger)
+
       @undo_action.set_user_and_group if @file_ownership_changed
       @undo_action.set_permissions
       @undo_action = nil
-
-      logger.log :restore, target if logger
-      progress.print if progress
     end
 
     def remove(progress = nil, logger = nil)
-      remove_target
+      return unless get_dataset_item(:remove)
+      remove_target(progress, logger)
 
       logger.log :remove, target if logger
       progress.print if progress
@@ -144,14 +144,11 @@ module Installation
       @file_ownership_changed = true
     end
 
-    protected
-    #########
-
     def target_stat
       File.stat(target)
     end
 
-    def remove_target
+    def remove_target(progress, logger)
       TSC::Error.ignore Errno::ENOENT do
         File.unlink target 
       end
@@ -165,20 +162,24 @@ module Installation
       raise TSC::NotImplementedError, 'make_target'
     end
 
-    def target_type
-      raise TSC::NotImplementedError, 'target_type'
+    def compatible_target_types
+      []
     end
 
     def undo_for_existing
-      raise TSC::NotImplementedError, 'undo_for_existing'
+      RestoreAction.new self, :target => target, :source => saved_target
     end
 
     def undo_for_non_existing
-      raise TSC::NotImplementedError, 'undo_for_non_existing'
+      RemoveAction.new self, :target => target
     end
 
     def preserve_target
-      raise TSC::NotImplementedError, 'preserve_target'
+      return unless File.exists?(target)
+      return if File.exists?(saved_target)
+
+      FileUtils.makedirs File.dirname(saved_target)
+      FileUtils.move target, saved_target
     end
 
     def change_file_mode(*args)
@@ -189,17 +190,12 @@ module Installation
       File.chown *args
     end
 
+    def saved_target
+      @saved_target ||= File.join(Task.installation_preserve_top, target).squeeze(File::SEPARATOR)
+    end
+
     private
     #######
-    def ensure_target_type
-      expected_types = Array(target_type)
-      actual_type = File.ftype target
-
-      unless expected_types.detect { |_type| _type.to_s == actual_type }
-        FileUtils.rm_rf target
-        # raise "#{target} is #{actual_type}, expected #{expected_types.join(', or ')}"
-      end
-    end
 
     def user_entry
       @user_entry ||= figure_user_entry(user)
@@ -230,6 +226,31 @@ module Installation
     def check_numeric(name)
       result = name.to_s.scanf "%d%s"
       result.first if result.size == 1
+    end
+  end
+end
+
+if $0 == __FILE__ or defined?(Test::Unit::TestCase)
+  require 'test/unit'
+  require 'mocha'
+  require 'stubba'
+  
+  module Installation
+    module Tasks
+      class ActionTaskTest < Test::Unit::TestCase
+        attr_reader :action
+
+        def test_saved_target
+          action = Action.new :target => 'aaa/bbb/zzz.c'
+          Task.properties.expects(:installation_top).at_least_once.returns "/T/u"
+          action.expects(:fileset).with.returns "abc"
+
+          assert_equal '/T/u/.meta-inf/preserve/T/u/aaa/bbb/zzz.c', action.saved_target
+        end
+        
+        def setup
+        end
+      end
     end
   end
 end

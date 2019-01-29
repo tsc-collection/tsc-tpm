@@ -50,6 +50,7 @@
 =end
 
 require 'tsc/progress.rb'
+require 'tsc/dataset.rb'
 require 'tsc/cli/communicator.rb'
 
 module Installation
@@ -182,7 +183,7 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
 
   module Installation
     class CommunicatorTest < Test::Unit::TestCase
-      attr_reader :communicator, :controller
+      attr_reader :communicator, :controller, :logger
 
       def test_no_default_stripped
         communicator.communicator.expects(:ask).yields(controller).with('What? ').returns('   ooo    ')
@@ -191,17 +192,24 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
       end
 
       def test_report
-        communicator.communicator.expects(:say).with('### aaa bbb ccc')
+        communicator.communicator.expects(:say).with("### aaa\n")
+        communicator.communicator.expects(:say).with("    bbb\n")
+        communicator.communicator.expects(:say).with("    ccc\n")
         communicator.report 'aaa', 'bbb', 'ccc'
       end
 
       def test_error
-        communicator.communicator.expects(:say).with('ERROR: aaa bbb ccc')
+        communicator.communicator.expects(:say).with("ERROR: aaa\n")
+        communicator.communicator.expects(:say).with("       bbb\n")
+        communicator.communicator.expects(:say).with("       ccc\n")
+
         communicator.error 'aaa', 'bbb', 'ccc'
       end
 
       def test_warning
-        communicator.communicator.expects(:say).with('WARNING: aaa bbb ccc')
+        communicator.communicator.expects(:say).with("WARNING: aaa\n")
+        communicator.communicator.expects(:say).with("         bbb\n")
+        communicator.communicator.expects(:say).with("         ccc\n")
         communicator.warning 'aaa', 'bbb', 'ccc'
       end
 
@@ -248,13 +256,11 @@ if $0 == __FILE__ or defined? Test::Unit::TestCase
       end
 
       def setup
-        @communicator = Communicator.new
-        @controller = Struct.new(:default).new
-      end
+        @controller = TSC::Dataset[ :default => nil ]
+        @logger = mock('logger')
+        @communicator = Communicator.new logger
 
-      def teardown
-        @communicator = nil
-        @controller = nil
+        logger.stubs(:log)
       end
     end
   end
